@@ -1,0 +1,40 @@
+{
+  "name": "task-management-system",
+  "version": "1.0.0",
+  "description": "task-management-system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GitXiaoLei/task-management-system.git"
+  },
+  "keywords": [
+    "mysql",
+    "nodejs",
+    "express",
+    "vue",
+    "webpack",
+    "system"
+  ],
+  "author": "GitXiaoLei",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GitXiaoLei/task-management-system/issues"
+  },
+  "homepage": "https://github.com/GitXiaoLei/task-management-system#readme",
+  "dependencies": {
+    "async": "^2.5.0",
+    "body-parser": "^1.18.1",
+    "content-type": "^1.0.4",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.15.4",
+    "express-session": "^1.15.5",
+    "hbs": "^4.0.1",
+    "helmet": "^3.8.1",
+    "mysql": "^2.14.1",
+    "raw-body": "^2.3.2",
+    "response-time": "^2.3.2"
+  }
+}
