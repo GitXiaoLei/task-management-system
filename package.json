@@ -36,5 +36,8 @@
     "mysql": "^2.14.1",
     "raw-body": "^2.3.2",
     "response-time": "^2.3.2"
+  },
+  "devDependencies": {
+    "hbs": "^4.0.1"
   }
 }
