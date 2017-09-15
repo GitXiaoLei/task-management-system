@@ -9,11 +9,7 @@ const route = (app) => {
         
         res.render('admin/m_department.html');
 
-        // Department
-        //     .getAll()
-        //     .then((rows) => {
-        //         res.json((rows));
-        //     });
+        
     });
 };
 
