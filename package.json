@@ -25,19 +25,21 @@
   },
   "homepage": "https://github.com/GitXiaoLei/task-management-system#readme",
   "dependencies": {
+    "art-template": "^4.12.1",
     "async": "^2.5.0",
     "body-parser": "^1.18.1",
     "content-type": "^1.0.4",
     "cookie-parser": "^1.4.3",
+    "ejs": "^2.5.7",
     "express": "^4.15.4",
+    "express-art-template": "^1.0.0",
     "express-session": "^1.15.5",
-    "hbs": "^4.0.1",
     "helmet": "^3.8.1",
     "mysql": "^2.14.1",
     "raw-body": "^2.3.2",
     "response-time": "^2.3.2"
   },
   "devDependencies": {
-    "hbs": "^4.0.1"
+
   }
 }

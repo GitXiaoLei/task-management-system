@@ -4,7 +4,10 @@ const WebpackNotifier = require('webpack-notifier');
 
 const config = {
     entry: {
-        m_department: './entry/m_department',
+        department: './entry/department',
+        subject: './entry/subject',
+        teacher: './entry/teacher',
+        student: './entry/student',
     },
     output: {
         path: path.resolve(__dirname, './build'),

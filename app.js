@@ -2,29 +2,33 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const hbs = require('hbs');
+const ejs = require('ejs');
 
 const app = express();
 // 监听端口
 const port = 3000;
 
 // 中间件
-// app.use(restime());
 app.use(bodyParser.raw({
     type: 'text/xml'
 }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use('/static', express.static('public'));
-app.set('view engine', 'html');
-app.engine('html', hbs.__express);
+app.set('view engine', 'hbs');
+app.engine('art', require('express-art-template'));
 app.set('views', 'public/views');
 
+app.use('/static', express.static('public'));
+
+
 /**
- * api路由
+ * 路由
  */
 require('./routes/admin/department')(app);
+require('./routes/admin/subject')(app);
+require('./routes/admin/teacher')(app);
+require('./routes/admin/student')(app);
 
 app.listen(port, (err) => {
     if(err) {

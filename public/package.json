@@ -25,6 +25,7 @@
     "jquery": "^3.2.1",
     "minireset.css": "0.0.3",
     "postcss-loader": "^2.0.6",
+    "qs": "^6.5.1",
     "vue": "^2.4.4"
   }
 }
