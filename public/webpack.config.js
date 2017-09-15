@@ -21,7 +21,7 @@ const config = {
             },
             {
                 test: /\.css/,
-                loader: 'style-loader!css-loader'
+                use: ['style-loader', 'css-loader', 'postcss-loader']
             },
             {
                 test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -35,7 +35,7 @@ const config = {
     },
     plugins: [
         new WebpackNotifier({ alwaysNotify: true }),
-        new webpack.ProgressPlugin({
+        new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery'
         })

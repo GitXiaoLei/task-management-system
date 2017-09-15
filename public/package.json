@@ -19,8 +19,12 @@
     "webpack-notifier": "^1.5.0"
   },
   "dependencies": {
+    "autoprefixer": "^7.1.4",
     "axios": "^0.16.2",
     "element-ui": "^1.4.4",
+    "jquery": "^3.2.1",
+    "minireset.css": "0.0.3",
+    "postcss-loader": "^2.0.6",
     "vue": "^2.4.4"
   }
 }
