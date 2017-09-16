@@ -68,7 +68,7 @@ class DB {
             try{
                 that.conn.query(options, (err, rows, fields) => {
                     if(err) {
-                        DB.catchError(err);
+                        // DB.catchError(err);
                         // 抛出原始错误
                         reject(err);
                     }else {
@@ -91,8 +91,12 @@ class DB {
         let condition = null;
 
         for(let field in conditions) {
-
+            console.log('----------------')
+            console.log(conditions)
+            console.log(typeof conditions)
+            
             if (conditions.hasOwnProperty(field)) {
+            
                 if (!where) where = ' WHERE ';
                 else where += ' AND ';
 
@@ -242,11 +246,14 @@ class DB {
             let sortby = DB.buildOrderby(sorts);
 
             sql = sql + where + sortby + ' LIMIT ' + limit;
-            that.query(sql).then((rows) => {
-                resolve(rows);
-            }).catch((err) => {
-                reject(err);
-            });
+            that
+                .query(sql)
+                .then((rows) => {
+                    resolve(rows);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
         });
     }
     /**
@@ -272,7 +279,43 @@ class DB {
                 });
         });
     }
-    
+    /**
+     * 删除某个条件下的一条记录
+     * 
+     * @param {String} tbname 表名
+     * @param {Object} conditions 条件，例：{name: 'Tom', age: 19}，根据这个条件删除
+     * @return null
+     */
+    delete(tbname, conditions) {
+        const that = this;
+        return new Promise((resolve, reject) => {
+            let sql = 'DELETE FROM `' + tbname + '`';
+            let where = DB.buildDelConditions(conditions);
+            
+            sql = sql + where;
+
+            console.log(sql);
+            that
+                .query(sql)
+                .then((result) => {
+                    resolve(result);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+    /**
+     * 
+     * @param {Object} conditions 删除条件，如{ id: 2 }
+     */
+    static buildDelConditions(conditions) {
+        let where = ' WHERE ';
+        for(let key in conditions) {
+            where = where + key + '=' + conditions[key];
+        }
+        return where;
+    }
     static escape(sql) {
         return mysql.escape(sql);
     }

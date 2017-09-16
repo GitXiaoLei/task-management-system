@@ -25,10 +25,12 @@ const Department = {
                 .catch((err) => {
                     reject(err);
                 });
-        });
+        }); 
     },
     /**
      * 添加院系
+     * @param {Object} data 院系信息
+     * @return Promise
      */
     addOne(data) {
         return new Promise((resolve, reject) => {
@@ -41,6 +43,20 @@ const Department = {
                 .catch((err) => {
                     reject(err);
                 });     
+        });
+    },
+
+    delOne(conditions) {
+        return new Promise((resolve, reject) => {
+            DB
+                .instance('w')
+                .delete(_dbtable, conditions)
+                .then((result) => {
+                    resolve(result);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
         });
     }
 };

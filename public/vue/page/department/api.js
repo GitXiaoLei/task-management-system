@@ -7,7 +7,10 @@ const api = {
     },
     addDepartment(params) {
         return axios.post('/admin/department/add', qs.stringify(params));
-    } 
+    },
+    delDepartment(params) {
+        return axios.post('/admin/department/del', qs.stringify(params));
+    }
 };
 
 export default api;

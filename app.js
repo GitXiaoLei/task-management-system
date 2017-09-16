@@ -3,6 +3,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
+const Output = require('./middlewares/output');
 
 const app = express();
 // 监听端口
@@ -20,7 +21,8 @@ app.engine('art', require('express-art-template'));
 app.set('views', 'public/views');
 
 app.use('/static', express.static('public'));
-
+// response输出响应封装
+app.use(Output.init);
 
 /**
  * 路由
