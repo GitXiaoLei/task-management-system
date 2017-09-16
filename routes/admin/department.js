@@ -26,6 +26,21 @@ const route = (app) => {
             });
 
     });
+    /**
+     * 添加院系
+     */
+    app.post('/admin/department/add', (req, res) => {
+        console.log(req.body);
+        Department
+            .addOne(req.body)
+            .then((result) => {
+                res.send(result);
+            })
+            .catch((err) => {
+                res.send(err);
+            });
+
+    });
 };
 
 module.exports = route;

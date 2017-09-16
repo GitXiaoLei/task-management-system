@@ -26,6 +26,22 @@ const Department = {
                     reject(err);
                 });
         });
+    },
+    /**
+     * 添加院系
+     */
+    addOne(data) {
+        return new Promise((resolve, reject) => {
+            DB 
+                .instance('w')
+                .insert(_dbtable, data)
+                .then((result) => {
+                    resolve(result);
+                })
+                .catch((err) => {
+                    reject(err);
+                });     
+        });
     }
 };
 

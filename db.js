@@ -46,7 +46,6 @@ class DB {
         console.log(typeof _instances[shard], '4~')
         return _instances[shard];
     }
-
     /**
      * 查询语句
      * 
@@ -81,7 +80,6 @@ class DB {
             }
         });
     }
-
     /**
      * 组建sql的where语句
      * 
@@ -198,7 +196,6 @@ class DB {
         }
         return where;
     }
-
     /**
      * 组建sql的sortby语句
      * 
@@ -224,9 +221,6 @@ class DB {
         }
         return sortby;
     }
-
-
-    
     /**
      * 根据条件，查询出固定数量的结果
      * 
@@ -255,7 +249,30 @@ class DB {
             });
         });
     }
-
+    /**
+     * 插入一条数据
+     * 
+     * @param {String} tbname 表名
+     * @param {Object} data 插入的数据，如：{ name: 'Tom', age: 19 }
+     * @return Promese result 插入的结果，成功则有insertId属性
+     */
+    insert(tbname, data) {
+        const that = this;
+        console.log('DB.insert~~~')
+        console.log(tbname, data);
+        return new Promise((resolve, reject) => {
+            const sql = 'INSERT INTO `' + tbname + '` SET ? ';
+            that
+                .query(sql, data)
+                .then((result) => {
+                    resolve(result);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+    
     static escape(sql) {
         return mysql.escape(sql);
     }
