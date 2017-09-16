@@ -1,3 +1,24 @@
+<template>
+    <div id="main">
+		<t-header class="header-wrap"></t-header>
+		<t-nav class="nav-wrap" :index="'1'"></t-nav>
+		<div class="content">
+            <slot name="content"></slot>
+		</div>
+	</div>
+</template>
+
+<script>
+import tNav from './t_nav';
+import tHeader from './t_header';
+
+export default {
+    name: 'tMain',
+    components: { tNav, tHeader }
+}
+</script>
+
+<style scoped>
 #main, body, html {
     width: 100%;
     height: 100%;
@@ -36,3 +57,5 @@
 .el-menu-item.is-active{
 	transform: translateX(6px);
 }
+</style>
+

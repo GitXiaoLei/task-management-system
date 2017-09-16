@@ -15,7 +15,7 @@ app.use(bodyParser.raw({
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.set('view engine', 'hbs');
+app.set('view engine', 'art');
 app.engine('art', require('express-art-template'));
 app.set('views', 'public/views');
 

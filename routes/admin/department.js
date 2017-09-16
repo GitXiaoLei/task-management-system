@@ -11,6 +11,21 @@ const route = (app) => {
         let obj = { type: 1 };
         res.render('admin/department.art', obj);
     });
+    /**
+     * 获取所有院系
+     */
+    app.get('/admin/department/list', (req, res) => {
+
+        Department
+            .getAll()
+            .then((departments) => {
+                res.json(departments);
+            })
+            .catch((err) => {
+                res.send(err);
+            });
+
+    });
 };
 
 module.exports = route;
