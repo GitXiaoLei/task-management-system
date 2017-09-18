@@ -55,6 +55,7 @@ class DB {
      */
     query(sql, values) {
         const that = this;
+        console.log(sql);
         return this.queryWithOptions({
             sql: sql,
             values: values
@@ -91,9 +92,6 @@ class DB {
         let condition = null;
 
         for(let field in conditions) {
-            console.log('----------------')
-            console.log(conditions)
-            console.log(typeof conditions)
             
             if (conditions.hasOwnProperty(field)) {
             
@@ -226,7 +224,7 @@ class DB {
         return sortby;
     }
     /**
-     * 根据条件，查询出固定数量的结果
+     * 根据条件，查询出固定数量的结果(默认100条记录)
      * 
      * @param {String} tbname 表名
      * @param {Object} conditions 例：{name: 'Tom', age: 19}，根据这个条件查询
@@ -257,6 +255,73 @@ class DB {
         });
     }
     /**
+     * 根据条件，排序选出某一页的数据
+     */
+    /**
+     * 根据条件，排序选出某一页的数据
+     * 
+     * @param  string tbname     [表名]
+     * @param  object conditions [例子: {name: 'Tom', age: 19}, 满足条件的查出]
+     * @param  object sorts      [例子: {created: 1} 代表按照created字段逆序排列]
+     * @param   [description]
+     * @param  object limit      [例子: {offset: 10, count: 10} 表示从记录数 10 开始，取出10条记录]
+     * @return Promise array<object>
+     */
+    selectOnePage (tbname, conditions, sorts, page, limit) {
+        const that = this;
+        return new Promise((resolve, reject) => {
+
+            page = isNaN(page)   ? 1   : page;
+            limit = isNaN(limit) ? 100 : limit;
+
+            let offset = (page - 1)*limit;
+
+            let sql     = 'SELECT * FROM `' + tbname + '`';
+            let where   = DB.buildConditions(conditions);
+            if (typeof where !== 'string' && where.message) {
+                reject(where);
+            }
+
+            let sortby  = DB.buildOrderby(sorts);
+            sql         = sql + where + sortby + ' LIMIT ' + limit + ' OFFSET '  + offset;
+
+            that.query(sql).then((rows) => {
+                resolve(rows);
+            }).catch((err) => {
+                reject(new DBError(5002, '数据查询错误: ' + err.message, err));
+            });
+        });
+    }
+
+    /**
+     * 查询表中的记录数
+     * @param  String  tbname     表名
+     * @param  Object  conditions [例子: {name: 'Tom', age: 19}, 满足条件的查出]
+     * @return Promise Number     记录的数量
+     */
+    selectCount (tbname, conditions) {
+        const that = this;
+        return new Promise((resolve, reject) => {
+
+            let sql = 'SELECT COUNT(*) AS count' + ' FROM `' + tbname + '`';
+            let where   = DB.buildConditions(conditions);
+            if (typeof where !== 'string' && where.message) {
+                reject(where);
+            }
+
+            sql = sql + where;
+
+            that.query(sql)
+                .then((count) => {
+                    resolve(count[0].count);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+
+    /**
      * 插入一条数据
      * 
      * @param {String} tbname 表名
@@ -265,8 +330,6 @@ class DB {
      */
     insert(tbname, data) {
         const that = this;
-        console.log('DB.insert~~~')
-        console.log(tbname, data);
         return new Promise((resolve, reject) => {
             const sql = 'INSERT INTO `' + tbname + '` SET ? ';
             that
@@ -306,7 +369,42 @@ class DB {
         });
     }
     /**
+     * 更新记录
      * 
+     * @param {String} tbname 表名
+     * @param {Object} conditions 条件，例：{ id: 1 }，根据这个条件更新某条记录
+     */
+    update(tbname, data, conditions) {
+        const that = this;
+        return new Promise((resolve, reject) => {
+            let sql = 'UPDATE `' + tbname + '` SET ? ';
+            console.log('$!@#@!#!@$$!')
+            let updateRecord = DB.buildUpdateRecord(conditions);
+            sql += updateRecord;
+            
+            that
+                .query(sql, data)
+                .then((result) => {
+                    resolve(result)
+                })
+                .catch((err) => {
+                    reject(err);
+                });
+        });
+    }
+    /**
+     * 组建更新条件
+     * @param {Object} conditions 
+     */
+    static buildUpdateRecord(conditions) {
+        let where = ' WHERE ';
+        for(let key in conditions) {
+            where = where + key + '=' + conditions[key];
+        }
+        return where;
+    }
+    /**
+     * 组建删除的条件
      * @param {Object} conditions 删除条件，如{ id: 2 }
      */
     static buildDelConditions(conditions) {

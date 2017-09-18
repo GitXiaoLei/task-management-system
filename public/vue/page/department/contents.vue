@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import api from './api';
+import { getDepartments, addDepartment, delDepartment } from '../api';
 
 export default {
 	name: 'contents',
@@ -67,8 +67,7 @@ export default {
     methods: {
 		// 获取所有的院系
 		getDms() {
-			api
-				.getDepartments()
+			getDepartments()
 				.then((data) => {
 					data = data.data;
 					if(data.code) {
@@ -84,8 +83,7 @@ export default {
 		},
 		// 添加院系
 		addDm() {
-			api
-				.addDepartment(this.dm)
+			addDepartment(this.dm)
 				.then((data) => {
 					data = data.data;
 					this.successMsg(data.message);
@@ -103,8 +101,7 @@ export default {
 		},
 		// 删除院系
 		delDm() {
-			api
-				.delDepartment(this.willDelData)
+			delDepartment(this.willDelData)
 				.then((data) => {
 					data = data.data;
 					this.successMsg(data.message);

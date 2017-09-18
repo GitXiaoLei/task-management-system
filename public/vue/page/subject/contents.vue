@@ -4,7 +4,7 @@
         <h2>添加科目</h2>
 		<el-form :inline="true">
 			<el-form-item label="科目名称">
-				<el-input v-model="sj.name" placeholder="请输入院系名"></el-input>
+				<el-input v-model="sj.name" placeholder="请输入科目名称"></el-input>
 			</el-form-item>
 			<el-button @click="addSj">添加</el-button>
 		</el-form>
@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import api from './api';
+import { getSubjects, addSubject, delSubject } from '../api';
 
 export default {
     name: 'contents',
@@ -65,8 +65,7 @@ export default {
     methods: {
         // 获取所有的科目
 		getSjs() {
-			api
-				.getSubjects()
+			getSubjects()
 				.then((data) => {
 					data = data.data;
 					if(data.code) {
@@ -82,8 +81,7 @@ export default {
         },
         // 添加科目
         addSj() {
-            api
-                .addSubject(this.sj)
+            addSubject(this.sj)
                 .then((data) => {
                     data = data.data;
 					this.successMsg(data.message);
@@ -101,8 +99,7 @@ export default {
         },
         // 删除科目
 		delSj() {
-			api
-				.delSubject(this.willDelData)
+			delSubject(this.willDelData)
 				.then((data) => {
 					data = data.data;
 					this.successMsg(data.message);
