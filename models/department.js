@@ -45,7 +45,11 @@ const Department = {
                 });     
         });
     },
-
+    /**
+     * 删除一个院系
+     * 
+     * @param {Object} conditions 
+     */
     delOne(conditions) {
         return new Promise((resolve, reject) => {
             DB

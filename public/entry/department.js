@@ -5,6 +5,7 @@ import 'minireset.css';
 import '../common/style/iconfont.css';
 import App from '../vue/page/department/department.vue';
 
+
 Vue.use(ElementUI);
 const vm = new Vue({
     el: '#app',

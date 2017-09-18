@@ -1,8 +1,8 @@
 <template>
     <div id="main">
 		<t-header class="header-wrap"></t-header>
-		<t-nav class="nav-wrap" :index="'1'"></t-nav>
-		<div class="content">
+		<t-nav class="nav-wrap" :index="index"></t-nav>
+		<div class="content" scrollbar>
             <slot name="content"></slot>
 		</div>
 	</div>
@@ -14,7 +14,10 @@ import tHeader from './t_header';
 
 export default {
     name: 'tMain',
-    components: { tNav, tHeader }
+	components: { tNav, tHeader },
+	props: {
+		index: String
+	}
 }
 </script>
 

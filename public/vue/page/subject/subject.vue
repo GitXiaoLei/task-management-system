@@ -1,26 +1,15 @@
 <template>
-	<div id="main">
-		<t-header class="header-wrap"></t-header>
-		<t-nav class="nav-wrap" :index="'2'"></t-nav>
-		<div class="content">
-			
-			
-		</div>
-	</div>
+	<t-main :index="'2'">
+		<contents slot="content"></contents>
+	</t-main>
 </template>
 
 <script>
-import tNav from '../../component/t_nav';
-import tHeader from '../../component/t_header';
+import tMain from '../../component/t_main';
+import contents from './contents';
 
 export default {
-	components: { tNav, tHeader },
-	methods: {
-		
-	},
-	created() {
-		// this.getDepartments();
-	}
+	components: { tMain, contents },
 }
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-	<t-main>
+	<t-main :index="'1'">
 		<contents slot="content"></contents>
 	</t-main>
 </template>
