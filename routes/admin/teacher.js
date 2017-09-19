@@ -64,6 +64,8 @@ const route = (app) => {
      * 添加老师账号
      */
     app.post('/admin/teacher/add', (req, res) => {
+        console.log('+++++++++++++++++++=')
+        console.log(req.body);
         req.body.created = Moment().unix();
         Teacher
             .addOne(req.body)

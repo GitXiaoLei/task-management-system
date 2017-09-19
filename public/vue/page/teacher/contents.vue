@@ -1,6 +1,7 @@
 <template>
     <div>
-        <h2>所有老师</h2>
+		<el-button @click="showAddDialog">添加老师</el-button>
+		<!-- 所有老师表格 -->
 		<el-table
 			:data="tcsData"
 			border
@@ -43,13 +44,16 @@
 			</el-table-column>
 		</el-table>
 		<!-- 修改账号信息的dialog -->
-		<el-dialog title="正在修改" :visible.sync="dialogEditVisible" :inline="true">
+		<el-dialog :title="dialogTitle" :visible.sync="dialogEditVisible" :inline="true">
 			<el-form :model="updateForm">
 				<el-form-item label="真实姓名">
 					<el-input v-model="updateForm.real_name"></el-input>
 				</el-form-item>
 				<el-form-item label="用户名">
 					<el-input v-model="updateForm.username"></el-input>
+				</el-form-item>
+				<el-form-item label="密码">
+					<el-input v-model="updateForm.password"></el-input>
 				</el-form-item>
 				<el-form-item label="性别">
 					<el-select v-model="updateForm.sex" placeholder="请选择性别">
@@ -93,7 +97,7 @@
 </template>
 
 <script>
-import { getTeachers, delTeacher, getDepartments, updateTeacher } from '../api';
+import { getTeachers, delTeacher, getDepartments, updateTeacher, addTeacher } from '../api';
 
 export default {
     data() {
@@ -103,6 +107,7 @@ export default {
 			dialogDelVisible: false, // 删除提示框的显示与隐藏
 			dialogEditVisible: false, // 修改框的显示与隐藏
 			willDelIndex: -1, // 将要删除数据的索引
+			willEditIndex: -1, // 将要编辑数据的索引
 			willDelData: {}, // 将要删除的数据
 			totalPages: 0, // 总页数
 			curPage: 1,// 总页数
@@ -113,10 +118,12 @@ export default {
 				username: '',
 				sex: '不设置',
 				department: '',
+				password: '',
 			},
 			departments: [], // 所有院系
 			willEditData: {}, // 将要编辑的数据
 			isGetDm: false, // 是否请求了department数据：保证其值为true时，不重复请求
+			dialogTitle: '正在修改', // dialog标题
         };
     },
     methods: {
@@ -136,7 +143,7 @@ export default {
                     }
                 })
                 .catch((err) => {
-                    console.error(err);
+                    this.errorMsg(err.message);
                 });
 
 		},
@@ -152,7 +159,7 @@ export default {
 					this.tcsData.splice(this.willDelIndex, 1);
 				})
 				.catch((err) => {
-					console.error(err);
+					this.errorMsg(err.message);
 				});
 		},
 		// 修改老师账号信息
@@ -164,19 +171,46 @@ export default {
 			}else if(this.updateForm.sex === '女') {
 				this.updateForm.sex = 2;
 			}
-			updateTeacher(this.updateForm)
-				.then((data) => {
-					data = data.data;
-					if(data.code === 1) {
-						this.successMsg(data.message);
-						this.dialogEditVisible = false;
-					}else {
-						this.errorMsg(data.message);
-					}
-				})
-				.catch((err) => {
-					this.errorMsg(err.message);
-				});
+
+			// 更新老师
+			if(this.dialogTitle === '正在修改') {
+				updateTeacher(this.updateForm)
+					.then((data) => {
+						data = data.data;
+						if(data.code === 1) {
+							this.successMsg(data.message);
+							this.dialogEditVisible = false;
+							// 修改本地的数据
+							Object.keys(this.updateForm).forEach((item) => {
+								this.tcsData[this.willEditIndex][item] = this.updateForm[item];
+							});
+						}else {
+							this.errorMsg(data.message);
+						}
+					})
+					.catch((err) => {
+						this.errorMsg(err.message);
+					});
+
+			// 添加老师
+			}else if(this.dialogTitle === '正在添加') {
+				delete this.updateForm.uid;
+				console.log(this.updateForm)
+				addTeacher(this.updateForm)
+					.then((data) => {
+						data = data.data;
+						if(data.code === 1) {
+							this.successMsg(data.message);
+							this.dialogEditVisible = false;
+						}else {
+							this.errorMsg(data.message);
+						}
+					})
+					.catch((err) => {
+						this.errorMsg(err.message);
+					});
+			}
+			
 		},
 		// 显示删除院系的提示
 		showDelDialog(index, row) {
@@ -213,20 +247,30 @@ export default {
                     }
                 })
                 .catch((err) => {
-                    console.error(err);
+                    this.errorMsg(err.message);
                 });
 		},
 		// 显示编辑的Dialog
 		showEditDialog(index, row) {
 			this.willEditData = row;
+			this.willEditIndex = index;
 			this.dialogEditVisible = true;
+			
+			this.dialogTitle = '正在修改';
 
 			this.updateForm.department = this.willEditData.department;
 			this.updateForm.sex = this.willEditData.sex;
 			this.updateForm.username = this.willEditData.username;
 			this.updateForm.real_name = this.willEditData.real_name;
+			this.updateForm.password = this.willEditData.password;
+
 			this.updateForm.uid = this.willEditData.uid;
 			if(this.isGetDm) return; 
+			// 获取院系
+			this.getDms();
+		},
+		// 获取院系
+		getDms() {
 			getDepartments()
 				.then((data) => {
 					data = data.data;
@@ -239,8 +283,20 @@ export default {
 					}
 				})
 				.catch((err) => {
-					console.error(err);
+					this.errorMsg(err.message);
 				});
+		},
+		// 显示添加老师的Dialog：是编辑老师的是同一个Dialog
+		showAddDialog() {
+			this.dialogTitle = '正在添加';
+			this.dialogEditVisible = true;
+			// 将要上传的数据线清空
+			Object.keys(this.updateForm).forEach((item) => {
+				this.updateForm[item] = '';
+			});
+			if(this.isGetDm) return; 
+			// 获取院系
+			this.getDms();
 		},
 		// 成功的消息提示弹窗
 		successMsg(msg) {

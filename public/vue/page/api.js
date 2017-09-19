@@ -24,6 +24,9 @@ export const delSubject = params => axios.post('/admin/subject/del', qs.stringif
 // 获取老师账号信息
 export const getTeachers = params => axios.get('/admin/teacher/list', { params: params });
 
+// 添加老师账号信息
+export const addTeacher = params => axios.post('/admin/teacher/add', qs.stringify(params));
+
 // 删除老师账号信息
 export const delTeacher = params => axios.post('/admin/teacher/del', params);
 
