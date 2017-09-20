@@ -8,6 +8,7 @@ const config = {
         subject: './entry/subject',
         teacher: './entry/teacher',
         student: './entry/student',
+        index: './entry/index',
     },
     output: {
         path: path.resolve(__dirname, './build'),

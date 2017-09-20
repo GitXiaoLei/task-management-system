@@ -43,7 +43,7 @@ const Output = {
         });
     },
     /**
-     * 输入页面
+     * 输出页面
      * 
      * @param {String} view 页面路径
      * @param {Object} data 传入页面的数据
@@ -52,6 +52,15 @@ const Output = {
     render(view, data = {}) {
         _res.render(view, data);
     },
+    /**
+     * 重定向
+     * 
+     * @param  {string} url [重定向地址]
+     * @return null
+     */
+    redirect: (url) => {
+        _res.redirect(url);
+    }
 };
 
 module.exports = Output;
