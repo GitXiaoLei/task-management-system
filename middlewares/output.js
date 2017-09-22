@@ -13,6 +13,19 @@ const Output = {
         next();
     },
     /**
+     * 设置cookie
+     * @param {String} name 名字
+     * @param {String} val 值
+     * @param {Number} expires 毫秒数
+     */
+    cookie(name, val, expires) {
+        _res.cookie(name, val, {
+            path: '/',
+            expires: expires,
+            httpOnly: true
+        });
+    },
+    /**
      * 输出api响应：前端成功请求到数据
      * 
      * @param {Object} data 数据

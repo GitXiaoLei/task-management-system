@@ -35,15 +35,12 @@ class DB {
      * @param {String} shard 数据库类型或连接分区，如“r”表示可读，“w”表示可写，'user-3-r'代表某个分区
      */
     static instance(shard) {
-        console.log('2~');
         shard = _istest ? 'test' : shard;
         shard = shard || 'w';
-        console.log(shard, '3~');
         if(_instances[shard]) {
             return _instances[shard];
         }
         _instances[shard] = new DB(shard);
-        console.log(typeof _instances[shard], '4~')
         return _instances[shard];
     }
     /**

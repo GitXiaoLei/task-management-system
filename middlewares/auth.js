@@ -2,17 +2,36 @@
 
 const jwt = require('jsonwebtoken');
 const uuid = require('uuid');
+const serverInfo = require('../config/server');
 
+const _secret = 'task';
 let _authInfo = null;
-const _secret = 'wqtt^|AW?O+sT5*|;g|Yb^fq-9)6O1zYT?v{duk(F_Dc`}2l$I7ZaEE!u.&W5_J-';
+
 const Auth = {
     /**
      * 初始化：将“加了密”的token“解密”成对象形式的信息
      */
     init(req, res, next) {
-        // 从cookie中取得token
-        let token = req.cookies.authorization;
+        let token;
+        
+        token = req.cookies.authorization;
+        /**
+         * 如果是调试模式，允许get上传和post上传authorization
+         */
+        // if(!token && serverInfo.debug) {
+        //     switch(req.method) {
+        //         case 'GET': 
+        //             token = req.headers.authorization;
+        //             break;
+        //         case 'POST':
+        //             token = req.headers.authorization;
+        //     }
+        // }
+        console.log('-----------------\n','前端发来的token：\n' + token, '\n-----------------');
         _authInfo = Auth.verify(token);
+        console.log('解析后的token：');
+        console.log(_authInfo);
+        console.log('-----------------');
         next();
     },
     /**
@@ -20,11 +39,9 @@ const Auth = {
      * @param {Number} uid 用户id
      */
     generateToken(uid) {
-        const authid = `${uid}:${uuid()}`;
         const info = {
             uid: uid,
-            auth: authid,
-            exp: '1h'
+            expiresIn: '365d' 
         };
         const token = jwt.sign(info, _secret);
         return token;
@@ -49,7 +66,8 @@ const Auth = {
      */
     authInfo() {
         return _authInfo;
-    }
+    },
+    
 };
 
 module.exports = Auth;
