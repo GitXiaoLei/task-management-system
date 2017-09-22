@@ -3,27 +3,19 @@
 const Auth = require('../../middlewares/auth');
 const User = require('../../models/user');
 const Output = require('../../middlewares/output');
-const RBAC = require('../../helper/rbac');
+const RBAC = require('../../middlewares/rbac');
 
 const route = (app) => {
     /**
      * 首页
      */    
     app.get('/', (req, res) => {
-        const token = Auth.authInfo();
-        User
-        .getSudo(token.uid)
-        .then((accessUrlArr) => {
-            console.log(accessUrlArr);
-            const canVisit = RBAC.canVisit(accessUrlArr, req.path);
-            if(!canVisit) {
-                Output.apiErr({ code: 0, message: '你没有权限访问该资源' });
-            }
-            Output.apiData('你有权限访问');
-        })
-        .catch((err) => {
-            Output.apiErr(err);
-        });
+
+        if(!req._canVisit) {
+            Output.apiErr({ code: 0, message: '你没有权限访问该资源' });
+        }
+        Output.apiData({}, '你有权限访问该资源');
+       
     });
     /**
      * 用户登录

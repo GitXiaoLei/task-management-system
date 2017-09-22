@@ -32,6 +32,8 @@ const Auth = {
         console.log('解析后的token：');
         console.log(_authInfo);
         console.log('-----------------');
+        // 将解析后的auth挂在到req对象下
+        req._authInfo = _authInfo;
         next();
     },
     /**

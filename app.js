@@ -11,6 +11,7 @@ const helmet = require('helmet');
  */
 const Output = require('./middlewares/output');
 const Auth = require('./middlewares/auth');
+const RBAC = require('./middlewares/rbac');
 
 const app = express();
 // 监听端口
@@ -43,6 +44,7 @@ app.use('/static', express.static('public'));
 
 app.use(Output.init);
 app.use(Auth.init);
+app.use(RBAC.init);
 
 /**
  * 路由
