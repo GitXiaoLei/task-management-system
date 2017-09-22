@@ -2,6 +2,7 @@
 
 const Async = require('async');
 const DB = require('../db');
+const Util = require('../helper/util');
 
 // 表名
 const _dbtable = 'user';
@@ -40,47 +41,76 @@ const User = {
                     .instance('w')
                     .select('user_role', { user_id: uid })
                     .then((userRoleData) => {
-                        userRoleData = userRoleData[0];
-                        cb(null, userRoleData.role_id);
-                    })  
+                        let roleIdArr = [];
+                        userRoleData.forEach((userRole) => {
+                            roleIdArr.push(userRole.role_id);
+                        });
+                        cb(null, roleIdArr);
+                    })
                     .catch((err) => {
                         reject(err);
                     });
                 },
                 //根据用户的 角色id 获取用户的 权限id：表role_access
-                (role_id, cb) => {
+                (roleIdArr, cb) => {
+                    let sql = 'SELECT * FROM `' + 'role_access' + '` WHERE ';
+                    roleIdArr.forEach((roleId, i, arr) => {
+                        if(arr.length - 1 !== i) {
+                            sql += 'role_id = ' + roleId + ' OR ';
+                        }else {
+                            sql += ' role_id = ' + roleId;
+                        }
+                    });
                     DB
                     .instance('w')
-                    .select('role_access', { role_id: role_id })
+                    .query(sql)
                     .then((roleAccessData) => {
-                        roleAccessData = roleAccessData[0];
-                        cb(null, roleAccessData.access_id);
+                        let accessIdArr = [];
+                        roleAccessData.forEach((roleAccess) => {
+                            accessIdArr.push(roleAccess.access_id);
+                        });
+                        // 去除重复的access_id
+                        accessIdArr = Util.removeSome(accessIdArr);
+                        cb(null, accessIdArr);
                     })
                     .catch((err) => {
                         reject(err);
                     });
                 },
                 // 根据用户的 权限id 获取用户的 权限(也就是能够请求的地址)：表access
-                (access_id, cb) => {
+                (accessIdArr, cb) => {
+                    let sql = 'SELECT * FROM `' + 'access' + '` WHERE ';
+                    accessIdArr.forEach((accessId, i, arr) => {
+                        if(arr.length - 1 !== i) {
+                            sql += ' access_id = ' + accessId + ' OR ';
+                        }else {
+                            sql += ' access_id = ' + accessId;
+                        }
+                    });
                     DB
                     .instance('w')
-                    .select('access', { access_id: access_id })
+                    .query(sql)
                     .then((accessData) => {
-                        cb(null, accessData);
+                        let accessUrlArr = [];
+                        accessData.forEach((access) => {
+                            accessUrlArr.push(access.access_url);
+                        });
+                        accessUrlArr = Util.removeSome(accessUrlArr);
+                        cb(null, accessUrlArr);
                     })
                     .catch((err) => {
                         reject(err);
                     });
                 }
-            ], (err, accessData) => {
+            ], (err, accessUrlArr) => {
                 if(err) {
                     reject(err);
                 }
-                resolve(accessData);
+                resolve(accessUrlArr);
             });
 
         });
-    }
+    },
 };
 
 module.exports = User;

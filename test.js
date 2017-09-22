@@ -1,10 +1,4 @@
-const jwt = require('jsonwebtoken');
+const Util = require('./helper/util');
 
-let token = jwt.sign({
-    expiresIn: '1h',
-    uid: 1
-}, 'secret');
-
-console.log(token);
-
-console.log( jwt.verify(token, 'secret') );
+const newArr = Util.removeSome([1, 1, 2, 3, 4, 3, 2]);
+console.log(newArr);

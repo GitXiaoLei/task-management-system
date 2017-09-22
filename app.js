@@ -44,7 +44,6 @@ app.use('/static', express.static('public'));
 app.use(Output.init);
 app.use(Auth.init);
 
-
 /**
  * 路由
  */

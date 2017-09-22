@@ -11,17 +11,15 @@ const route = (app) => {
      */    
     app.get('/', (req, res) => {
         const token = Auth.authInfo();
-        // console.log(req.path);
         User
         .getSudo(token.uid)
-        .then((accessData) => {
-            console.log(accessData, req.path);
-            const canVisit = RBAC.canVisit(accessData, req.path);
-            console.log('hahhaahhaah:' + canVisit)
+        .then((accessUrlArr) => {
+            console.log(accessUrlArr);
+            const canVisit = RBAC.canVisit(accessUrlArr, req.path);
             if(!canVisit) {
                 Output.apiErr({ code: 0, message: '你没有权限访问该资源' });
             }
-            res.send('你有权限访问');
+            Output.apiData('你有权限访问');
         })
         .catch((err) => {
             Output.apiErr(err);
