@@ -195,7 +195,37 @@ const RBAC = {
             }
         });
         return can;
-    }
+    },
+    /**
+     * 判断用户是否是超级管理员
+     * @param {Array} roleNameArr 角色名
+     */
+    isSuperAdmin(roleNameArr) {
+        let flag = false;
+        roleNameArr.forEach((roleName) => {
+            if(roleName === 'superAdmin') {
+                flag = true;
+            }
+        });
+        return flag;
+    },
+    /**
+     * 判断用户是否仅仅是管理员
+     * @param {Array} roleNameArr 角色名
+     */
+    isAdmin(roleNameArr) {
+        let superFlag = false;
+        let adminFlag = false;
+        roleNameArr.forEach((roleName) => {
+            if(roleName === 'superAdmin') {
+                superFlag = true;
+            }
+            if(roleName === 'admin') {
+                adminFlag = true;
+            }
+        });
+        return !superFlag && adminFlag;
+    },
 };
 
 module.exports = RBAC;
