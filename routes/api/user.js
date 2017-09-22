@@ -10,11 +10,12 @@ const route = (app) => {
      * 首页
      */    
     app.get('/', (req, res) => {
-
-        if(!req._canVisit) {
-            Output.apiErr({ code: 0, message: '你没有权限访问该资源' });
-        }
-        Output.apiData({}, '你有权限访问该资源');
+        console.log(req._role)
+        res.send('hahah')
+        // if(!req._canVisit) {
+        //     Output.apiErr({ code: 0, message: '你没有权限访问该资源' });
+        // }
+        // Output.apiData({}, '你有权限访问该资源');
        
     });
     /**

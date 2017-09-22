@@ -3,7 +3,7 @@
  */
 const Util = {
     /**
-     * 数组取重
+     * 数组去重
      * @param {Array} arr 数组
      * @return Array
      */

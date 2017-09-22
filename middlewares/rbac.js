@@ -17,7 +17,10 @@ const RBAC = {
     init(req, res, next) {
         // req._authInfo等于false时，表示前端没有发token过来或者token解析失败，就没有权限访问
         if(!req._authInfo) {
+            // 没有权限访问资源
             req._canVisit = false;
+            // 用户角色名设置为guest(游客)：只有游客的类型才为字符串，其他角色的都为数组类型
+            req._role = 'guest';
             next();
         }
         RBAC
@@ -25,6 +28,14 @@ const RBAC = {
         .then((accessUrlArr) => {
             // 将改地址改用户能不能访问的布尔值挂载到req对象下：true表示能访问该地址，false表示不能访问该地址
             req._canVisit = RBAC.canVisit(accessUrlArr, req.path);
+        })
+        .catch((err) => {
+            Output.apiErr(err);
+        });
+        RBAC
+        .getRole(req._authInfo.uid)
+        .then((roleNameArr) => {
+            req._role = roleNameArr;
             next();
         })
         .catch((err) => {
@@ -112,6 +123,62 @@ const RBAC = {
                 resolve(accessUrlArr);
             });
 
+        });
+    },
+    /**
+     * 获取用户角色名
+     * @param {Number} uid 用户id
+     */
+    getRole(uid) {
+        return new Promise((resolve, reject) => {
+            Async.waterfall([
+                // 根据uid获取 用户角色的id：表user_role
+                (cb) => {
+                    DB
+                    .instance('w')
+                    .select('user_role')
+                    .then((userRoles) => {
+                        const roleIdArr = [];
+                        userRoles.forEach((userRole) => {
+                            roleIdArr.push(userRole.role_id);
+                        });
+                        cb(null, roleIdArr);
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    });
+                },
+                // 根据角色的id获取 角色名：表role
+                (roleIdArr, cb) => {
+                    let sql = 'SELECT * FROM `' + 'role' + '` WHERE ';
+                    roleIdArr.forEach((roleId, i, arr) => {
+                        if(arr.length - 1 !== i) {
+                            sql += ' role_id = ' + roleId + ' or ';
+                        }else {
+                            sql += ' role_id = ' + roleId;
+                        }
+                    });
+                    console.log(sql);
+                    DB
+                    .instance('w')
+                    .query(sql)
+                    .then((roleNames) => {
+                        const roleNameArr = [];
+                        roleNames.forEach((roleName) => {
+                            roleNameArr.push(roleName.role_name);
+                        });
+                        cb(null, roleNameArr);
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    });
+                }
+            ], (err, roleNameArr) => {
+                if(err) {
+                    reject(err);
+                }
+                resolve(roleNameArr);
+            });
         });
     },
     /**
