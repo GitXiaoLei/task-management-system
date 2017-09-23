@@ -119,6 +119,27 @@ const route = (app) => {
             Output.apiErr(err);
         });
     });
+    // 获取所有角色
+    app.get('/admin/role/list', (req, res) => {
+        // 没有登录
+        if(!req._authInfo) {
+            Output.apiErr({ code: 0, message: '请先登录' });
+            return;
+        }
+        // 超级管理员才能访问
+        // if(!req._canVisit) {
+        //     Output.apiErr({ code: 0, message: '你没有权限访问' });
+        //     return;
+        // }
+        Admin
+        .getRole()
+        .then((roleArr) => {
+            Output.apiData(roleArr, '获取成功');
+        })
+        .catch((err) => {
+            Output.apiErr(err);
+        });
+    });
     // 添加角色
     app.post('/admin/role/add', (req, res) => {
         // 没有登录

@@ -77,6 +77,20 @@ const Admin = {
         });
     },
 
+    // 获取所有角色
+    getRole() {
+        return new Promise((resolve, reject) => {
+            DB
+            .instance('r')
+            .select('role')
+            .then((roleArr) =>{
+                resolve(roleArr);
+            })
+            .catch((err) => {
+                reject(err);
+            });
+        });
+    },
     /**
      * 添加角色
      * @param {Object} insetData 插入的数据，如{ role_name: 'teacher' }
