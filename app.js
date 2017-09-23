@@ -30,22 +30,24 @@ app.use(helmet());
 app.engine('html', ejs.__express);
 app.set('view engine', 'html');
 app.set('views', 'public/views');
-
 app.use('/static', express.static('public'));
-
-// app.use(ckParser());
-// session
-// app.use(session({
-//     secret: 'tmssess',
-//     cookie: { maxAge: 1440*60*1000, httpOnly: true },
-//     saveUninitialized: false,
-//     resave: false
-// }));
 
 app.use(Output.init);
 app.use(Auth.init);
 app.use(RBAC.init);
 
+//设置跨域访问
+app.all('*', function(req, res, next) {
+    // 允许跨域
+    res.header("Access-Control-Allow-Origin", "http://localhost:8080");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+    // 允许接受跨域的cookie
+    res.header("Access-Control-Allow-Credentials","true");
+    res.header("X-Powered-By",' 3.2.1')
+    // res.header("Content-Type", "application/json;charset=utf-8");
+    next();
+});
 /**
  * 路由
  */

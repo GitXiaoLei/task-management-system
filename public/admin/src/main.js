@@ -8,7 +8,17 @@ import 'element-ui/lib/theme-default/index.css'
 import axios from 'axios'
 Vue.config.productionTip = false
 Vue.use(ElementUi)
-Vue.prototype.$ajax = axios
+Vue.prototype.Axios = axios
+// 开发时的请求地址：跨域地址
+const DEV_URL = 'http://localhost:3000'
+// 生产时的请求地址：没有跨域
+/* eslint-disable no-unused-vars */
+const PRO_URL = ''
+
+Vue.prototype.MAIN_URL = DEV_URL
+
+Vue.prototype.Axios.default.baseURL = 'http://localhost:3000'
+Vue.prototype.Axios.default.withCredentials = true
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
