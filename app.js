@@ -49,6 +49,7 @@ app.use(RBAC.init);
 /**
  * 路由
  */
+require('./routes/web/user')(app);
 require('./routes/api/user')(app);
 require('./routes/admin/department')(app);
 require('./routes/admin/subject')(app);

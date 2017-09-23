@@ -2,7 +2,7 @@ import $ from 'jquery';
 
 $(document).on('click', 'button', function() {
     $.post({
-        url: '/home/login',
+        url: '/login',
         data: {
             username: $('#username').val(),
             password: $('#password').val()

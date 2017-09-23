@@ -7,34 +7,10 @@ const RBAC = require('../../middlewares/rbac');
 
 const route = (app) => {
     /**
-     * 首页
-     */    
-    app.get('/', (req, res) => {
-        console.log('请求了首页')
-        console.log(req._role)
-        // 游客
-        if(typeof req._role === 'string') {
-            Output.render('user/index.art');
-        }
-        // 超级管理员
-        if(RBAC.isSuperAdmin(req._role)) {
-            Output.apiData('你是超级管理员哦~');
-        }
-        // 管理员
-        if(RBAC.isAdmin(req._role)) {
-            Output.apiData('你仅仅是管理员哦~');
-        }
-        Output.apiData('你是老师或学生');
-        // if(!req._canVisit) {
-        //     Output.apiErr({ code: 0, message: '你没有权限访问该资源' });
-        // }
-        // Output.apiData({}, '你有权限访问该资源');
-       
-    });
-    /**
      * 用户登录
      */
     app.post('/login', (req, res) => {
+        console.log('走到了这里？')
         const username = req.body.username
         const password = req.body.password;
 
