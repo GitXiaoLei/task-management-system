@@ -49,12 +49,13 @@ app.use(RBAC.init);
 /**
  * 路由
  */
+require('./routes/admin/admin')(app);
 require('./routes/web/user')(app);
 require('./routes/api/user')(app);
-require('./routes/admin/department')(app);
-require('./routes/admin/subject')(app);
-require('./routes/admin/teacher')(app);
-require('./routes/admin/student')(app);
+// require('./routes/admin/department')(app);
+// require('./routes/admin/subject')(app);
+// require('./routes/admin/teacher')(app);
+// require('./routes/admin/student')(app);
 
 app.listen(port, (err) => {
     if(err) {

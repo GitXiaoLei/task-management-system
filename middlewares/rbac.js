@@ -25,12 +25,13 @@ const RBAC = {
             next();
             return;
         }
-        console.log('执行了这里？')
+        // 请求权限
         RBAC
         .getSudo(req._authInfo.uid)
         .then((accessUrlArr) => {
             // 将改地址改用户能不能访问的布尔值挂载到req对象下：true表示能访问该地址，false表示不能访问该地址
             req._canVisit = RBAC.canVisit(accessUrlArr, req.path);
+            // 请求角色
             RBAC
             .getRole(req._authInfo.uid)
             .then((roleNameArr) => {
@@ -56,7 +57,7 @@ const RBAC = {
                 // 根据 用户id 获取用户的 角色id：表user_role
                 (cb) => {
                     DB
-                    .instance('w')
+                    .instance('r')
                     .select('user_role', { user_id: uid })
                     .then((userRoleData) => {
                         let roleIdArr = [];
@@ -80,7 +81,7 @@ const RBAC = {
                         }
                     });
                     DB
-                    .instance('w')
+                    .instance('r')
                     .query(sql)
                     .then((roleAccessData) => {
                         let accessIdArr = [];
@@ -106,7 +107,7 @@ const RBAC = {
                         }
                     });
                     DB
-                    .instance('w')
+                    .instance('r')
                     .query(sql)
                     .then((accessData) => {
                         let accessUrlArr = [];
@@ -139,7 +140,7 @@ const RBAC = {
                 // 根据uid获取 用户角色的id：表user_role
                 (cb) => {
                     DB
-                    .instance('w')
+                    .instance('r')
                     .select('user_role')
                     .then((userRoles) => {
                         const roleIdArr = [];
@@ -164,7 +165,7 @@ const RBAC = {
                     });
                     console.log(sql);
                     DB
-                    .instance('w')
+                    .instance('r')
                     .query(sql)
                     .then((roleNames) => {
                         const roleNameArr = [];

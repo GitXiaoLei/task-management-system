@@ -375,7 +375,6 @@ class DB {
         const that = this;
         return new Promise((resolve, reject) => {
             let sql = 'UPDATE `' + tbname + '` SET ? ';
-            console.log('$!@#@!#!@$$!')
             let updateRecord = DB.buildUpdateRecord(conditions);
             sql += updateRecord;
             
