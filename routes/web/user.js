@@ -19,7 +19,7 @@ const route = (app) => {
         }
         // 超级管理员
         if(RBAC.isSuperAdmin(req._role)) {
-            Output.apiData('你是超级管理员哦~');
+            Output.render('admin/index');
             return;
         }
         // 管理员

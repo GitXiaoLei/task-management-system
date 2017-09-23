@@ -27,8 +27,8 @@ app.use(bodyParser.json());
 
 app.use(helmet());
 
-app.set('view engine', 'art');
-app.engine('art', require('express-art-template'));
+app.engine('html', ejs.__express);
+app.set('view engine', 'html');
 app.set('views', 'public/views');
 
 app.use('/static', express.static('public'));
