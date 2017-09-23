@@ -189,6 +189,34 @@ const route = (app) => {
             Output.apiErr(err);
         });
     });
+    // 给角色添加权限
+    app.post('/admin/role_access/add', (req, res) => {
+        // 没有登录
+        if(!req._authInfo) {
+            Output.apiErr({ code: 0, message: '请先登录' });
+            return;
+        }
+        // 超级管理员才能访问
+        // if(!req._canVisit) {
+        //     Output.apiErr({ code: 0, message: '你没有权限访问' });
+        //     return;
+        // }
+        // 要插入数据库的数据
+        const insetData = {
+            role_id: req.body.role_id,
+            access_id: req.body.access_id,
+            created_time: Moment().unix(),
+            updated_time: Moment().unix()
+        };
+        Admin
+        .addRole(insetData)
+        .then((result) => {
+            Output.apiData(result, '添加成功');
+        })
+        .catch((err) => {
+            Output.apiErr(err);
+        });
+    });
 };
 
 module.exports = route;

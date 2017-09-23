@@ -127,6 +127,24 @@ const Admin = {
             })
         });
     },
+    /**
+     * 给角色添加权限
+     * @param {Object} insertData 数据
+     * @return Promise
+     */
+    roleAccessAdd(insertData) {
+        return new Promise((resolve, reject) => {
+            DB
+            .instance('w')
+            .insert('role_access', insertData)
+            .then((result) => {
+                resolve(result);
+            })
+            .catch((err) => {
+                reject(err);
+            })
+        });
+    }
 };
 
 module.exports = Admin;
