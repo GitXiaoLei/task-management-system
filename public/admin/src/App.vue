@@ -2,12 +2,12 @@
   <div id="app">
     <router-view></router-view>
 		<div>{{ data }}</div>
-    <el-button @click="get">获取</el-button>
+    <el-button @click="g">获取</el-button>
   </div>
 </template>
 
 <script>
-
+import { getAccessList } from './api'
 export default {
   name: 'app',
   data () {
@@ -16,13 +16,8 @@ export default {
     }
   },
   methods: {
-    get () {
-      const instance = this.Axios.create({
-        baseURL: 'http://localhost:3000',
-        withCredentials: true
-      })
-      instance
-      .get('/admin/access/list')
+    g () {
+      getAccessList()
       .then((data) => {
         console.log(data)
       })
