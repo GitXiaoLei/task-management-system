@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-		<div>App component</div>
+		<div>App</div>
+    <router-link to="/admin/user">User</router-link>
+    <router-link to="/admin/role">Role</router-link>
     <router-view></router-view>
   </div>
 </template>

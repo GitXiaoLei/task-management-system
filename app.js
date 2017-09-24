@@ -59,6 +59,15 @@ require('./routes/api/user')(app);
 // require('./routes/admin/teacher')(app);
 // require('./routes/admin/student')(app);
 
+app.get('*', (req, res) => {
+    // 返回404页面
+    if(req.path.indexOf('admin') === -1) {
+        Output.apiData({}, '404');
+        return;
+    }
+    Output.render('admin/index');
+})
+
 app.listen(port, (err) => {
     if(err) {
         console.log('监听端口失败');

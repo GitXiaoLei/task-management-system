@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    this is role component.
+    Role
   </div>
 </template>
 
