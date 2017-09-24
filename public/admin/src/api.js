@@ -8,3 +8,7 @@ if (ENV === 'dev') {
 }
 
 export const getAccessList = params => axios.get('/admin/access/list', params)
+
+export const login = params => axios.post('/login', {
+  params: params
+})

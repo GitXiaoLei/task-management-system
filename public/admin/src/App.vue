@@ -3,6 +3,7 @@
 		<div>App</div>
     <router-link to="/admin/user">User</router-link>
     <router-link to="/admin/role">Role</router-link>
+    <el-button @click="g">登录</el-button>
     <router-view></router-view>
   </div>
 </template>
