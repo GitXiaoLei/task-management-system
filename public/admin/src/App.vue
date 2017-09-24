@@ -1,8 +1,7 @@
 <template>
   <div id="app">
+		<div>App component</div>
     <router-view></router-view>
-		<div>{{ data }}</div>
-    <el-button @click="g">获取</el-button>
   </div>
 </template>
 

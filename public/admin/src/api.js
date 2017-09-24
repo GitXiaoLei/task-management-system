@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+// import qs from 'qs'
 // 定义环境：为开发环境时，才设置baseURL和允许发送cookie
 const ENV = 'dev'
 if (ENV === 'dev') {
