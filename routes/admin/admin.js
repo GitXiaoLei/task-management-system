@@ -9,12 +9,12 @@ const route = (app) => {
   /**
    * 院系管理页面
    */
-  app.get('/admin/department', (req, res) => {
+  app.get('/api/department', (req, res) => {
     let obj = { type: 1 }
     Output.render('admin/department.art', obj)
   })
   // 获取所有权限
-  app.get('/admin/access/list', (req, res) => {
+  app.get('/api/access/list', (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -35,7 +35,7 @@ const route = (app) => {
       })
   })
   // 添加权限
-  app.post('/admin/access/add', (req, res) => {
+  app.post('/api/access/add', (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -63,7 +63,7 @@ const route = (app) => {
       })
   })
   // 更新权限
-  app.post('/admin/access/update', (req, res) => {
+  app.post('/api/access/update', (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -97,7 +97,7 @@ const route = (app) => {
       })
   })
   // 删除权限
-  app.post('/admin/access/del', (req, res) => {
+  app.post('/api/access/del', (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -119,7 +119,7 @@ const route = (app) => {
       })
   })
   // 获取所有角色
-  app.get('/admin/role/list', (req, res) => {
+  app.get('/api/role/list', (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -140,7 +140,7 @@ const route = (app) => {
       })
   })
   // 添加角色
-  app.post('/admin/role/add', (req, res) => {
+  app.post('/api/role/add', (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -167,7 +167,7 @@ const route = (app) => {
       })
   })
   // 删除角色
-  app.post('/admin/role/del', (req, res) => {
+  app.post('/api/role/del', (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -189,7 +189,7 @@ const route = (app) => {
       })
   })
   // 给角色添加权限
-  app.post('/admin/role_access/add', (req, res) => {
+  app.post('/api/role_access/add', (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
