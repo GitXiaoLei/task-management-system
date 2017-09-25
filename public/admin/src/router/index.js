@@ -1,11 +1,13 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import user from '@/components/user'
-import role from '@/components/role'
-import notFound from '@/components/404'
-// import app from '../App'
-Vue.use(Router)
 
+const User = r => require.ensure([], () => r(require('@/components/user.vue')), 'User')
+const Role = r => require.ensure([], () => r(require('@/components/role.vue')), 'Role')
+const NotFound = r => require.ensure([], () => r(require('@/components/404.vue')), 'NotFound')
+const Access = r => require.ensure([], () => r(require('@/components/access.vue')), 'Access')
+const Department = r => require.ensure([], () => r(require('@/components/department.vue')), 'Department')
+
+Vue.use(Router)
 export default new Router({
   mode: 'history',
   routes: [
@@ -19,13 +21,21 @@ export default new Router({
     },
     {
       path: '/admin/user',
-      component: user
+      component: User
     },
     {
       path: '/admin/role',
-      component: role
+      component: Role
+    },
+    {
+      path: '/admin/access',
+      component: Access
+    },
+    {
+      path: '/admin/department',
+      component: Department
     },
     // 404
-    { path: '*', component: notFound }
+    { path: '*', component: NotFound }
   ]
 })
