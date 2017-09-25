@@ -118,7 +118,7 @@ export default {
         })
       })
     },
-    // 删除权限
+    // 删除权限：要同时删除role_access中access_id对应的记录
     delAccess (i, row) {
       delAccess({ access_id: row.access_id })
       .then((data) => {

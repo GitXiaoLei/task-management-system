@@ -32,10 +32,6 @@ app.set('view engine', 'html')
 app.set('views', 'public/views')
 app.use('/static', express.static('public'))
 
-app.use(Output.init)
-app.use(Auth.init)
-app.use(RBAC.init)
-
 // 设置跨域访问
 app.all('*', function (req, res, next) {
   // 允许跨域
@@ -48,6 +44,11 @@ app.all('*', function (req, res, next) {
   // res.header("Content-Type", "application/json;charset=utf-8");
   next()
 })
+
+app.use(Output.init)
+app.use(Auth.init)
+app.use(RBAC.init)
+
 /**
  * 路由
  */

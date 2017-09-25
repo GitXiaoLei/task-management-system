@@ -71,6 +71,7 @@ const RBAC = {
         },
         // 根据用户的 角色id 获取用户的 权限id：表role_access
         (roleIdArr, cb) => {
+          console.log(roleIdArr)
           let sql = 'SELECT * FROM `' + 'role_access' + '` WHERE '
           roleIdArr.forEach((roleId, i, arr) => {
             if (arr.length - 1 !== i) {
@@ -97,6 +98,12 @@ const RBAC = {
         },
         // 根据用户的 权限id 获取用户的 权限(也就是能够请求的地址)：表access
         (accessIdArr, cb) => {
+          console.log('------------------')
+          console.log(accessIdArr)
+          console.log('------------------')
+          if (accessIdArr.length === 0) {
+            resolve(accessIdArr)
+          }
           let sql = 'SELECT * FROM `' + 'access' + '` WHERE '
           accessIdArr.forEach((accessId, i, arr) => {
             if (arr.length - 1 !== i) {

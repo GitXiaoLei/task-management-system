@@ -1,6 +1,8 @@
 'use strict'
 
 const DB = require('../db')
+const Async = require('async')
+const Util = require('../public/utils/util')
 
 /**
  * 院系模型
@@ -10,14 +12,14 @@ const Admin = {
   getAccess () {
     return new Promise((resolve, reject) => {
       DB
-        .instance('r')
-        .select('access')
-        .then((accessArr) => {
-          resolve(accessArr)
-        })
-        .catch((err) => {
-          reject(err)
-        })
+      .instance('r')
+      .select('access')
+      .then((accessArr) => {
+        resolve(accessArr)
+      })
+      .catch((err) => {
+        reject(err)
+      })
     })
   },
   /**
@@ -28,14 +30,14 @@ const Admin = {
   addAccess (insetData) {
     return new Promise((resolve, reject) => {
       DB
-        .instance('w')
-        .insert('access', insetData)
-        .then((result) => {
-          resolve(result)
-        })
-        .catch((err) => {
-          reject(err)
-        })
+      .instance('w')
+      .insert('access', insetData)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
     })
   },
   /**
@@ -47,14 +49,14 @@ const Admin = {
   updateAccess (updateData, conditions) {
     return new Promise((resolve, reject) => {
       DB
-        .instance('w')
-        .update('access', updateData, conditions)
-        .then((result) => {
-          resolve(result)
-        })
-        .catch((err) => {
-          reject(err)
-        })
+      .instance('w')
+      .update('access', updateData, conditions)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
     })
   },
   /**
@@ -65,14 +67,14 @@ const Admin = {
   delAccess (conditions) {
     return new Promise((resolve, reject) => {
       DB
-        .instance('w')
-        .delete('access', conditions)
-        .then((result) => {
-          resolve(result)
-        })
-        .catch((err) => {
-          reject(err)
-        })
+      .instance('w')
+      .delete('access', conditions)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
     })
   },
 
@@ -80,14 +82,14 @@ const Admin = {
   getRole () {
     return new Promise((resolve, reject) => {
       DB
-        .instance('r')
-        .select('role')
-        .then((roleArr) => {
-          resolve(roleArr)
-        })
-        .catch((err) => {
-          reject(err)
-        })
+      .instance('r')
+      .select('role')
+      .then((roleArr) => {
+        resolve(roleArr)
+      })
+      .catch((err) => {
+        reject(err)
+      })
     })
   },
   /**
@@ -98,14 +100,14 @@ const Admin = {
   addRole (insetData) {
     return new Promise((resolve, reject) => {
       DB
-        .instance('w')
-        .insert('role', insetData)
-        .then((result) => {
-          resolve(result)
-        })
-        .catch((err) => {
-          reject(err)
-        })
+      .instance('w')
+      .insert('role', insetData)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
     })
   },
   /**
@@ -116,14 +118,14 @@ const Admin = {
   delRole (conditions) {
     return new Promise((resolve, reject) => {
       DB
-        .instance('w')
-        .delete('role', conditions)
-        .then((result) => {
-          resolve(result)
-        })
-        .catch((err) => {
-          reject(err)
-        })
+      .instance('w')
+      .delete('role', conditions)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
     })
   },
   /**
@@ -134,14 +136,129 @@ const Admin = {
   roleAccessAdd (insertData) {
     return new Promise((resolve, reject) => {
       DB
-        .instance('w')
-        .insert('role_access', insertData)
-        .then((result) => {
-          resolve(result)
-        })
-        .catch((err) => {
+      .instance('w')
+      .insert('role_access', insertData)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
+  // 获取某个角色的所有权限
+  getRoleAccess (roleId) {
+    return new Promise((resolve, reject) => {
+      Async.waterfall([
+        // 从role_access表中通过角色id获取权限id
+        (cb) => {
+          DB
+          .instance('r')
+          .select('role_access', { role_id: roleId })
+          .then((roleAccessArr) => {
+            // 改角色没有相关权限
+            if (roleAccessArr.length === 0) {
+              resolve(roleAccessArr)
+              return
+            }
+            // 获取所有的权限id
+            let accessIdArr = []
+            roleAccessArr.forEach((roleAccess) => {
+              accessIdArr.push(roleAccess.access_id)
+            })
+            accessIdArr = Util.removeSome(accessIdArr)
+            cb(null, accessIdArr)
+          })
+          .catch((err) => {
+            reject(err)
+          })
+        },
+        // 根据上面获得的权限id，来获取权限的详细信息
+        (accessIdArr, cb) => {
+          console.log('到这里了哦~~~')
+          let sql = 'SELECT * FROM `' + 'access' + '` WHERE '
+          accessIdArr.forEach((accessId, i, arr) => {
+            if (arr.length - 1 !== i) {
+              sql += ' access_id = ' + accessId + ' OR '
+            } else {
+              sql += ' access_id = ' + accessId
+            }
+          })
+          DB
+          .instance('r')
+          .query(sql)
+          .then((accessData) => {
+            cb(null, accessData)
+          })
+          .catch((err) => {
+            reject(err)
+          })
+        }
+      ], (err, accessData) => {
+        if (err) {
           reject(err)
-        })
+        }
+        resolve(accessData)
+      })
+    })
+  },
+  // 为某个角色添加某个权限
+  addRoleAccess (insertData) {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .insert('role_access', insertData)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
+  // 删除某个角色的某个权限
+  delRoleAccess (insertData) {
+    const sql = 'DELETE FROM `role_access` WHERE ' + 'role_id = ' + insertData.role_id + ' AND ' + 'access_id = ' + insertData.access_id
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .query(sql)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
+  // 删除某个角色对应的所有的权限
+  delRoleAccessByRoleId (conditions) {
+    const sql = 'DELETE FROM `role_access` WHERE role_id = ' + conditions.role_id
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .query(sql)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
+  // 根据access_id，删除role_access表中的记录
+  delRoleAccessByAccessId (conditions) {
+    const sql = 'DELETE FROM `role_access` WHERE access_id = ' + conditions.access_id
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .query(sql)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
     })
   }
 }

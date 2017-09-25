@@ -317,6 +317,7 @@ class DB {
    * @return Promese result 插入的结果，成功则有insertId属性
    */
   insert (tbname, data) {
+    console.log(tbname + '111111111111')
     const that = this
     return new Promise((resolve, reject) => {
       const sql = 'INSERT INTO `' + tbname + '` SET ? '

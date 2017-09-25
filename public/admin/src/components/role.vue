@@ -25,14 +25,32 @@
       <el-table-column label="操作">
         <template scope="scope">
           <el-button v-if="scope.row.role_id !== 1" size="small" type="danger" @click="delRole(scope.$index, scope.row)">删除</el-button>
+          <el-button v-if="scope.row.role_id !== 1" size="small" type="primary" @click="editDialog(scope.$index, scope.row)">更新权限</el-button>
         </template>
       </el-table-column>
     </el-table>
+    <!-- 添加/删除 权限dialog -->
+    <el-dialog
+      title="更新角色的权限"
+      :visible.sync="dialogVisible">
+      <!-- 权限列表 -->
+      <el-form ref="accessForm" :model="accessForm">
+        <el-checkbox-group v-model="checkboxArr">
+          <el-checkbox
+            v-for="access in accessForm.accessData"
+            :key="access.id"
+            :label="access.access_id"
+            name="access"
+            @change="updateRoleAccess">【ID:{{ access.access_id }}】{{ access.access_url }}<span style="float: right;">【{{ access.access_title }}】</span></el-checkbox>
+        </el-checkbox-group>
+      </el-form>
+      
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getRole, addRole, delRole } from '../api'
+import { getRole, addRole, delRole, getAccess, getRoleAccess, addRoleAccess, delRoleAccess } from '../api'
 export default {
   name: 'role',
   data () {
@@ -40,11 +58,17 @@ export default {
       roleData: [],
       addRoleForm: {
         role_name: ''
-      }
+      },
+      accessForm: {
+        accessData: []
+      },
+      checkboxArr: [],
+      dialogVisible: false,
+      tempRow: {}
     }
   },
   methods: {
-    // 获取权限
+    // 获取角色
     getRole () {
       getRole()
       .then((data) => {
@@ -59,7 +83,7 @@ export default {
         this.errorMsg(err)
       })
     },
-    // 添加权限
+    // 添加角色
     addRole (formName) {
       this.$refs[formName].validate((valid) => {
         if (!valid) {
@@ -81,7 +105,7 @@ export default {
         })
       })
     },
-    // 删除权限
+    // 删除角色：同时要将该角色的权限删除掉
     delRole (i, row) {
       delRole({ role_id: row.role_id })
       .then((data) => {
@@ -97,6 +121,86 @@ export default {
       .catch((err) => {
         this.errorMsg(err)
       })
+    },
+    // 显示更新角色权限的dialog
+    editDialog (i, row) {
+      const that = this
+      this.dialogVisible = true
+      this.checkboxArr = []
+      this.tempRow = row
+      // 获取所有权限
+      new Promise((resolve, reject) => {
+        getAccess()
+        .then((data) => {
+          data = data.data
+          if (data.code !== 1) {
+            that.errorMsg(data.message)
+            reject(data.message)
+            return
+          }
+          that.accessForm.accessData = data.data
+          resolve()
+        })
+        .catch((err) => {
+          that.errorMsg(err)
+          reject(err)
+        })
+      })
+      // 获取某个角色的所有权限
+      .then((data) => {
+        getRoleAccess({ role_id: row.role_id })
+        .then((data) => {
+          data = data.data
+          if (data.code !== 1) {
+            that.errorMsg(data.message)
+            return
+          }
+          data.data.forEach((item) => {
+            that.checkboxArr.push(item.access_id)
+          })
+        })
+        .catch((err) => {
+          that.errorMsg(err)
+        })
+      })
+      .catch((err) => {
+        that.errorMsg(err)
+      })
+    },
+    // 更新某个角色的权限
+    updateRoleAccess (e) {
+      const targetEl = e.srcElement
+      // 添加该权限
+      if (targetEl.checked) {
+        addRoleAccess({ role_id: this.tempRow.role_id, access_id: targetEl.value })
+        .then((data) => {
+          data = data.data
+          if (data.code !== 1) {
+            this.errorMsg(data.message)
+            targetEl.checked = false
+            return
+          }
+          this.successMsg(data.message)
+        })
+        .catch((err) => {
+          this.errorMsg(err)
+        })
+      } else {
+      // 删除该权限
+        delRoleAccess({ role_id: this.tempRow.role_id, access_id: targetEl.value })
+        .then((data) => {
+          data = data.data
+          if (data.code !== 1) {
+            this.errorMsg(data.message)
+            targetEl.checked = true
+            return
+          }
+          this.successMsg(data.message)
+        })
+        .catch((err) => {
+          this.errorMsg(err)
+        })
+      }
     },
     // 成功消息提示
     successMsg (msg) {
@@ -120,5 +224,15 @@ export default {
 </script>
 
 <style scoped>
-
+label{
+  display: block;
+  padding: 4px 0 2px 0px;
+  border-bottom: 1px solid #eef1f6;
+}
+label:hover{
+  background: #eef1f6;
+}
+.el-checkbox{
+  margin-left: 0;
+}
 </style>

@@ -21,3 +21,9 @@ export const getRole = () => axios.get('/api/role/list')
 export const addRole = params => axios.post('/api/role/add', qs.stringify(params))
 // 删除角色
 export const delRole = params => axios.post('/api/role/del', qs.stringify(params))
+// 获取某个角色的所有权限
+export const getRoleAccess = params => axios.post('/api/role_access/list', qs.stringify(params))
+// 为某个角色添加某个权限
+export const addRoleAccess = params => axios.post('/api/role_access/add', qs.stringify(params))
+// 删除某个角色的某个权限
+export const delRoleAccess = params => axios.post('/api/role_access/del', qs.stringify(params))
