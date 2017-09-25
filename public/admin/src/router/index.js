@@ -6,6 +6,7 @@ const Role = r => require.ensure([], () => r(require('@/components/role.vue')), 
 const NotFound = r => require.ensure([], () => r(require('@/components/404.vue')), 'NotFound')
 const Access = r => require.ensure([], () => r(require('@/components/access.vue')), 'Access')
 const Department = r => require.ensure([], () => r(require('@/components/department.vue')), 'Department')
+const Subject = r => require.ensure([], () => r(require('@/components/subject.vue')), 'Subject')
 
 Vue.use(Router)
 export default new Router({
@@ -34,6 +35,10 @@ export default new Router({
     {
       path: '/admin/department',
       component: Department
+    },
+    {
+      path: '/admin/subject',
+      component: Subject
     },
     // 404
     { path: '*', component: NotFound }

@@ -42,10 +42,10 @@ const route = (app) => {
       return
     }
     // 超级管理员才能访问
-    if (!req._canVisit) {
-      Output.apiErr({ code: 0, message: '你没有权限访问' })
-      return
-    }
+    // if (!req._canVisit) {
+    //   Output.apiErr({ code: 0, message: '你没有权限访问' })
+    //   return
+    // }
     // 要插入数据库的数据
     const insetData = {
       access_title: req.body.access_title,
