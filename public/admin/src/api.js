@@ -14,3 +14,10 @@ export const addAccess = params => axios.post('/api/access/add', qs.stringify(pa
 export const updateAccess = params => axios.post('/api/access/update', qs.stringify(params))
 // 删除权限
 export const delAccess = params => axios.post('/api/access/del', qs.stringify(params))
+
+// 获取角色
+export const getRole = () => axios.get('/api/role/list')
+// 添加角色
+export const addRole = params => axios.post('/api/role/add', qs.stringify(params))
+// 删除角色
+export const delRole = params => axios.post('/api/role/del', qs.stringify(params))
