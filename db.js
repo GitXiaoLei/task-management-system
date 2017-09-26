@@ -49,7 +49,7 @@ class DB {
    * @return Promise result|rows
    */
   query (sql, values) {
-    // console.log(sql)
+    console.log(sql)
     return this.queryWithOptions({
       sql: sql,
       values: values

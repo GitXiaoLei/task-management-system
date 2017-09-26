@@ -288,6 +288,20 @@ const Admin = {
       })
     })
   },
+  // 获取用户列表
+  getUser () {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('r')
+      .select('user')
+      .then((userArr) => {
+        resolve(userArr)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
   // 添加院系
   addDepartment (insertData) {
     return new Promise((resolve, reject) => {
@@ -316,6 +330,20 @@ const Admin = {
       })
     })
   },
+  // 添加用户
+  addUser (insertData) {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .insert('user', insertData)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
   // 删除院系
   delDepartment (conditions) {
     return new Promise((resolve, reject) => {
@@ -336,6 +364,34 @@ const Admin = {
       DB
       .instance('w')
       .delete('subject', conditions)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
+  // 删除用户
+  delUser (conditions) {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .delete('user', conditions)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
+  // 更新用户信息
+  updateUser (updateData, conditions) {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .update('user', updateData, conditions)
       .then((result) => {
         resolve(result)
       })

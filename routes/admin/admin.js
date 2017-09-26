@@ -361,6 +361,27 @@ const route = (app) => {
       Output.apiErr(err)
     })
   })
+  // 获取用户列表
+  app.get('/api/user/list', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    Admin
+    .getUser()
+    .then((userArr) => {
+      Output.apiData(userArr, '获取用户列表成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
   // 添加院系
   app.post('/api/department/add', (req, res) => {
     // 没有登录
@@ -405,6 +426,32 @@ const route = (app) => {
       Output.apiErr(err)
     })
   })
+  // 添加用户
+  app.post('/api/user/add', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const insertData = {
+      username: req.body.username,
+      created_time: Moment().unix(),
+      updated_time: Moment().unix()
+    }
+    Admin
+    .addUser(insertData)
+    .then((result) => {
+      Output.apiData(result, '添加用户成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
   // 删除院系
   app.post('/api/department/del', (req, res) => {
     // 没有登录
@@ -444,6 +491,60 @@ const route = (app) => {
     .delSubject(conditions)
     .then((result) => {
       Output.apiData(result, '删除科目成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
+  // 删除用户
+  app.post('/api/user/del', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const conditions = { user_id: req.body.user_id }
+    Admin
+    .delUser(conditions)
+    .then((result) => {
+      Output.apiData(result, '删除用户成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
+  // 更新用户信息
+  app.post('/api/user/update', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const updateData = {
+      username: req.body.username,
+      real_name: req.body.real_name,
+      sex: req.body.sex,
+      department_name: req.body.department_name,
+      class_name: req.body.class_name,
+      phone_num: req.body.phone_num,
+      qq_num: req.body.qq_num,
+      updated_time: Moment().unix()
+    }
+    const conditions = { user_id: req.body.user_id }
+    Admin
+    .updateUser(updateData, conditions)
+    .then((result) => {
+      Output.apiData(result, '更新用户信息成功')
     })
     .catch((err) => {
       Output.apiErr(err)

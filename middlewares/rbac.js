@@ -157,8 +157,6 @@ const RBAC = {
         },
         // 根据角色的id获取 角色名：表role
         (roleIdArr, cb) => {
-          console.log('哈哈哈哈哈哈：')
-          console.log(roleIdArr)
           let sql = 'SELECT * FROM `' + 'role' + '` WHERE '
           roleIdArr.forEach((roleId, i, arr) => {
             if (arr.length - 1 !== i) {

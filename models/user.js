@@ -1,33 +1,31 @@
 'use strict'
 
-const Async = require('async');
-const DB = require('../db');
+const DB = require('../db')
 
 // 表名
-const _dbtable = 'user';
+const _dbtable = 'user'
 
 /**
  * 用户模型
  */
 const User = {
-    /**
-     * 
-     * @param {Number} uid 获取一个用户的信息
-     */
-    getOne(username) {
-        return new Promise((resolve, reject) => {
-            DB
-            .instance('r')
-            .select(_dbtable, { username: username })
-            .then((userData) => {
-                resolve(userData[0]);
-            })
-            .catch((err) => {
-                reject(err);
-            });
-        }); 
-    },
-    
-};
+  /**
+   * 获取一个用户的信息
+   * @param {Number} uid 用户id
+   */
+  getOne (username) {
+    return new Promise((resolve, reject) => {
+      DB
+        .instance('r')
+        .select(_dbtable, { username: username })
+        .then((userData) => {
+          resolve(userData[0])
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    })
+  }
+}
 
-module.exports = User;
+module.exports = User
