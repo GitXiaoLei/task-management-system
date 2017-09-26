@@ -267,6 +267,28 @@ const route = (app) => {
       Output.apiErr(err)
     })
   })
+  // 获取某个用户的所有角色
+  app.post('/api/user_role/list', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const userId = req.body.user_id
+    Admin
+    .getUserRole(userId)
+    .then((result) => {
+      Output.apiData(result, '获取成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
   // 为某个角色添加某个权限
   app.post('/api/role_access/add', (req, res) => {
     // 没有登录
@@ -294,6 +316,33 @@ const route = (app) => {
       Output.apiErr(err)
     })
   })
+  // 为某个用户添加某个角色
+  app.post('/api/user_role/add', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const insertData = {
+      user_id: req.body.user_id,
+      role_id: req.body.role_id,
+      created_time: Moment().unix(),
+      updated_time: Moment().unix()
+    }
+    Admin
+    .addUserRole(insertData)
+    .then((result) => {
+      Output.apiData(result, '添加权限成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
   // 删除某个角色的某个权限
   app.post('/api/role_access/del', (req, res) => {
     // 没有登录
@@ -312,6 +361,31 @@ const route = (app) => {
     }
     Admin
     .delRoleAccess(conditions)
+    .then((result) => {
+      Output.apiData(result, '移除权限成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
+  // 删除某个用户的某个角色
+  app.post('/api/user_role/del', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const conditions = {
+      user_id: req.body.user_id,
+      role_id: req.body.role_id
+    }
+    Admin
+    .delUserRole(conditions)
     .then((result) => {
       Output.apiData(result, '移除权限成功')
     })
@@ -509,13 +583,37 @@ const route = (app) => {
       return
     }
     const conditions = { user_id: req.body.user_id }
-    Admin
-    .delUser(conditions)
-    .then((result) => {
-      Output.apiData(result, '删除用户成功')
-    })
-    .catch((err) => {
-      Output.apiErr(err)
+    Async.parallel({
+      // 根据user_id，删除user表中的用户信息
+      delUser: (cb) => {
+        Admin
+        .delUser(conditions)
+        .then((result) => {
+          cb(null, result)
+        })
+        .catch((err) => {
+          Output.apiErr(err)
+          return false
+        })
+      },
+      // 根据role_id，删除role_access表中的记录
+      delUserRoleByUserId: (cb) => {
+        Admin
+        .delUserRoleByUserId(conditions)
+        .then((result) => {
+          cb(null, result)
+        })
+        .catch((err) => {
+          Output.apiErr(err)
+          return false
+        })
+      }
+    }, (err, result) => {
+      if (err) {
+        Output.apiErr(err)
+        return
+      }
+      Output.apiData(result, '删除角色成功')
     })
   })
   // 更新用户信息
@@ -545,6 +643,55 @@ const route = (app) => {
     .updateUser(updateData, conditions)
     .then((result) => {
       Output.apiData(result, '更新用户信息成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
+  // 给某个用户添加某个角色
+  app.post('/api/user_role/add', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const insertData = {
+      user_id: req.body.user_id,
+      role_id: req.body.role_id,
+      created_time: Moment().unix(),
+      updated_time: Moment().unix()
+    }
+    Admin
+    .addUserRole(insertData)
+    .then((result) => {
+      Output.apiData(result, '给用户添加角色成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
+  // 给某个用户删除某个角色
+  app.post('/api/user_role/del', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const conditions = { user_role_id: req.body.user_role_id }
+    Admin
+    .delUserRole(conditions)
+    .then((result) => {
+      Output.apiData(result, '删除角色成功')
     })
     .catch((err) => {
       Output.apiErr(err)

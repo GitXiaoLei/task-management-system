@@ -27,7 +27,7 @@
         <el-table-column label="操作">
           <template scope="scope">
             <el-button v-if="scope.row.role_id !== 1" size="small" type="danger" @click="delRole(scope.$index, scope.row)">删除</el-button>
-            <el-button size="small" type="primary" @click="editDialog(scope.$index, scope.row)">更新权限</el-button>
+            <el-button size="small" type="primary" @click="editDialog(scope.$index, scope.row)">权限</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -36,17 +36,16 @@
         title="更新角色的权限"
         :visible.sync="dialogVisible">
         <!-- 权限列表 -->
-        <el-form ref="accessForm" :model="accessForm">
+        <el-form ref="accessForm">
           <el-checkbox-group v-model="checkboxArr">
             <el-checkbox
-              v-for="access in accessForm.accessData"
+              v-for="access in accessData"
               :key="access.id"
               :label="access.access_id"
               name="access"
               @change="updateRoleAccess">【ID:{{ access.access_id }}】{{ access.access_url }}<span style="float: right;">【{{ access.access_title }}】</span></el-checkbox>
           </el-checkbox-group>
         </el-form>
-        
       </el-dialog>
     </div>
     <!-- 没有权限访问该页面 -->
@@ -66,9 +65,7 @@ export default {
       addRoleForm: {
         role_name: ''
       },
-      accessForm: {
-        accessData: []
-      },
+      accessData: [],
       checkboxArr: [],
       dialogVisible: false,
       tempRow: {},
@@ -146,7 +143,7 @@ export default {
             reject(data.message)
             return
           }
-          that.accessForm.accessData = data.data
+          that.accessData = data.data
           resolve()
         })
         .catch((err) => {

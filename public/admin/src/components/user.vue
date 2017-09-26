@@ -106,6 +106,23 @@
           <el-button type="primary" @click="updateUser">提交</el-button>
         </span>
       </el-dialog>
+
+      <!-- 添加/删除 用户角色 -->
+      <el-dialog
+        title="更新用户的权限"
+        :visible.sync="roleDialogVisible">
+        <!-- 角色列表 -->
+        <el-form ref="accessForm">
+          <el-checkbox-group v-model="checkboxArr">
+            <el-checkbox
+              v-for="role in roleData"
+              :key="role.id"
+              :label="role.role_id"
+              name="role"
+              @change="updateUserRole">【ID:{{ role.role_id }}】{{ role.role_name }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form>
+      </el-dialog>
     </div>
     <div v-else-if="canVisit === 0">你没有权限访问该页面</div>
     <div v-else></div>
@@ -113,7 +130,7 @@
 </template>
 
 <script>
-import { getUser, addUser, delUser, getDepartment, updateUser } from '../api'
+import { getUser, addUser, delUser, getDepartment, updateUser, getRole, getUserRole, addUserRole, delUserRole } from '../api'
 export default {
   name: 'user',
   data () {
@@ -133,10 +150,14 @@ export default {
         qq_num: ''
       },
       editDialogVisible: false,
+      roleDialogVisible: false,
       editIndex: -1,
       canVisit: -1,
       departmentArr: [],
-      sexArr: []
+      sexArr: [],
+      checkboxArr: [],
+      roleData: [], // 角色信息
+      tempRow: {}
     }
   },
   methods: {
@@ -233,6 +254,82 @@ export default {
         this.errorMsg(err)
       })
     },
+    // 显示更新用户角色的dialog
+    chooseRoleDialog (i, row) {
+      const that = this
+      this.roleDialogVisible = true
+      this.checkboxArr = []
+      this.tempRow = row
+      return new Promise((resolve, reject) => {
+        getRole()
+        .then((data) => {
+          data = data.data
+          if (data.code !== 1) {
+            that.errorMsg(data.message)
+            reject(data.message)
+          }
+          that.roleData = data.data
+          resolve()
+        })
+        .catch((err) => {
+          that.errorMsg(err)
+          reject
+        })
+      })
+      // 获取该用户所拥有的角色
+      .then((data) => {
+        getUserRole({ user_id: row.user_id })
+        .then((data) => {
+          data = data.data
+          if (data.code !== 1) {
+            that.errorMsg(data.message)
+            return
+          }
+          data.data.forEach((item) => {
+            that.checkboxArr.push(item.role_id)
+          })
+        })
+      })
+      .catch((err) => {
+        this.errorMsg(err)
+      })
+      // this.chooseRoleDialog = true
+    },
+    // 添加、删除某个用户的某个角色
+    updateUserRole (e) {
+      const targetEl = e.srcElement
+      // 添加该角色
+      if (targetEl.checked) {
+        addUserRole({ user_id: this.tempRow.user_id, role_id: targetEl.value })
+        .then((data) => {
+          data = data.data
+          if (data.code !== 1) {
+            this.errorMsg(data.message)
+            targetEl.checked = false
+            return
+          }
+          this.successMsg(data.message)
+        })
+        .catch((err) => {
+          this.errorMsg(err)
+        })
+      } else {
+      // 删除该角色
+        delUserRole({ user_id: this.tempRow.user_id, role_id: targetEl.value })
+        .then((data) => {
+          data = data.data
+          if (data.code !== 1) {
+            this.errorMsg(data.message)
+            targetEl.checked = true
+            return
+          }
+          this.successMsg(data.message)
+        })
+        .catch((err) => {
+          this.errorMsg(err)
+        })
+      }
+    },
     // 成功消息提示
     successMsg (msg) {
       this.$message({
@@ -273,5 +370,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+label{
+  display: block;;
+}
 </style>

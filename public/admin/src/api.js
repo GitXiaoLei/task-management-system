@@ -65,6 +65,12 @@ export const addUser = params => axios.post('/api/user/add', qs.stringify(params
 export const delUser = params => axios.post('/api/user/del', qs.stringify(params))
 // 更新用户信息
 export const updateUser = params => axios.post('/api/user/update', qs.stringify(params))
+// 获取某个用户的所有角色
+export const getUserRole = params => axios.post('/api/user_role/list', qs.stringify(params))
+// 为某个用户添加某个角色
+export const addUserRole = params => axios.post('/api/user_role/add', qs.stringify(params))
+// 删除某个用户的某个角色
+export const delUserRole = params => axios.post('/api/user_role/del', qs.stringify(params))
 
 // 退出登录
 export const loginout = () => axios.get('/loginout')

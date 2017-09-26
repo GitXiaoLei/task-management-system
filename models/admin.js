@@ -201,6 +201,61 @@ const Admin = {
       })
     })
   },
+  // 获取某个用户的所有角色
+  getUserRole (userId) {
+    return new Promise((resolve, reject) => {
+      Async.waterfall([
+        // 从user_role表中通过用户id获取角色id
+        (cb) => {
+          DB
+          .instance('r')
+          .select('user_role', { user_id: userId })
+          .then((userRoleArr) => {
+            // 该用户没有相关角色
+            if (userRoleArr.length === 0) {
+              resolve(userRoleArr)
+              return
+            }
+            // 获取所有的角色id
+            let roleIdArr = []
+            userRoleArr.forEach((userRole) => {
+              roleIdArr.push(userRole.role_id)
+            })
+            roleIdArr = Util.removeSome(roleIdArr)
+            cb(null, roleIdArr)
+          })
+          .catch((err) => {
+            reject(err)
+          })
+        },
+        // 根据上面获得的角色id，来获取角色的详细信息
+        (roleIdArr, cb) => {
+          let sql = 'SELECT * FROM `' + 'role' + '` WHERE '
+          roleIdArr.forEach((roleId, i, arr) => {
+            if (arr.length - 1 !== i) {
+              sql += ' role_id = ' + roleId + ' OR '
+            } else {
+              sql += ' role_id = ' + roleId
+            }
+          })
+          DB
+          .instance('r')
+          .query(sql)
+          .then((roleData) => {
+            cb(null, roleData)
+          })
+          .catch((err) => {
+            reject(err)
+          })
+        }
+      ], (err, roleData) => {
+        if (err) {
+          reject(err)
+        }
+        resolve(roleData)
+      })
+    })
+  },
   // 为某个角色添加某个权限
   addRoleAccess (insertData) {
     return new Promise((resolve, reject) => {
@@ -215,9 +270,38 @@ const Admin = {
       })
     })
   },
+  // 为某个用户添加某个角色
+  addUserRole (insertData) {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .insert('user_role', insertData)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
   // 删除某个角色的某个权限
   delRoleAccess (insertData) {
     const sql = 'DELETE FROM `role_access` WHERE ' + 'role_id = ' + insertData.role_id + ' AND ' + 'access_id = ' + insertData.access_id
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .query(sql)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
+  // 删除某个用户的某个角色
+  delUserRole (conditions) {
+    const sql = 'DELETE FROM `user_role` WHERE ' + ' user_id = ' + conditions.user_id + ' AND ' + ' role_id = ' + conditions.role_id
     return new Promise((resolve, reject) => {
       DB
       .instance('w')
@@ -248,6 +332,21 @@ const Admin = {
   // 根据access_id，删除role_access表中的记录
   delRoleAccessByAccessId (conditions) {
     const sql = 'DELETE FROM `role_access` WHERE access_id = ' + conditions.access_id
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .query(sql)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
+  // 根据user_id，删除user_role表中的记录
+  delUserRoleByUserId (conditions) {
+    const sql = 'DELETE FROM `user_role` WHERE user_id = ' + conditions.user_id
     return new Promise((resolve, reject) => {
       DB
       .instance('w')
