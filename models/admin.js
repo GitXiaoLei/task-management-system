@@ -175,7 +175,6 @@ const Admin = {
         },
         // 根据上面获得的权限id，来获取权限的详细信息
         (accessIdArr, cb) => {
-          console.log('到这里了哦~~~')
           let sql = 'SELECT * FROM `' + 'access' + '` WHERE '
           accessIdArr.forEach((accessId, i, arr) => {
             if (arr.length - 1 !== i) {

@@ -49,7 +49,7 @@ class DB {
    * @return Promise result|rows
    */
   query (sql, values) {
-    console.log(sql)
+    // console.log(sql)
     return this.queryWithOptions({
       sql: sql,
       values: values
@@ -317,7 +317,6 @@ class DB {
    * @return Promese result 插入的结果，成功则有insertId属性
    */
   insert (tbname, data) {
-    console.log(tbname + '111111111111')
     const that = this
     return new Promise((resolve, reject) => {
       const sql = 'INSERT INTO `' + tbname + '` SET ? '
@@ -345,7 +344,7 @@ class DB {
 
       sql = sql + where
 
-      console.log(sql)
+      // console.log(sql)
       that
         .query(sql)
         .then((result) => {

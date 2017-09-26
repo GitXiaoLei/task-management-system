@@ -15,7 +15,7 @@ const RBAC = {
    * 初始化
    */
   init (req, res, next) {
-    console.log(req._authInfo)
+    // console.log(req._authInfo)
     // req._authInfo等于false时，表示前端没有发token过来或者token解析失败，就没有权限访问
     if (!req._authInfo) {
       // 没有权限访问资源
@@ -27,24 +27,24 @@ const RBAC = {
     }
     // 请求权限
     RBAC
-      .getSudo(req._authInfo.uid)
-      .then((accessUrlArr) => {
-        // 将改地址改用户能不能访问的布尔值挂载到req对象下：true表示能访问该地址，false表示不能访问该地址
-        req._canVisit = RBAC.canVisit(accessUrlArr, req.path)
-        // 请求角色
-        RBAC
-          .getRole(req._authInfo.uid)
-          .then((roleNameArr) => {
-            req._role = roleNameArr
-            next()
-          })
-          .catch((err) => {
-            Output.apiErr(err)
-          })
-      })
-      .catch((err) => {
-        Output.apiErr(err)
-      })
+    .getSudo(req._authInfo.uid)
+    .then((accessUrlArr) => {
+      // 将改地址改用户能不能访问的布尔值挂载到req对象下：true表示能访问该地址，false表示不能访问该地址
+      req._canVisit = RBAC.canVisit(accessUrlArr, req.path)
+      // 请求角色
+      RBAC
+        .getRole(req._authInfo.uid)
+        .then((roleNameArr) => {
+          req._role = roleNameArr
+          next()
+        })
+        .catch((err) => {
+          Output.apiErr(err)
+        })
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
   },
   /**
    * 获取用户的权限：也就是能够请求的地址
@@ -56,22 +56,22 @@ const RBAC = {
         // 根据 用户id 获取用户的 角色id：表user_role
         (cb) => {
           DB
-            .instance('r')
-            .select('user_role', { user_id: uid })
-            .then((userRoleData) => {
-              let roleIdArr = []
-              userRoleData.forEach((userRole) => {
-                roleIdArr.push(userRole.role_id)
-              })
-              cb(null, roleIdArr)
+          .instance('r')
+          .select('user_role', { user_id: uid })
+          .then((userRoleData) => {
+            let roleIdArr = []
+            userRoleData.forEach((userRole) => {
+              roleIdArr.push(userRole.role_id)
             })
-            .catch((err) => {
-              reject(err)
-            })
+            cb(null, roleIdArr)
+          })
+          .catch((err) => {
+            reject(err)
+          })
         },
         // 根据用户的 角色id 获取用户的 权限id：表role_access
         (roleIdArr, cb) => {
-          console.log(roleIdArr)
+          // console.log(roleIdArr)
           let sql = 'SELECT * FROM `' + 'role_access' + '` WHERE '
           roleIdArr.forEach((roleId, i, arr) => {
             if (arr.length - 1 !== i) {
@@ -81,26 +81,23 @@ const RBAC = {
             }
           })
           DB
-            .instance('r')
-            .query(sql)
-            .then((roleAccessData) => {
-              let accessIdArr = []
-              roleAccessData.forEach((roleAccess) => {
-                accessIdArr.push(roleAccess.access_id)
-              })
-              // 去除重复的access_id
-              accessIdArr = Util.removeSome(accessIdArr)
-              cb(null, accessIdArr)
+          .instance('r')
+          .query(sql)
+          .then((roleAccessData) => {
+            let accessIdArr = []
+            roleAccessData.forEach((roleAccess) => {
+              accessIdArr.push(roleAccess.access_id)
             })
-            .catch((err) => {
-              reject(err)
-            })
+            // 去除重复的access_id
+            accessIdArr = Util.removeSome(accessIdArr)
+            cb(null, accessIdArr)
+          })
+          .catch((err) => {
+            reject(err)
+          })
         },
         // 根据用户的 权限id 获取用户的 权限(也就是能够请求的地址)：表access
         (accessIdArr, cb) => {
-          console.log('------------------')
-          console.log(accessIdArr)
-          console.log('------------------')
           if (accessIdArr.length === 0) {
             resolve(accessIdArr)
           }
@@ -113,19 +110,19 @@ const RBAC = {
             }
           })
           DB
-            .instance('r')
-            .query(sql)
-            .then((accessData) => {
-              let accessUrlArr = []
-              accessData.forEach((access) => {
-                accessUrlArr.push(access.access_url)
-              })
-              accessUrlArr = Util.removeSome(accessUrlArr)
-              cb(null, accessUrlArr)
+          .instance('r')
+          .query(sql)
+          .then((accessData) => {
+            let accessUrlArr = []
+            accessData.forEach((access) => {
+              accessUrlArr.push(access.access_url)
             })
-            .catch((err) => {
-              reject(err)
-            })
+            accessUrlArr = Util.removeSome(accessUrlArr)
+            cb(null, accessUrlArr)
+          })
+          .catch((err) => {
+            reject(err)
+          })
         }
       ], (err, accessUrlArr) => {
         if (err) {
@@ -145,21 +142,23 @@ const RBAC = {
         // 根据uid获取 用户角色的id：表user_role
         (cb) => {
           DB
-            .instance('r')
-            .select('user_role')
-            .then((userRoles) => {
-              const roleIdArr = []
-              userRoles.forEach((userRole) => {
-                roleIdArr.push(userRole.role_id)
-              })
-              cb(null, roleIdArr)
+          .instance('r')
+          .select('user_role', { user_id: uid })
+          .then((userRoles) => {
+            const roleIdArr = []
+            userRoles.forEach((userRole) => {
+              roleIdArr.push(userRole.role_id)
             })
-            .catch((err) => {
-              reject(err)
-            })
+            cb(null, roleIdArr)
+          })
+          .catch((err) => {
+            reject(err)
+          })
         },
         // 根据角色的id获取 角色名：表role
         (roleIdArr, cb) => {
+          console.log('哈哈哈哈哈哈：')
+          console.log(roleIdArr)
           let sql = 'SELECT * FROM `' + 'role' + '` WHERE '
           roleIdArr.forEach((roleId, i, arr) => {
             if (arr.length - 1 !== i) {
@@ -168,20 +167,19 @@ const RBAC = {
               sql += ' role_id = ' + roleId
             }
           })
-          console.log(sql)
           DB
-            .instance('r')
-            .query(sql)
-            .then((roleNames) => {
-              const roleNameArr = []
-              roleNames.forEach((roleName) => {
-                roleNameArr.push(roleName.role_name)
-              })
-              cb(null, roleNameArr)
+          .instance('r')
+          .query(sql)
+          .then((roleNames) => {
+            const roleNameArr = []
+            roleNames.forEach((roleName) => {
+              roleNameArr.push(roleName.role_name)
             })
-            .catch((err) => {
-              reject(err)
-            })
+            cb(null, roleNameArr)
+          })
+          .catch((err) => {
+            reject(err)
+          })
         }
       ], (err, roleNameArr) => {
         if (err) {

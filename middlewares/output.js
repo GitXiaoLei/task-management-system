@@ -31,9 +31,9 @@ const Output = {
    * @param {String} message 提示消息
    * @return null
    */
-  apiData (data = {}, message = '') {
+  apiData (data = {}, message = '', code = 1) {
     _res.json({
-      code: 1,
+      code: code,
       message: message,
       data: data
     })

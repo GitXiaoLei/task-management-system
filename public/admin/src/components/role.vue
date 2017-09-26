@@ -1,51 +1,58 @@
 <template>
   <div>
-    <!-- 添加角色 -->
-    <el-form :inline="true" :model="addRoleForm" ref="addRoleForm">
-      <el-form-item label="角色名" required>
-        <el-input v-model="addRoleForm.role_name" placeholder="请输入角色名"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="addRole('addRoleForm')">添加</el-button>
-      </el-form-item>
-    </el-form>
-    <!-- 角色列表 -->
-    <el-table
-      :data="roleData">
-      <el-table-column
-        prop="role_id"
-        label="ID"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="role_name"
-        label="角色名"
-        width="180">
-      </el-table-column>
-      <el-table-column label="操作">
-        <template scope="scope">
-          <el-button v-if="scope.row.role_id !== 1" size="small" type="danger" @click="delRole(scope.$index, scope.row)">删除</el-button>
-          <el-button v-if="scope.row.role_id !== 1" size="small" type="primary" @click="editDialog(scope.$index, scope.row)">更新权限</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <!-- 添加/删除 权限dialog -->
-    <el-dialog
-      title="更新角色的权限"
-      :visible.sync="dialogVisible">
-      <!-- 权限列表 -->
-      <el-form ref="accessForm" :model="accessForm">
-        <el-checkbox-group v-model="checkboxArr">
-          <el-checkbox
-            v-for="access in accessForm.accessData"
-            :key="access.id"
-            :label="access.access_id"
-            name="access"
-            @change="updateRoleAccess">【ID:{{ access.access_id }}】{{ access.access_url }}<span style="float: right;">【{{ access.access_title }}】</span></el-checkbox>
-        </el-checkbox-group>
+    <!-- 有权限访问页面才会渲染出来 -->
+    <div v-if="canVisit === 1">
+      <!-- 添加角色 -->
+      <el-form :inline="true" :model="addRoleForm" ref="addRoleForm">
+        <el-form-item label="角色名" required>
+          <el-input v-model="addRoleForm.role_name" placeholder="请输入角色名"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="addRole('addRoleForm')">添加</el-button>
+        </el-form-item>
       </el-form>
-      
-    </el-dialog>
+      <!-- 角色列表 -->
+      <el-table
+        :data="roleData">
+        <el-table-column
+          prop="role_id"
+          label="ID"
+          width="180">
+        </el-table-column>
+        <el-table-column
+          prop="role_name"
+          label="角色名"
+          width="180">
+        </el-table-column>
+        <el-table-column label="操作">
+          <template scope="scope">
+            <el-button v-if="scope.row.role_id !== 1" size="small" type="danger" @click="delRole(scope.$index, scope.row)">删除</el-button>
+            <el-button size="small" type="primary" @click="editDialog(scope.$index, scope.row)">更新权限</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <!-- 添加/删除 权限dialog -->
+      <el-dialog
+        title="更新角色的权限"
+        :visible.sync="dialogVisible">
+        <!-- 权限列表 -->
+        <el-form ref="accessForm" :model="accessForm">
+          <el-checkbox-group v-model="checkboxArr">
+            <el-checkbox
+              v-for="access in accessForm.accessData"
+              :key="access.id"
+              :label="access.access_id"
+              name="access"
+              @change="updateRoleAccess">【ID:{{ access.access_id }}】{{ access.access_url }}<span style="float: right;">【{{ access.access_title }}】</span></el-checkbox>
+          </el-checkbox-group>
+        </el-form>
+        
+      </el-dialog>
+    </div>
+    <!-- 没有权限访问该页面 -->
+    <div v-else-if="canVisit === 0">你没有权限访问该页面！</div>
+    <!-- 过渡页面 -->
+    <div v-else></div>
   </div>
 </template>
 
@@ -64,7 +71,8 @@ export default {
       },
       checkboxArr: [],
       dialogVisible: false,
-      tempRow: {}
+      tempRow: {},
+      canVisit: -1
     }
   },
   methods: {
@@ -218,7 +226,24 @@ export default {
     }
   },
   created () {
-    this.getRole()
+    this
+    .checkAuth('/admin/role')
+    .then((code) => {
+      // 验证成功，且有权限访问
+      if (code === 1) {
+        this.getRole()
+        this.canVisit = 1
+      } else if (code === -1) {
+      // 没有登录，跳转至登录页面
+        window.location.href = '/'
+      } else if (code === 0) {
+      // 没有权限访问该页面
+        this.canVisit = 0
+      }
+    })
+    .catch((err) => {
+      this.errorMsg(err)
+    })
   }
 }
 </script>

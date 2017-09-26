@@ -8,7 +8,6 @@ const route = (app) => {
    * 首页
    */
   app.get('/', (req, res) => {
-    console.log('请求了首页')
     console.log(req._role)
     // 游客
     if (typeof req._role === 'string' && req._role === 'guest') {
@@ -24,7 +23,7 @@ const route = (app) => {
     if (RBAC.isAdmin(req._role)) {
       Output.apiData('你仅仅是管理员哦~')
     }
-    Output.apiData('你是老师或学生')
+    Output.render('user/index')
     // if(!req._canVisit) {
     //     Output.apiErr({ code: 0, message: '你没有权限访问该资源' });
     // }

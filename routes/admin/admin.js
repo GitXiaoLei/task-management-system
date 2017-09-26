@@ -7,31 +7,32 @@ const Async = require('async')
 // const DBError = require('../../errors/db_error');
 
 const route = (app) => {
-  // 用户管理页面
-  // app.get('/admin/user', (req, res) => {
-  //   if (!req._canVisit) {
-  //     Output.render('admin/index', {
-  //       canVisit: 1
-  //     })
-  //     return
-  //   }
-  //   Output.render('admin/index', {
-  //     canVisit: true
-  //   })
-  // })
-  // 获取所有权限
+  // 后台管理(单页应用)页面的token验证
+  app.get('/admin/*', (req, res) => {
+    console.log(req.path)
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiData({}, '你没有权限访问', -1)
+    }
+    // 没有权限访问
+    if (!req._canVisit) {
+      Output.apiData({}, '你没有权限访问', 0)
+      return
+    }
+    Output.apiData({}, '你有权限访问')
+  })
+  // 获取权限列表
   app.get('/api/access/list', (req, res) => {
-    console.log('这里？这里？')
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
       return
     }
     // 超级管理员才能访问
-    // if(!req._canVisit) {
-    //     Output.apiErr({ code: 0, message: '你没有权限访问' });
-    //     return;
-    // }
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
     Admin
     .getAccess()
     .then((accessArr) => {
@@ -49,10 +50,10 @@ const route = (app) => {
       return
     }
     // 超级管理员才能访问
-    // if (!req._canVisit) {
-    //   Output.apiErr({ code: 0, message: '你没有权限访问' })
-    //   return
-    // }
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
     // 要插入数据库的数据
     const insetData = {
       access_title: req.body.access_title,
@@ -77,10 +78,10 @@ const route = (app) => {
       return
     }
     // 超级管理员才能访问
-    // if(!req._canVisit) {
-    //     Output.apiErr({ code: 0, message: '你没有权限访问' });
-    //     return;
-    // }
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
     // 要插入数据库的数据
     const updateData = {
       access_title: req.body.access_title || null,
@@ -111,10 +112,10 @@ const route = (app) => {
       return
     }
     // 超级管理员才能访问
-    // if(!req._canVisit) {
-    //     Output.apiErr({ code: 0, message: '你没有权限访问' });
-    //     return;
-    // }
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
     const conditions = { access_id: req.body.access_id }
     Async.parallel({
       // 删除access表中的权限信息
@@ -157,10 +158,10 @@ const route = (app) => {
       return
     }
     // 超级管理员才能访问
-    // if(!req._canVisit) {
-    //     Output.apiErr({ code: 0, message: '你没有权限访问' });
-    //     return;
-    // }
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
     Admin
     .getRole()
     .then((roleArr) => {
@@ -178,10 +179,10 @@ const route = (app) => {
       return
     }
     // 超级管理员才能访问
-    // if(!req._canVisit) {
-    //     Output.apiErr({ code: 0, message: '你没有权限访问' });
-    //     return;
-    // }
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
     // 要插入数据库的数据
     const insetData = {
       role_name: req.body.role_name,
@@ -205,10 +206,10 @@ const route = (app) => {
       return
     }
     // 超级管理员才能访问
-    // if(!req._canVisit) {
-    //     Output.apiErr({ code: 0, message: '你没有权限访问' });
-    //     return;
-    // }
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
     const conditions = { role_id: req.body.role_id }
     Async.parallel({
       // 根据role_id，删除role表中的角色信息
@@ -251,10 +252,10 @@ const route = (app) => {
       return
     }
     // 超级管理员才能访问
-    // if(!req._canVisit) {
-    //     Output.apiErr({ code: 0, message: '你没有权限访问' });
-    //     return;
-    // }
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
 
     const roleId = req.body.role_id
     Admin
@@ -274,10 +275,10 @@ const route = (app) => {
       return
     }
     // 超级管理员才能访问
-    // if(!req._canVisit) {
-    //     Output.apiErr({ code: 0, message: '你没有权限访问' });
-    //     return;
-    // }
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
     const insertData = {
       role_id: req.body.role_id,
       access_id: req.body.access_id,
@@ -301,10 +302,10 @@ const route = (app) => {
       return
     }
     // 超级管理员才能访问
-    // if(!req._canVisit) {
-    //     Output.apiErr({ code: 0, message: '你没有权限访问' });
-    //     return;
-    // }
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
     const conditions = {
       role_id: req.body.role_id,
       access_id: req.body.access_id
