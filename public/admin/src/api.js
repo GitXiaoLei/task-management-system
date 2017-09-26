@@ -30,7 +30,7 @@ export const updateAccess = params => axios.post('/api/access/update', qs.string
 // 删除权限
 export const delAccess = params => axios.post('/api/access/del', qs.stringify(params))
 
-// 获取角色
+// 获取角色列表
 export const getRole = () => axios.get('/api/role/list')
 // 添加角色
 export const addRole = params => axios.post('/api/role/add', qs.stringify(params))
@@ -43,4 +43,19 @@ export const addRoleAccess = params => axios.post('/api/role_access/add', qs.str
 // 删除某个角色的某个权限
 export const delRoleAccess = params => axios.post('/api/role_access/del', qs.stringify(params))
 
+// 获取院系列表
+export const getDepartment = () => axios.get('/api/department/list')
+// 添加院系
+export const addDepartment = params => axios.post('/api/department/add', qs.stringify(params))
+// 删除院系
+export const delDepartment = params => axios.post('/api/department/del', qs.stringify(params))
+
+// 获取科目列表
+export const getSubject = () => axios.get('/api/subject/list')
+// 添加科目
+export const addSubject = params => axios.post('/api/subject/add', qs.stringify(params))
+// 删除科目
+export const delSubject = params => axios.post('/api/subject/del', qs.stringify(params))
+
+// 退出登录
 export const loginout = () => axios.get('/loginout')

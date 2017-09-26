@@ -248,7 +248,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 label{
   display: block;
   padding: 4px 0 2px 0px;
@@ -259,5 +259,9 @@ label:hover{
 }
 .el-checkbox{
   margin-left: 0;
+}
+.el-dialog__body{
+  max-height: 460px;
+  overflow: auto;
 }
 </style>

@@ -419,7 +419,7 @@ const route = (app) => {
     }
     const conditions = { department_id: req.body.department_id }
     Admin
-    .delSubject(conditions)
+    .delDepartment(conditions)
     .then((result) => {
       Output.apiData(result, '删除院系成功')
     })
