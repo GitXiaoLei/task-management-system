@@ -158,7 +158,6 @@ export default {
           return
         }
         // 更新本地数据
-        this.accessData.splice(this.editIndex, 1, this.editAccessForm)
         this.successMsg(data.message)
       })
       .catch((err) => {

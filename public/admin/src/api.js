@@ -57,5 +57,14 @@ export const addSubject = params => axios.post('/api/subject/add', qs.stringify(
 // 删除科目
 export const delSubject = params => axios.post('/api/subject/del', qs.stringify(params))
 
+// 获取用户列表
+export const getUser = () => axios.get('/api/user/list')
+// 添加用户
+export const addUser = params => axios.post('/api/user/add', qs.stringify(params))
+// 删除用户
+export const delUser = params => axios.post('/api/user/del', qs.stringify(params))
+// 更新用户信息
+export const updateUser = params => axios.post('/api/user/update', qs.stringify(params))
+
 // 退出登录
 export const loginout = () => axios.get('/loginout')
