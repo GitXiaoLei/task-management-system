@@ -259,6 +259,90 @@ const Admin = {
         reject(err)
       })
     })
+  },
+  // 获取院系列表
+  getDepartment () {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('r')
+      .select('department')
+      .then((departmentArr) => {
+        resolve(departmentArr)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
+  // 获取科目列表
+  getSubject () {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('r')
+      .select('subject')
+      .then((subjectArr) => {
+        resolve(subjectArr)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
+  // 添加院系
+  addDepartment (insertData) {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .insert('department', insertData)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
+  // 添加科目
+  addSubject (insertData) {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .insert('subject', insertData)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
+  // 删除院系
+  delDepartment (conditions) {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .delete('department', conditions)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
+  // 删除科目
+  delSubject (conditions) {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .delete('subject', conditions)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
   }
 }
 

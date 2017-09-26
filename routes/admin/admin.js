@@ -319,6 +319,136 @@ const route = (app) => {
       Output.apiErr(err)
     })
   })
+  // 获取院系列表
+  app.get('/api/department/list', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    Admin
+    .getDepartment()
+    .then((departmentArr) => {
+      Output.apiData(departmentArr, '获取院系列表成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
+  // 获取科目列表
+  app.get('/api/subject/list', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    Admin
+    .getSubject()
+    .then((departmentArr) => {
+      Output.apiData(departmentArr, '获取院系列表成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
+  // 添加院系
+  app.post('/api/department/add', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const insertData = { department_name: req.body.department_name }
+    Admin
+    .addDepartment(insertData)
+    .then((result) => {
+      Output.apiData(result, '添加院系成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
+  // 添加科目
+  app.post('/api/subject/add', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const insertData = { subject_name: req.body.subject_name }
+    Admin
+    .addSubject(insertData)
+    .then((result) => {
+      Output.apiData(result, '添加科目成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
+  // 删除院系
+  app.post('/api/department/del', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const conditions = { department_id: req.body.department_id }
+    Admin
+    .delSubject(conditions)
+    .then((result) => {
+      Output.apiData(result, '删除院系成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
+  // 删除科目
+  app.post('/api/subject/del', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const conditions = { subject_id: req.body.subject_id }
+    Admin
+    .delSubject(conditions)
+    .then((result) => {
+      Output.apiData(result, '删除科目成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
 }
 
 module.exports = route
