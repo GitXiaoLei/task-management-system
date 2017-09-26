@@ -7,13 +7,18 @@ const Async = require('async')
 // const DBError = require('../../errors/db_error');
 
 const route = (app) => {
-  /**
-   * 院系管理页面
-   */
-  app.get('/api/department', (req, res) => {
-    let obj = { type: 1 }
-    Output.render('admin/department.art', obj)
-  })
+  // 用户管理页面
+  // app.get('/admin/user', (req, res) => {
+  //   if (!req._canVisit) {
+  //     Output.render('admin/index', {
+  //       canVisit: 1
+  //     })
+  //     return
+  //   }
+  //   Output.render('admin/index', {
+  //     canVisit: true
+  //   })
+  // })
   // 获取所有权限
   app.get('/api/access/list', (req, res) => {
     console.log('这里？这里？')

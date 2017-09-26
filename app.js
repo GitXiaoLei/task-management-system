@@ -2,7 +2,6 @@
 
 const express = require('express')
 const bodyParser = require('body-parser')
-const ejs = require('ejs')
 // const session = require('express-session')
 const ckParser = require('cookie-parser')
 const helmet = require('helmet')
@@ -27,7 +26,7 @@ app.use(bodyParser.json())
 
 app.use(helmet())
 
-app.engine('html', ejs.__express)
+app.engine('.html', require('ejs').__express)
 app.set('view engine', 'html')
 app.set('views', 'public/views')
 app.use('/static', express.static('public'))
@@ -60,14 +59,14 @@ require('./routes/api/user')(app)
 // require('./routes/admin/teacher')(app);
 // require('./routes/admin/student')(app);
 
-app.get('*', (req, res) => {
+// app.get('*', (req, res) => {
   // 返回404页面
-  if (req.path.indexOf('admin') === -1) {
-    Output.apiData({}, '404')
-    return
-  }
-  Output.render('admin/index')
-})
+  // if (req.path.indexOf('admin') === -1) {
+  //   Output.apiData({}, '404')
+  //   return
+  // }
+  // Output.render('admin/index')
+// })
 
 app.listen(port, (err) => {
   if (err) {

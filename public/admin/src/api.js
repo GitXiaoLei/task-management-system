@@ -1,7 +1,7 @@
 import axios from 'axios'
 import qs from 'qs'
 // 定义环境：为开发环境时，才设置baseURL和允许发送cookie
-const ENV = 'dev'
+const ENV = ''
 if (ENV === 'dev') {
   axios.defaults.baseURL = 'http://localhost:3000'
   axios.defaults.withCredentials = true // 能够发送、接受cookie：https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/withCredentials
