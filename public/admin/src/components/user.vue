@@ -198,7 +198,7 @@ export default {
         })
       })
     },
-    // 删除用户
+    // 删除用户：同时也要删除user_role表中user_id所对应的数据
     delUser (i, row) {
       delUser({ user_id: row.user_id })
       .then((data) => {

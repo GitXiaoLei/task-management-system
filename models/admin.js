@@ -429,6 +429,20 @@ const Admin = {
       })
     })
   },
+  // 添加班级
+  addClass (insertData) {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .insert('class', insertData)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
   // 添加用户
   addUser (insertData) {
     return new Promise((resolve, reject) => {
@@ -471,6 +485,20 @@ const Admin = {
       })
     })
   },
+  // 删除班级
+  delClass (conditions) {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .delete('class', conditions)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
   // 删除用户
   delUser (conditions) {
     return new Promise((resolve, reject) => {
@@ -498,6 +526,15 @@ const Admin = {
         reject(err)
       })
     })
+  },
+  // 查询一个用户是否存在
+  async getOne (conditions) {
+    try {
+      const userData = await DB.instance('r').select('user', conditions)
+      return userData
+    } catch (e) {
+      await e
+    }
   }
 }
 

@@ -500,6 +500,31 @@ const route = (app) => {
       Output.apiErr(err)
     })
   })
+  // 添加班级
+  app.post('/api/class/add', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const insertData = {
+      class_name: req.body.class_name,
+      created_time: Moment().unix()
+    }
+    Admin
+    .addClass(insertData)
+    .then((result) => {
+      Output.apiData(result, '添加班级成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
   // 添加用户
   app.post('/api/user/add', (req, res) => {
     // 没有登录
@@ -565,6 +590,28 @@ const route = (app) => {
     .delSubject(conditions)
     .then((result) => {
       Output.apiData(result, '删除科目成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
+  // 删除班级
+  app.post('/api/class/del', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const conditions = { class_id: req.body.class_id }
+    Admin
+    .delClass(conditions)
+    .then((result) => {
+      Output.apiData(result, '删除班级成功')
     })
     .catch((err) => {
       Output.apiErr(err)
@@ -696,6 +743,26 @@ const route = (app) => {
     .catch((err) => {
       Output.apiErr(err)
     })
+  })
+  // 是否存在相同的角色
+  app.post('/api/user/same', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const conditions = { username: req.body.username }
+    try {
+      const userData = await Admin.getOne(conditions)
+      Output.apiData(userData, '用户数据')
+    } catch (e) {
+      Output.apiErr(e)
+    }
   })
 }
 

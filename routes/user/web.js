@@ -21,7 +21,8 @@ const route = (app) => {
     }
     // 管理员
     if (RBAC.isAdmin(req._role)) {
-      Output.apiData('你仅仅是管理员哦~')
+      Output.render('admin/index')
+      return
     }
     Output.render('user/index')
     // if(!req._canVisit) {
