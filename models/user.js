@@ -9,7 +9,7 @@ const _dbtable = 'user'
  * 用户模型
  */
 const User = {
-  // 获取一个用户的信息
+  // 获取一个用户的信息：通过username
   getOne (username) {
     return new Promise((resolve, reject) => {
       DB
@@ -22,6 +22,11 @@ const User = {
         reject(err)
       })
     })
+  },
+  // 获取一个用户的信息，通过user_id
+  async getUserById (uid) {
+    const userInfo = await DB.instance('r').select('user', { user_id: uid })
+    return userInfo
   },
   // 老师添加自己所教的科目：teacher_subject表
   addTeacherSubject (insertData) {

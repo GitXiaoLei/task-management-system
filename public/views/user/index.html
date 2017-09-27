@@ -1,16 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>首页</title>
-</head>
-<body>
-    <div>{{name}}</div>
-    <input type="text" id="username">
-    <input type="password" id="password">
-    <button type="button">登录</button>
-    <script src="/static/build/index.js"></script>
-</body>
-</html>
+{{extend '../common/layout.html'}}
+
+{{block 'title'}}首页{{/block}}
+
+{{block 'content'}}
+
+{{title}}
+<br>
+<!-- 没登录 -->
+{{if !userInfo}}
+<input type="text" id="username">
+<input type="password" id="password">
+<button type="button" class="login">登录</button>
+{{/if}}
+<!-- 登录了 -->
+{{if userInfo}}
+<button type="button" class="loginout">退出登录</button>
+{{/if}}
+<script src="/static/build/index.js"></script>
+{{/block}}

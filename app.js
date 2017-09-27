@@ -26,8 +26,11 @@ app.use(bodyParser.json())
 
 app.use(helmet())
 
-app.engine('.html', require('ejs').__express)
+app.engine('.html', require('express-art-template'))
 app.set('view engine', 'html')
+app.set('view options', {
+  debug: process.env.NODE_ENV !== 'production'
+})
 app.set('views', 'public/views')
 app.use('/static', express.static('public'))
 

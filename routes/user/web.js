@@ -11,7 +11,9 @@ const route = (app) => {
     console.log(req._role)
     // 游客
     if (typeof req._role === 'string' && req._role === 'guest') {
-      Output.render('user/index')
+      Output.render('user/index', {
+        title: '还没有登录'
+      })
       return
     }
     // 超级管理员
@@ -24,11 +26,20 @@ const route = (app) => {
       Output.render('admin/index')
       return
     }
-    Output.render('user/index')
-    // if(!req._canVisit) {
-    //     Output.apiErr({ code: 0, message: '你没有权限访问该资源' });
-    // }
-    // Output.apiData({}, '你有权限访问该资源');
+    // 老师
+    if (req._role[0] === 'teacher') {
+      Output.render('user/index', {
+        userInfo: req._userInfo,
+        title: '老师，你已经登录了'
+      })
+    }
+    // 学生
+    if (req._role[0] === 'student') {
+      Output.render('user/index', {
+        userInfo: req._userInfo,
+        title: '同学，你已经登录了'
+      })
+    }
   })
 }
 

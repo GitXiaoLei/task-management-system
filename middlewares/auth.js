@@ -1,6 +1,7 @@
 'use strict'
 
 const jwt = require('jsonwebtoken')
+const User = require('../models/user')
 // const uuid = require('uuid')
 // const serverInfo = require('../config/server')
 
@@ -11,17 +12,21 @@ const Auth = {
   /**
    * 初始化：将“加了密”的token“解密”成对象形式的信息
    */
-  init (req, res, next) {
+  async init (req, res, next) {
     let token
 
     token = req.cookies.authorization
-    console.log('-----------------\n', '前端发来的token：\n' + token, '\n-----------------')
     _authInfo = Auth.verify(token)
-    console.log('解析后的token：')
-    console.log(_authInfo)
-    console.log('-----------------')
     // 将解析后的auth挂在到req对象下
     req._authInfo = _authInfo
+    // 将用户的信息挂载到req对象下面
+    if (_authInfo) {
+      const userInfo = await User.getUserById(_authInfo.uid)
+      req._userInfo = {
+        user_id: userInfo.user_id,
+        username: userInfo.username
+      }
+    }
     next()
   },
   /**
