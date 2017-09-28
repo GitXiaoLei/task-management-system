@@ -3,7 +3,8 @@
     <!-- 有权限访问 -->
     <div v-if="canVisit === 1">
       <!-- 添加权限 -->
-      <el-form :inline="true" :model="addAccessForm" ref="addAccessForm">
+      <h2>添加权限</h2>
+      <el-form :inline="true" :model="addAccessForm" ref="addAccessForm" class="add-form">
         <el-form-item label="标题" required>
           <el-input v-model="addAccessForm.title" placeholder="请输入标题"></el-input>
         </el-form-item>
@@ -14,17 +15,18 @@
         </el-form-item>
       </el-form>
       <!-- 权限列表 -->
+      <h2>权限列表</h2>
       <el-table
-        :data="accessData">
+        :data="accessData"
+        class="main-table"
+        height="450">
         <el-table-column
           prop="access_id"
-          label="ID"
-          width="180">
+          label="ID">
         </el-table-column>
         <el-table-column
           prop="access_title"
-          label="标题"
-          width="180">
+          label="标题">
         </el-table-column>
         <el-table-column
           prop="access_url"

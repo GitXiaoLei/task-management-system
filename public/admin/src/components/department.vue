@@ -3,7 +3,8 @@
     <!-- 有权限访问该页面 -->
     <div v-if="canVisit === 1">
       <!-- 添加院系 -->
-      <el-form :inline="true" :model="addDepartmentForm" ref="addDepartmentForm">
+      <h2>添加院系</h2>
+      <el-form :inline="true" :model="addDepartmentForm" ref="addDepartmentForm" class="add-form">
         <el-form-item label="院系名称" required>
           <el-input v-model="addDepartmentForm.name" placeholder="请输入院系名称"></el-input>
         </el-form-item>
@@ -11,17 +12,17 @@
         </el-form-item>
       </el-form>
       <!-- 院系列表 -->
+      <h2>院系列表</h2>
       <el-table
-        :data="departmentData">
+        :data="departmentData"
+        class="main-table">
         <el-table-column
           prop="department_id"
-          label="ID"
-          width="180">
+          label="ID">
         </el-table-column>
         <el-table-column
           prop="department_name"
-          label="院系名称"
-          width="180">
+          label="院系名称">
         </el-table-column>
         <el-table-column label="操作">
           <template scope="scope">

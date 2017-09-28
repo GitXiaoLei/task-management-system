@@ -3,7 +3,8 @@
     <!-- 有权限访问该页面 -->
     <div v-if="canVisit === 1">
       <!-- 添加用户 -->
-      <el-form :inline="true" :model="addUserForm" ref="addUserForm">
+      <h2>添加用户</h2>
+      <el-form :inline="true" :model="addUserForm" ref="addUserForm" class="add-form">
         <el-form-item label="用户名" required>
           <el-input v-model="addUserForm.username" placeholder="请输入用户名"></el-input>
         </el-form-item>
@@ -11,9 +12,11 @@
         </el-form-item>
       </el-form>
       <!-- 用户列表 -->
+      <h2>用户列表</h2>
       <el-table
         :data="userData"
-        border>
+        border
+        class="main-table">
         <el-table-column
           prop="user_id"
           label="ID">
@@ -50,7 +53,7 @@
           prop="qq_num"
           label="QQ号码">
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="200">
           <template scope="scope">
             <el-button size="small" @click="editDialog(scope.$index, scope.row)">编辑</el-button>
             <el-button size="small" @click="chooseRoleDialog(scope.$index, scope.row)">角色</el-button>
@@ -63,7 +66,7 @@
         title="编辑用户信息"
         :visible.sync="editDialogVisible">
         <!-- 编辑的表单 -->
-        <el-form :model="editUserForm" ref="editUserForm" label-position="right">
+        <el-form :model="editUserForm" ref="editUserForm" label-position="right" class="dialog-form">
           <el-form-item label="用户名" required>
             <el-input v-model="editUserForm.username" placeholder="请输入用户名"></el-input>
           </el-form-item>
@@ -109,12 +112,13 @@
 
       <!-- 添加/删除 用户角色 -->
       <el-dialog
-        title="更新用户的权限"
+        title="更新用户的角色"
         :visible.sync="roleDialogVisible">
         <!-- 角色列表 -->
         <el-form ref="accessForm">
           <el-checkbox-group v-model="checkboxArr">
             <el-checkbox
+              class="label"
               v-for="role in roleData"
               :key="role.id"
               :label="role.role_id"
@@ -170,6 +174,12 @@ export default {
           this.errorMsg(data.message)
           return
         }
+        // 去除uid为1的用户，即超级管理员
+        data.data.forEach((data, i, arr) => {
+          if (data.user_id === 1) {
+            arr.splice(i, 1)
+          }
+        })
         this.userData = data.data
       })
       .catch((err) => {
@@ -260,7 +270,7 @@ export default {
       this.roleDialogVisible = true
       this.checkboxArr = []
       this.tempRow = row
-      return new Promise((resolve, reject) => {
+      new Promise((resolve, reject) => {
         getRole()
         .then((data) => {
           data = data.data
@@ -268,6 +278,11 @@ export default {
             that.errorMsg(data.message)
             reject(data.message)
           }
+          data.data.forEach((data, i, arr) => {
+            if (data.role_id === 1) {
+              arr.splice(i, 1)
+            }
+          })
           that.roleData = data.data
           resolve()
         })
@@ -370,7 +385,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-label{
-  display: block;;
-}
+
 </style>

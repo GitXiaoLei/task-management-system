@@ -7,6 +7,7 @@ import ElementUi from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 import 'reset-css/reset.css'
 import '../../common/style/reset.css'
+import './admin-common.css'
 Vue.config.productionTip = false
 Vue.use(ElementUi)
 

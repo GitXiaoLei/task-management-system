@@ -3,7 +3,8 @@
     <!-- 有权限访问该页面 -->
     <div v-if="canVisit === 1">
       <!-- 添加科目 -->
-      <el-form :inline="true" :model="addSubjectForm" ref="addSubjectForm">
+      <h2>添加科目</h2>
+      <el-form :inline="true" :model="addSubjectForm" ref="addSubjectForm" class="add-form">
         <el-form-item label="科目名称" required>
           <el-input v-model="addSubjectForm.name" placeholder="请输入科目名称"></el-input>
         </el-form-item>
@@ -11,17 +12,17 @@
         </el-form-item>
       </el-form>
       <!-- 科目列表 -->
+      <h2>科目列表</h2>
       <el-table
-        :data="subjectData">
+        :data="subjectData"
+        class="main-table">
         <el-table-column
           prop="subject_id"
-          label="ID"
-          width="180">
+          label="ID">
         </el-table-column>
         <el-table-column
           prop="subject_name"
-          label="科目名称"
-          width="180">
+          label="科目名称">
         </el-table-column>
         <el-table-column label="操作">
           <template scope="scope">

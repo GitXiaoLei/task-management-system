@@ -3,7 +3,8 @@
     <!-- 有权限访问页面才会渲染出来 -->
     <div v-if="canVisit === 1">
       <!-- 添加角色 -->
-      <el-form :inline="true" :model="addRoleForm" ref="addRoleForm">
+      <h2>添加角色</h2>
+      <el-form :inline="true" :model="addRoleForm" ref="addRoleForm" class="add-form">
         <el-form-item label="角色名" required>
           <el-input v-model="addRoleForm.role_name" placeholder="请输入角色名"></el-input>
         </el-form-item>
@@ -12,17 +13,17 @@
         </el-form-item>
       </el-form>
       <!-- 角色列表 -->
+      <h2>角色列表</h2>
       <el-table
-        :data="roleData">
+        :data="roleData"
+        class="main-table">
         <el-table-column
           prop="role_id"
-          label="ID"
-          width="180">
+          label="ID">
         </el-table-column>
         <el-table-column
           prop="role_name"
-          label="角色名"
-          width="180">
+          label="角色名">
         </el-table-column>
         <el-table-column label="操作">
           <template scope="scope">
@@ -39,6 +40,7 @@
         <el-form ref="accessForm">
           <el-checkbox-group v-model="checkboxArr">
             <el-checkbox
+              class="label"
               v-for="access in accessData"
               :key="access.id"
               :label="access.access_id"
@@ -246,7 +248,7 @@ export default {
 </script>
 
 <style>
-label{
+/* label{
   display: block;
   padding: 4px 0 2px 0px;
   border-bottom: 1px solid #eef1f6;
@@ -260,5 +262,5 @@ label:hover{
 .el-dialog__body{
   max-height: 460px;
   overflow: auto;
-}
+} */
 </style>

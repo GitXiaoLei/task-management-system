@@ -1,0 +1,26 @@
+.label{
+  display: block;
+  padding: 6px 0;
+}
+label:hover{
+  background: #eef1f6;
+}
+.el-checkbox+.el-checkbox{
+  margin-left: 0;
+}
+.main-table, .add-form, h2{
+  width: 90%;
+  margin: 20px auto;
+}
+h2{
+  text-indent: 10px;
+  border-left: 2px solid #20a0ff;
+}
+.dialog-form{
+  max-height: 400px;
+  overflow: auto;
+}
+.el-dialog__body{
+  max-height: 460px;
+  overflow: auto;
+}
