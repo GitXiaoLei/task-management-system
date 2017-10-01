@@ -72,5 +72,12 @@ export const addUserRole = params => axios.post('/api/user_role/add', qs.stringi
 // 删除某个用户的某个角色
 export const delUserRole = params => axios.post('/api/user_role/del', qs.stringify(params))
 
+// 获取班级列表
+export const getClass = () => axios.get('/api/class/list')
+// 添加班级
+export const addClass = params => axios.post('/api/class/add', qs.stringify(params))
+// 删除班级
+export const delClass = params => axios.post('/api/class/del', qs.stringify(params))
+
 // 退出登录
 export const loginout = () => axios.get('/loginout')

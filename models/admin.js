@@ -5,7 +5,7 @@ const Async = require('async')
 const Util = require('../public/utils/util')
 
 /**
- * 院系模型
+ * Admin模型
  */
 const Admin = {
   // 获取所有权限
@@ -22,10 +22,22 @@ const Admin = {
       })
     })
   },
+  // 获取所有班级
+  getClass () {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('r')
+      .select('class')
+      .then((classArr) => {
+        resolve(classArr)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  },
   /**
    * 添加权限
-   * @param {Object} insetData 插入的数据，如{ access_title: '首页', access_url: '/' }
-   * @return Promise
    */
   addAccess (insetData) {
     return new Promise((resolve, reject) => {

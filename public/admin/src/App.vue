@@ -17,6 +17,9 @@
       <el-menu-item index="5">
         <router-link to="/admin/subject">科目管理</router-link>
       </el-menu-item>
+      <el-menu-item index="6">
+        <router-link to="/admin/class">班级管理</router-link>
+      </el-menu-item>
       <el-button @click="loginout" style="float: right; margin: 10px; background-color: #324157; color: #fff;">退出登录</el-button>
     </el-menu>
     <router-view></router-view>

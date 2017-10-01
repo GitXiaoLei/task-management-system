@@ -21,6 +21,7 @@ import NotFound from '@/components/404.vue'
 import Access from '@/components/access.vue'
 import Department from '@/components/department.vue'
 import Subject from '@/components/subject.vue'
+import Class from '@/components/class.vue'
 
 Vue.use(Router)
 export default new Router({
@@ -52,6 +53,10 @@ export default new Router({
     {
       path: '/admin/subject',
       component: Subject
+    },
+    {
+      path: '/admin/class',
+      component: Class
     },
     // 404
     { path: '*', component: NotFound }

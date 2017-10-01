@@ -456,6 +456,27 @@ const route = (app) => {
       Output.apiErr(err)
     })
   })
+  // 获取班级列表
+  app.get('/api/class/list', (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    Admin
+    .getClass()
+    .then((classArr) => {
+      Output.apiData(classArr, '获取班级列表成功')
+    })
+    .catch((err) => {
+      Output.apiErr(err)
+    })
+  })
   // 添加院系
   app.post('/api/department/add', (req, res) => {
     // 没有登录
