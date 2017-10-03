@@ -95,6 +95,56 @@ const User = {
     } catch (e) {
       return e
     }
+  },
+  // 添加题目
+  async addQuestion (insertData) {
+    try {
+      return await DB.instance('w').insert('question', insertData)
+    } catch (e) {
+      throw Error(e)
+    }
+  },
+  // 更新题目
+  updateQuestion (updateData, conditions) {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .update('question', updateData, conditions)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((e) => {
+        reject(e)
+      })
+    })
+  },
+  // 删除题目
+  delQuestion (conditions) {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .delete('question', conditions)
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((e) => {
+        reject(e)
+      })
+    })
+  },
+  // 获取题目列表
+  getQuestion () {
+    return new Promise((resolve, reject) => {
+      DB
+      .instance('w')
+      .select('question')
+      .then((questionArr) => {
+        resolve(questionArr)
+      })
+      .catch((e) => {
+        reject(e)
+      })
+    })
   }
 }
 

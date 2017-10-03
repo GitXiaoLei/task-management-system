@@ -15,24 +15,23 @@ const RBAC = {
    * 初始化
    */
   init (req, res, next) {
-    // console.log(req._authInfo)
-    // req._authInfo等于false时，表示前端没有发token过来或者token解析失败，就没有权限访问
+    // 未登录
     if (!req._authInfo) {
       // 没有权限访问资源
       req._canVisit = false
       // 用户角色名设置为guest(游客)：只有游客的类型才为字符串，其他角色的都为数组类型
       req._role = 'guest'
       next()
-      return
-    }
-    // 请求权限
-    RBAC
-    .getSudo(req._authInfo.uid)
-    .then((accessUrlArr) => {
-      // 将改地址改用户能不能访问的布尔值挂载到req对象下：true表示能访问该地址，false表示不能访问该地址
-      req._canVisit = RBAC.canVisit(accessUrlArr, req.path)
-      // 请求角色
+    } else {
+    // 已登录
+      // 请求权限
       RBAC
+      .getSudo(req._authInfo.uid)
+      .then((accessUrlArr) => {
+        // 将改地址改用户能不能访问的布尔值挂载到req对象下：true表示能访问该地址，false表示不能访问该地址
+        req._canVisit = RBAC.canVisit(accessUrlArr, req.path)
+        // 请求角色
+        RBAC
         .getRole(req._authInfo.uid)
         .then((roleNameArr) => {
           req._role = roleNameArr
@@ -41,10 +40,11 @@ const RBAC = {
         .catch((err) => {
           Output.apiErr(err)
         })
-    })
-    .catch((err) => {
-      Output.apiErr(err)
-    })
+      })
+      .catch((err) => {
+        Output.apiErr(err)
+      })
+    }
   },
   /**
    * 获取用户的权限：也就是能够请求的地址
