@@ -499,7 +499,7 @@ const route = (app) => {
       Output.apiErr(err)
     })
   })
-  // 添加科目
+  // 添加课程
   app.post('/api/subject/add', (req, res) => {
     // 没有登录
     if (!req._authInfo) {
@@ -511,7 +511,10 @@ const route = (app) => {
       Output.apiErr({ code: 0, message: '你没有权限访问' })
       return
     }
-    const insertData = { subject_name: req.body.subject_name }
+    const insertData = {
+      subject_name: req.body.subject_name,
+      subject_num: req.body.subject_num
+    }
     Admin
     .addSubject(insertData)
     .then((result) => {

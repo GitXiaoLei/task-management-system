@@ -2,17 +2,20 @@
   <div>
     <!-- 有权限访问该页面 -->
     <div v-if="canVisit === 1">
-      <!-- 添加科目 -->
-      <h2>添加科目</h2>
+      <!-- 添加课程 -->
+      <h2>添加课程</h2>
       <el-form :inline="true" :model="addSubjectForm" ref="addSubjectForm" class="add-form">
-        <el-form-item label="科目名称" required>
-          <el-input v-model="addSubjectForm.name" placeholder="请输入科目名称"></el-input>
+        <el-form-item label="课程名称" required>
+          <el-input v-model="addSubjectForm.name" placeholder="请输入课程名称"></el-input>
+        </el-form-item>
+        <el-form-item label="课程号" required>
+          <el-input v-model="addSubjectForm.num" placeholder="请输入课程名称"></el-input>
         </el-form-item>
         <el-button type="primary" @click="addSubject('addSubjectForm')">添加</el-button>
         </el-form-item>
       </el-form>
-      <!-- 科目列表 -->
-      <h2>科目列表</h2>
+      <!-- 课程列表 -->
+      <h2>课程列表</h2>
       <el-table
         :data="subjectData"
         class="main-table">
@@ -21,8 +24,12 @@
           label="ID">
         </el-table-column>
         <el-table-column
+          prop="subject_num"
+          label="课程号">
+        </el-table-column>
+        <el-table-column
           prop="subject_name"
-          label="科目名称">
+          label="课程名称">
         </el-table-column>
         <el-table-column label="操作">
           <template scope="scope">
@@ -44,7 +51,8 @@ export default {
     return {
       subjectData: [],
       addSubjectForm: {
-        name: ''
+        name: '',
+        num: ''
       },
       canVisit: -1
     }
@@ -72,7 +80,10 @@ export default {
           return
         }
         // 发送请求
-        addSubject({ subject_name: this.addSubjectForm.name })
+        addSubject({
+          subject_name: this.addSubjectForm.name,
+          subject_num: this.addSubjectForm.num
+        })
         .then((data) => {
           data = data.data
           if (data.code !== 1) {

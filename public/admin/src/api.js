@@ -50,11 +50,11 @@ export const addDepartment = params => axios.post('/api/department/add', qs.stri
 // 删除院系
 export const delDepartment = params => axios.post('/api/department/del', qs.stringify(params))
 
-// 获取科目列表
+// 获取课程列表
 export const getSubject = () => axios.get('/api/subject/list')
-// 添加科目
+// 添加课程
 export const addSubject = params => axios.post('/api/subject/add', qs.stringify(params))
-// 删除科目
+// 删除课程
 export const delSubject = params => axios.post('/api/subject/del', qs.stringify(params))
 
 // 获取用户列表
