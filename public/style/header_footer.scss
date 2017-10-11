@@ -1,0 +1,30 @@
+$primary-color: #20a0ff;
+$body-bg-color: #f3f3f3;
+$content-bg-color: #fff;
+body{
+  background: $body-bg-color;
+}
+#content{
+  width: 1000px;
+  min-height: 600px;
+  margin: 0 auto;
+  background: $content-bg-color;
+}
+header, footer{
+  width: 100%;
+  line-height: 50px;
+  background: $primary-color;
+}
+#header{
+  width: 1000px;
+  height: 100%;
+  margin: 0 auto;
+  background: $primary-color;
+  border: none;
+  a{
+    color: #fff;
+  }
+  li > a{
+    color: #262626;
+  }
+}

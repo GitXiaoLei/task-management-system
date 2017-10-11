@@ -49,7 +49,7 @@ const route = (app) => {
       return
     }
     const insertData = {
-      user_id: req.body.user_id,
+      user_id: req._userInfo.user_id,
       subject_id: req.body.subject_id,
       created_time: Moment().unix()
     }
@@ -87,6 +87,25 @@ const route = (app) => {
     .catch((err) => {
       Output.apiErr(err)
     })
+  })
+  // 老师获取自己所教的课程
+  app.get('/api/teacher_subject/list', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const subjectIdArr = User.getTeacherSubjectIdArr(req._userInfo.user_id)
+      Output.apiData(subjectIdArr, '获取自己所教课id程成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
   })
   // 老师删除自己所教的科目,同时也要删除subject_class表中对应的记录
   app.post('/api/teacher_subject/del', async (req, res) => {
@@ -282,6 +301,27 @@ const route = (app) => {
     .catch((e) => {
       Output.apiErr(e)
     })
+  })
+  // 用户修改用户名、真实姓名、性别、所属院系、电话号码、qq号码
+  app.post('/api/user/*/update', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const updateData = {}
+    Object.assign(updateData, req.body)
+    try {
+      const result = await User.updateUserInfo(updateData, { user_id: req._userInfo.user_id })
+      Output.apiData(result, '修改成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
   })
 }
 

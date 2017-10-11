@@ -428,8 +428,8 @@ const route = (app) => {
     }
     Admin
     .getSubject()
-    .then((departmentArr) => {
-      Output.apiData(departmentArr, '获取院系列表成功')
+    .then((subjectArr) => {
+      Output.apiData(subjectArr, '获取院系列表成功')
     })
     .catch((err) => {
       Output.apiErr(err)

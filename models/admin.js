@@ -13,7 +13,7 @@ const Admin = {
     return new Promise((resolve, reject) => {
       DB
       .instance('r')
-      .select('access')
+      .select('access', {}, { access_id: 0 })
       .then((accessArr) => {
         resolve(accessArr)
       })
@@ -27,7 +27,7 @@ const Admin = {
     return new Promise((resolve, reject) => {
       DB
       .instance('r')
-      .select('class')
+      .select('class', {}, { class_id: 0 })
       .then((classArr) => {
         resolve(classArr)
       })
@@ -95,7 +95,7 @@ const Admin = {
     return new Promise((resolve, reject) => {
       DB
       .instance('r')
-      .select('role')
+      .select('role', {}, { role_id: 0 })
       .then((roleArr) => {
         resolve(roleArr)
       })
@@ -376,7 +376,7 @@ const Admin = {
     return new Promise((resolve, reject) => {
       DB
       .instance('r')
-      .select('department')
+      .select('department', {}, { department_id: 0 })
       .then((departmentArr) => {
         resolve(departmentArr)
       })
@@ -390,7 +390,7 @@ const Admin = {
     return new Promise((resolve, reject) => {
       DB
       .instance('r')
-      .select('subject')
+      .select('subject', {}, { subject_id: 0 })
       .then((subjectArr) => {
         resolve(subjectArr)
       })
@@ -404,7 +404,7 @@ const Admin = {
     return new Promise((resolve, reject) => {
       DB
       .instance('r')
-      .select('user')
+      .select('user', {}, { user_id: 0 })
       .then((userArr) => {
         resolve(userArr)
       })

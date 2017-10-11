@@ -1,0 +1,6 @@
+{{each data}}
+<div class="in-jc subject-single {{$value.active === 1 ? 'selected' : ''}}" data-subjectid="{{$value.subject_id}}">
+  <span>{{$value.subject_num}}</span>
+  <span>{{$value.subject_name}}</span>
+</div>
+{{/each}}

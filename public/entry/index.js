@@ -1,5 +1,4 @@
-import $ from 'jquery'
-
+require('./common')
 // 登录
 $(document).on('click', '.login', function () {
   $.post({

@@ -4,7 +4,9 @@ const WebpackNotifier = require('webpack-notifier')
 
 const config = {
   entry: {
-    index: './entry/index'
+    index: './entry/index',
+    publish_task: './entry/publish_task',
+    personal: './entry/personal'
   },
   output: {
     path: path.resolve(__dirname, './build'),
@@ -20,8 +22,12 @@ const config = {
         loader: 'vue-loader'
       },
       {
-        test: /\.css/,
+        test: /\.css$/,
         use: ['style-loader', 'css-loader', 'postcss-loader']
+      },
+      {
+        test: /\.scss$/,
+        use: ['style-loader', 'css-loader', 'sass-loader']
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -30,6 +36,10 @@ const config = {
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         loader: 'url-loader'
+      },
+      {
+        test: /\.art$/,
+        loader: 'art-template-loader'
       }
     ]
   },

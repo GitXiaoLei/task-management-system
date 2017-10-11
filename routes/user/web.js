@@ -2,11 +2,11 @@
 
 const Output = require('../../middlewares/output')
 const RBAC = require('../../middlewares/rbac')
+const User = require('../../models/user')
+const Async = require('async')
 
 const route = (app) => {
-  /**
-   * 首页
-   */
+  // 首页
   app.get('/', (req, res) => {
     console.log(req._role)
     // 游客
@@ -40,6 +40,46 @@ const route = (app) => {
         title: '同学，你已经登录了'
       })
     }
+  })
+  // 老师个人中心页面
+  app.get('/teacher/personal', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const userData = await User.getUserById(req._userInfo.user_id)
+      const classes = await User.getClasses(req._userInfo.user_id)
+      const subjects = await User.getSubject(req._userInfo.user_id)
+      const data = {
+        userData: userData[0],
+        subjects: subjects,
+        classes: classes
+      }
+      Output.render('user/personal', data)
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 老师布置作业页面
+  app.get('/teacher/publish_task', (req, res) => {
+     // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    Output.render('user/publish_task')
   })
 }
 

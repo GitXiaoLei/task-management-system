@@ -1,0 +1,84 @@
+.head-title {
+  font-size: 18px;
+  text-indent: 16px;
+  border-left: 4px solid #20a0ff;
+  margin: 0;
+}
+.teacher-info {
+  float: left;
+  width: 360px;
+  margin: 20px 0;
+  border-right: 1px solid #cccccc;
+  h3 {
+    line-height: 30px;
+  }
+  #subject-list {
+    display: inline-block;
+  }
+  form {
+    margin-top: 20px;
+    .form-group {
+      margin-bottom: 0;
+      padding: 8px 0 8px 16px;
+      position: relative;
+      transition: .2s;
+      label {
+        display: block;
+      }
+      input {
+        width: 62%;
+        display: none;
+      }
+      div {
+        text-indent: 10px;
+      }
+      .change, .confirm-cancel {
+        display: none;
+        position: absolute;
+        right: 10px;
+      }
+      .change {
+        top: 24px;
+      }
+      .confirm-cancel {
+        top: 35px;
+      }
+    }
+    .form-group:hover {
+      background: #f3f3f3;
+    }
+  }
+}
+.other-info {
+  float: left;
+  margin: 20px 0;
+  h3 {
+    line-height: 30px;
+  }
+  .subjects-wrap {
+    margin: 20px;
+  }
+}
+// 所有课程中的单个课程
+.in-jc.subject-single {
+  &:hover {
+    background: #f3f3f3;
+    cursor: pointer;
+  }
+  &.selected {
+    background: #20a0ff;
+    color: #fff;
+  }
+  display: inline-block;
+  width: 100%;
+  line-height: 26px;
+  span:nth-of-type(1) {
+    float: left;
+    width: 56px;
+  }
+  span:nth-of-type(2) {
+    float: left;
+    width: 180px;
+  }
+}
+

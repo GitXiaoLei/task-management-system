@@ -1,0 +1,85 @@
+{{extend '../common/layout.html'}}
+
+{{block 'title'}}个人中心{{/block}}
+
+<!-- header -->
+{{block 'header'}}
+  {{include '../common/header.html', userData}}
+{{/block}}
+<!-- content -->
+{{block 'content'}}
+  <!-- 老师个人详细信息 -->
+  <section class="teacher-info">
+    <h3 class="head-title">个人信息</h3>
+    <form>
+      <div class="form-group" data-type="username">
+        <label for="username">用户名</label>
+        <input type="text" class="form-control" id="username" placeholder="请输入用户名" value="{{userData.username}}">
+        <div class="info-val">{{userData.username}}</div>
+        <a class="btn btn-default btn-xs change" href="javascript:;" role="button">修改</a>
+        <div class="confirm-cancel">
+          <a class="btn btn-default btn-sm confirm confirm-username" href="javascript:;" role="button">确认</a>
+          <a class="btn btn-default btn-sm cancel">取消</a>
+        </div>
+      </div>
+      <div class="form-group" data-type="real_name">
+        <label for="real_name">真实姓名</label>
+        <input type="text" class="form-control" id="real_name" placeholder="请输入真实姓名" value="{{userData.real_name}}">
+        <div class="info-val">{{userData.real_name}}</div>
+        <a class="btn btn-default btn-xs change" href="javascript:;" role="button">修改</a>
+        <div class="confirm-cancel">
+          <a class="btn btn-default btn-sm confirm" href="javascript:;" role="button">确认</a>
+          <a class="btn btn-default btn-sm cancel">取消</a>
+        </div>
+      </div>
+      <div class="form-group" data-type="sex">
+        <label for="sex">性别</label>
+        <div>{{userData.sex}}</div>
+      </div>
+      <div class="form-group" data-type="department_name">
+        <label for="department_name">所属院系</label>
+        <input type="text" class="form-control" id="department_name" placeholder="请选择院系">
+        <div class="info-val">{{userData.department_name}}</div>
+      </div>
+      <div class="form-group" data-type="phone_num">
+        <label for="phone_num">电话号码</label>
+        <input type="text" class="form-control" id="phone_num" placeholder="请输入电话号码" value="{{userData.phone_num}}">
+        <div class="info-val">{{userData.phone_num}}</div>
+        <a class="btn btn-default btn-xs change" href="javascript:;" role="button">修改</a>
+        <div class="confirm-cancel">
+          <a class="btn btn-default btn-sm confirm" href="javascript:;" role="button">确认</a>
+          <a class="btn btn-default btn-sm cancel">取消</a>
+        </div>
+      </div>
+      <div class="form-group" data-type="qq_num">
+        <label for="qq_num">QQ号码</label>
+        <input type="text" class="form-control" id="qq_num" placeholder="请输入QQ号" value="{{userData.qq_num}}">
+        <div class="info-val">{{userData.qq_num}}</div>
+        <a class="btn btn-default btn-xs change" href="javascript:;" role="button">修改</a>
+        <div class="confirm-cancel">
+          <a class="btn btn-default btn-sm confirm" href="javascript:;" role="button">确认</a>
+          <a class="btn btn-default btn-sm cancel">取消</a>
+        </div>
+      </div>
+    </form>
+  </section>
+  <!-- 老师所教课程、班级 -->
+  <section class="other-info">
+    <!-- 所教课程 -->
+    <h3 class="head-title">所教课程</h3>
+    <div class="subjects-wrap">
+      <div id="subject-list">
+        {{each subjects}}
+        <div class="out-jc subject-single" data-subjectid="{{$value.subject_id}}">
+          <span class="label label-default">{{$value.subject_name}}</span>
+          <span class="label label-default">{{$value.subject_num}}</span>
+        </div>
+        {{/each}}
+      </div>
+      <a class="btn btn-default add-subject" href="javascript:;" role="button">添加</a>
+    </div>
+  </section>
+{{/block}}
+{{block 'script'}}
+<script src="/static/build/personal.js"></script>
+{{/block}}

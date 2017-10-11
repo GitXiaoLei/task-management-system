@@ -49,7 +49,7 @@ class DB {
    * @return Promise result|rows
    */
   query (sql, values) {
-    console.log(sql)
+    // console.log(sql)
     return this.queryWithOptions({
       sql: sql,
       values: values
@@ -246,6 +246,33 @@ class DB {
     })
   }
   /**
+   * 根据条件，查询出固定数量的结果
+   * @param {String} tbname 表名
+   * @param {String} field 字段名称，如subject_id，就是根据subject_id这个条件查找
+   * @param {Array} valArr 例：[1, 3]，字段值的数组，如语句 where subject_id = 1 or subject_id = 3
+   */
+  selectOr (tbname, field, valArr) {
+    const that = this
+    return new Promise((resolve, reject) => {
+      let sql = 'SELECT * FROM `' + tbname + '` WHERE '
+      valArr.forEach((val, i, valArr) => {
+        if (i !== valArr.length - 1) {
+          sql += field + ' = ' + val + ' or '
+        } else {
+          sql += field + ' = ' + val
+        }
+      })
+      that
+      .query(sql)
+      .then((rows) => {
+        resolve(rows)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  }
+  /**
    * 根据条件，排序选出某一页的数据
    */
   /**
@@ -358,6 +385,7 @@ class DB {
   /**
    * 更新记录
    * @param {String} tbname 表名
+   * @param {Object} data 要更新的数据，例：{ username: 'xl' }，将字段username的值更新为xl
    * @param {Object} conditions 条件，例：{ id: 1 }，根据这个条件更新某条记录
    */
   update (tbname, data, conditions) {

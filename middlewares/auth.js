@@ -23,8 +23,9 @@ const Auth = {
     if (_authInfo) {
       const userInfo = await User.getUserById(_authInfo.uid)
       req._userInfo = {
-        user_id: userInfo.user_id,
-        username: userInfo.username
+        user_id: userInfo[0].user_id,
+        username: userInfo[0].username,
+        real_name: userInfo[0].real_name
       }
     }
     next()
