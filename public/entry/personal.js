@@ -117,8 +117,8 @@ const task = {
                 jconfirm.failTips('获取课程列表失败')
                 return
               }
-              console.log(data)
               data = task.compareDeal(data)
+              console.log(data)
               const html = require('../template/personal/subject_list_injc.art')(data)
               self.setContentAppend(html)
             })
@@ -131,9 +131,30 @@ const task = {
       // 点击单个课程，添加此课程
       $(document).on('click', '.in-jc.subject-single', function () {
         const $this = $(this)
+        const curId = $this.data('subjectid')
+        const addData = {
+          subject_name: $this.find('.name').html(),
+          subject_num: $this.find('.num').html()
+        }
         // 删除课程
         if ($this.hasClass('selected')) {
-
+          const data = { subject_id: $this.data('subjectid') }
+          $.post('/api/teacher_subject/del', data, (data) => {
+            if (data.code !== 1) {
+              jconfirm.failTips('删除课程失败', 50)
+              return
+            }
+            jconfirm.successTips('删除课程成功', 50)
+            $this.removeClass('selected')
+            // 删除本地数据
+            task.data.curSubjectList.forEach((subject, i) => {
+              if (subject.subject_id === curId) {
+                task.data.curSubjectList.splice(i, 1)
+              }
+            })
+            // 重新渲染
+            task.renderCurSubjectList()
+          })
         } else {
         // 添加课程
           const data = { subject_id: $this.data('subjectid') }
@@ -144,6 +165,13 @@ const task = {
             }
             jconfirm.successTips('添加课程成功', 50)
             $this.addClass('selected')
+            // 添加本地数据
+            console.log(task.data.curSubjectList)
+            addData.subject_id = data.data.insertId
+            task.data.curSubjectList.push(addData)
+            console.log(task.data.curSubjectList)
+            // 重新渲染
+            task.renderCurSubjectList()
           })
         }
       })
@@ -155,8 +183,8 @@ const task = {
     $('.out-jc.subject-single').each(function (i, ele) {
       const obj = {
         subject_id: $(this).data('subjectid'),
-        subject_name: $(this).find('span:nth-of-type(1)').html(),
-        subject_num: $(this).find('span:nth-of-type(2)').html()
+        subject_name: $(this).find('.name').html(),
+        subject_num: $(this).find('.num').html()
       }
       arr.push(obj)
     })
@@ -180,6 +208,13 @@ const task = {
     }
     data.data = dataList
     return data
+  },
+  // 渲染老师当前所教的科目
+  renderCurSubjectList () {
+    const data = {}
+    data.subjects = task.data.curSubjectList
+    const html = require('../template/personal/subject_list_cur.art')(data)
+    $('#subject-list').html(html)
   }
 }
 task.init()

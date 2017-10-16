@@ -262,6 +262,34 @@ class DB {
           sql += field + ' = ' + val
         }
       })
+      console.log(sql)
+      that
+      .query(sql)
+      .then((rows) => {
+        resolve(rows)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+    })
+  }
+  /**
+   * 根据条件，查询出固定数量的结果
+   * @param {String} tbname 表名
+   * @param {String} field 字段名称，如subject_id，就是根据subject_id这个条件查找
+   * @param {Array} valArr 例：[1, 3]，字段值的数组，如语句 where subject_id = 1 and subject_id = 3
+   */
+  selectAnd (tbname, field, valArr) {
+    const that = this
+    return new Promise((resolve, reject) => {
+      let sql = 'SELECT * FROM `' + tbname + '` WHERE '
+      valArr.forEach((val, i, valArr) => {
+        if (i !== valArr.length - 1) {
+          sql += field + ' = ' + val + ' and '
+        } else {
+          sql += field + ' = ' + val
+        }
+      })
       that
       .query(sql)
       .then((rows) => {
@@ -423,7 +451,7 @@ class DB {
   static buildDelConditions (conditions) {
     let where = ' WHERE '
     for (let key in conditions) {
-      where = where + key + '=' + conditions[key]
+      where = where + key + ' = ' + conditions[key]
     }
     return where
   }

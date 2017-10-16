@@ -63,7 +63,7 @@ const route = (app) => {
     })
   })
   // 老师为自己的某个科目添加班级
-  app.post('/api/subject_class/add', (req, res) => {
+  app.post('/api/teacher_subject_class/add', async (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -75,18 +75,17 @@ const route = (app) => {
       return
     }
     const insertData = {
+      user_id: req._userInfo.user_id,
       subject_id: req.body.subject_id,
       class_id: req.body.class_id,
       created_time: Moment().unix()
     }
-    User
-    .addSubjectClass(insertData)
-    .then((result) => {
-      Output.apiData(result, '添加班级成功')
-    })
-    .catch((err) => {
-      Output.apiErr(err)
-    })
+    try {
+      const result = User.addTSC(insertData)
+      Output.apiData(result, '为课程添加班级成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
   })
   // 老师获取自己所教的课程
   app.get('/api/teacher_subject/list', async (req, res) => {
@@ -119,26 +118,29 @@ const route = (app) => {
       Output.apiErr({ code: 0, message: '你没有权限访问' })
       return
     }
-    const conditions = { teacher_subject_id: req.body.teacher_subject_id }
+    const conditions = {
+      user_id: req._userInfo.user_id,
+      subject_id: req.body.subject_id
+    }
     try {
       // 获取teacher_subject表中的记录
       const teacherSubjectArr = await User.getTeacherSubjectById(conditions)
-      const subjectIdArr = []
+      const teacherSubjectIdArr = []
       teacherSubjectArr.forEach((teacherSubject) => {
-        subjectIdArr.push(teacherSubject.subject_id)
+        teacherSubjectIdArr.push(teacherSubject.subject_id)
       })
       // 没有要删除的科目
-      if (subjectIdArr.length === 0) {
+      if (teacherSubjectIdArr.length === 0) {
         Output.apiData({}, '你没有相关的科目需要删除', 0)
       }
-      const result = await Promise.all([User.delTeacherSubject(conditions), User.delSubjectClassBySubjectIdArr(subjectIdArr)])
-      Output.apiData(result, '删除科目成功')
+      const result = await Promise.all([User.delTeacherSubject(conditions), User.delTeacherSubjectClass(teacherSubjectIdArr)])
+      Output.apiData(result, '删除课程成功')
     } catch (e) {
       Output.apiErr(e)
     }
   })
   // 老师删除自己的某个科目下的某个班级
-  app.post('/api/subject_class/del', (req, res) => {
+  app.post('/api/teacher_subject_class/del', async (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -149,15 +151,17 @@ const route = (app) => {
       Output.apiErr({ code: 0, message: '你没有权限访问' })
       return
     }
-    const conditions = { subject_class_id: req.body.subject_class_id }
-    User
-    .delSubjectClassById(conditions)
-    .then((result) => {
-      Output.apiData(result, '删除班级成功')
-    })
-    .catch((err) => {
-      Output.apiErr(err)
-    })
+    const conditions = {
+      user_id: req._userInfo.user_id,
+      subject_id: req.body.subject_id,
+      class_id: req.body.class_id
+    }
+    try {
+      const result = await User.delSubjectClassById(conditions)
+      Output.apiErr(result, '删除该课程下的该班级成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
   })
   // 老师添加题目
   app.post('/api/question/add', async (req, res) => {

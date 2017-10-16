@@ -71,7 +71,6 @@ const RBAC = {
         },
         // 根据用户的 角色id 获取用户的 权限id：表role_access
         (roleIdArr, cb) => {
-          // console.log(roleIdArr)
           let sql = 'SELECT * FROM `' + 'role_access' + '` WHERE '
           roleIdArr.forEach((roleId, i, arr) => {
             if (arr.length - 1 !== i) {
@@ -84,6 +83,7 @@ const RBAC = {
           .instance('r')
           .query(sql)
           .then((roleAccessData) => {
+            
             let accessIdArr = []
             roleAccessData.forEach((roleAccess) => {
               accessIdArr.push(roleAccess.access_id)

@@ -1,0 +1,6 @@
+{{each subjects}}
+<div class="out-jc subject-single" data-subjectid="{{$value.subject_id}}">
+  <span class="label label-success num">{{$value.subject_num}}</span>
+  <span class="label label-success name">{{$value.subject_name}}</span>
+</div>
+{{/each}}

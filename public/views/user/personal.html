@@ -69,15 +69,26 @@
     <h3 class="head-title">所教课程</h3>
     <div class="subjects-wrap">
       <div id="subject-list">
-        {{each subjects}}
+        {{each subjectsClasses}}
         <div class="out-jc subject-single" data-subjectid="{{$value.subject_id}}">
-          <span class="label label-default">{{$value.subject_name}}</span>
-          <span class="label label-default">{{$value.subject_num}}</span>
+          <span class="label label-success num">{{$value.subject_num}}</span>
+          <span class="label label-success name">{{$value.subject_name}}</span>
         </div>
         {{/each}}
       </div>
       <a class="btn btn-default add-subject" href="javascript:;" role="button">添加</a>
     </div>
+    <!-- 课程对应的班级 -->
+    <h3 class="head-title">所教班级</h3>
+      {{each subjectsClasses}}
+      <div class="class-wrap">
+        <h4>{{$value.subject_num}} | {{$value.subject_name}}</h4>
+        {{each $value.classes}}
+          <span>{{$value.class_name}}</span>
+        {{/each}}
+        <a href="javascript:;" class="btn btn-default add-class" role="button">添加</a>
+      </div>
+      {{/each}}
   </section>
 {{/block}}
 {{block 'script'}}

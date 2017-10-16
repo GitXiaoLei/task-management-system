@@ -3,12 +3,12 @@
 const Output = require('../../middlewares/output')
 const RBAC = require('../../middlewares/rbac')
 const User = require('../../models/user')
-const Async = require('async')
+// const Async = require('async')
 
 const route = (app) => {
   // 首页
   app.get('/', (req, res) => {
-    console.log(req._role)
+    // console.log(req._role)
     // 游客
     if (typeof req._role === 'string' && req._role === 'guest') {
       Output.render('user/index', {
@@ -55,12 +55,11 @@ const route = (app) => {
     }
     try {
       const userData = await User.getUserById(req._userInfo.user_id)
-      const classes = await User.getClasses(req._userInfo.user_id)
-      const subjects = await User.getSubject(req._userInfo.user_id)
+      const subjectsClasses = await User.getSubject(req._userInfo.user_id)
+      console.log(subjectsClasses[1])
       const data = {
         userData: userData[0],
-        subjects: subjects,
-        classes: classes
+        subjectsClasses: subjectsClasses
       }
       Output.render('user/personal', data)
     } catch (e) {
