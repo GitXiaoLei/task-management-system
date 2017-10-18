@@ -1,0 +1,40 @@
+.add-question-wrap{
+  overflow: hidden;
+}
+.add-question-wrap>div{
+  float: left;
+}
+.task-add-question{
+  width: 400px;
+}
+.task-add-question.choose-type{
+  width: 100%;
+}
+.task-add-question.fill-question, .task-add-question.fill-answer, .task-add-question.choose-type{
+  margin-left: 22px;
+}
+.task-list-btn{
+  width: 20px;
+  position: fixed;
+  right: 0;
+  top: 150px;
+  text-align: center;
+  border: 1px solid #999;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.task-list{
+  width: 100px;
+  position: fixed;
+  right: 0;
+  top: 150px;
+  text-align: center;
+  border: 1px solid #999;
+  border-radius: 3px;
+}
+.task-list>div{
+  cursor: pointer;
+}
+.task-list>div:hover{
+  background: red;
+}

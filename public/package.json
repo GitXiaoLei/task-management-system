@@ -29,12 +29,15 @@
     "element-ui": "^1.4.4",
     "express-art-template": "^1.0.0",
     "file-loader": "^1.1.5",
+    "iview": "^2.5.1",
     "jquery": "^3.2.1",
     "jquery-confirm": "^3.3.2",
+    "mavon-editor": "^2.2.10",
     "minireset.css": "0.0.3",
     "postcss-loader": "^2.0.6",
     "qs": "^6.5.1",
     "simplemde": "^1.11.2",
-    "vue": "^2.4.4"
+    "vue": "^2.4.4",
+    "vue-markdown": "^2.2.4"
   }
 }

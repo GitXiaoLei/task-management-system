@@ -177,9 +177,9 @@ const User = {
       throw new Error(e)
     }
   },
-  async getQuestions (subjectId) {
+  async getQuestions (conditions) {
     try {
-      const questions = await DB.instance('r').select('question', { subject_id: subjectId })
+      const questions = await DB.instance('r').select('question', conditions)
       return questions
     } catch (e) {
       throw new Error(e)
@@ -235,6 +235,36 @@ const User = {
   async addTask (insertData) {
     try {
       return await DB.instance('w').insert('task', insertData)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  async addTaskClass (insertData) {
+    try {
+      return await DB.instance('w').insert('task_class', insertData)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  async delTaskClass (conditions) {
+    let sql = 'delete from task_class where task_id=' + conditions.task_id + ' and class_id=' + conditions.class_id 
+    try {
+      return await DB.instance('w').query(sql)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  async getTask5 (conditions) {
+    try {
+      return DB.instance('r').select('task', conditions, { task_id: 1 }, {offset: 0, count: 5})
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  async getSubjectByTaskId (conditions) {
+    let sql = 'select * from subject where subject_id in (select subject_id from task where task_id=' + conditions.task_id + ')'
+    try {
+      return DB.instance('r').query(sql)
     } catch (e) {
       throw new Error(e)
     }

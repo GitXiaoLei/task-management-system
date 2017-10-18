@@ -272,6 +272,7 @@ const route = (app) => {
       Output.apiErr({ code: 0, message: '你没有权限访问' })
       return
     }
+    console.log(req.query.subject_id)
     try {
       const result = await User.getClasses(req.query.subject_id)
       Output.apiData(result, '获取班级列表成功')
@@ -293,6 +294,43 @@ const route = (app) => {
     }
     try {
       const result = await User.getQuestions(req.query.subject_id)
+      Output.apiData(result, '获取问题列表成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 老师获取某个课程下的所有选择题、判断题、填空题、主观题
+  app.get('/api/subject_question/*/list', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const conditions = {
+      subject_id: req.query.subject_id
+    }
+    // 根据请求地址，判断题目类型
+    switch (req.path) {
+      case '/api/subject_question/choose/list':
+      conditions.type = 0
+      break
+      case '/api/subject_question/judge/list':
+      conditions.type = 1
+      break
+      case '/api/subject_question/fill/list':
+      conditions.type = 2
+      break
+      case '/api/subject_question/words/list':
+      conditions.type = 3
+    }
+    try {
+      const result = await User.getQuestions(conditions)
+      result.type = conditions.type
       Output.apiData(result, '获取问题列表成功')
     } catch (e) {
       Output.apiErr(e)
@@ -334,13 +372,102 @@ const route = (app) => {
     const insertData = { 
       subject_id: req.body.subject_id,
       user_id: req._userInfo.user_id,
+      task_name: req.body.task_name,
       created_time: Moment().unix(),
       updated_time: Moment().unix()
     }
-    console.log(insertData)
     try {
       const result = await User.addTask(insertData)
       Output.apiData(result, '创建作业成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 为作业添加班级
+  app.post('/api/task_class/add', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const insertData = { 
+      task_id: req.body.task_id,
+      class_id: req.body.class_id,
+      created_time: Moment().unix()
+    }
+    try {
+      const result = await User.addTaskClass(insertData)
+      Output.apiData(result, '为作业添加班级成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 为作业删除班级
+  app.post('/api/task_class/del', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const conditions = { 
+      task_id: req.body.task_id,
+      class_id: req.body.class_id
+    }
+    try {
+      const result = await User.delTaskClass(conditions)
+      Output.apiData(result, '为作业删除班级成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 获取最近5条作业记录
+  app.get('/api/task/recent', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const conditions = {
+      user_id: req._userInfo.user_id
+    }
+    try {
+      const result = await User.getTask5(conditions)
+      Output.apiData(result, '获取5条作业记录成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 获取最近5条作业记录
+  app.get('/api/task/subject', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const conditions = { task_id: req.query.task_id }
+    try {
+      const result = await User.getSubjectByTaskId(conditions)
+      Output.apiData(result, '获取该作业所对应的课程成功')
     } catch (e) {
       Output.apiErr(e)
     }
