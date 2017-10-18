@@ -1,17 +1,60 @@
-{{extend '../common/layout.html'}}
-
-{{block 'title'}}布置作业{{/block}}
+{{extend '../common/layout.html'}} {{block 'title'}}布置作业{{/block}}
 
 <!-- header -->
-{{block 'header'}}
-  {{include '../common/header.html'}}
-{{/block}}
+{{block 'header'}} {{include '../common/header.html'}} {{/block}}
 <!-- content -->
 {{block 'content'}}
 
-布置作业 - content
+<!-- 选择课程 -->
+<section>
+  <h4>请选择课程：</h4>
+  {{each subjects}}
+  <div class="subject" data-subjectid="{{$value.subject_id}}">
+    <span>{{$value.subject_num}}</span>
+    <span>{{$value.subject_name}}</span>
+  </div>
+  {{/each}}
+</section>
+<!-- 创建作业按钮 -->
+<div class="create-task">
+  <a href="javascript:;" class="btn btn-default">创建作业</a>
+</div>
+<!-- 为创建的作业补充完整资料 -->
+<div class="choose" style="display: none;">
+  <!-- 选择班级 -->
+  <section style="overflow: hidden; border: 1px solid #333;">
+    <h4>请选择班级：</h4>
+    <div id="class-list"></div>
+  </section>
+  <!-- 选择题目 -->
+  <section style="overflow: hidden; border: 1px solid #333;">
+    <h4>请选择题目：</h4>
+    <a class="btn btn-default get-question" href="javascript:;">获取题目</a>
+    <div class="question-wrap">
+      <div id="question-list"></div>
+      <div id="publish-question">
+        <textarea></textarea>
+      </div>
+    </div>
+    <a class="btn btn-default" href="javascript:;" style="">添加题目</a>
+  </section>
+  <a class="btn btn-default" href="javascript:;">发布</a>
+</div>
+<!-- 悬浮的遮罩，里面是添加题目 -->
+<div class="mask">
+  <div class="add-question">
+    <h2>添加题目</h2>
+    <div class="choose-type">
+      <h3>请选择题目类型：</h3>
+      <a href="javascript:;" class="btn btn-default choose">选择题</a>
+      <a href="javascript:;" class="btn btn-default judge">判断题</a>
+      <a href="javascript:;" class="btn btn-default fill">填空题</a>
+      <a href="javascript:;" class="btn btn-default words">主观题</a>
+    </div>
+    <div id="question-content">
 
-{{/block}}
-{{block 'script'}}
-<script src="/static/build/publish_task.js"></script>
-{{/block}}
+    </div>
+  </div>
+</div>
+{{/block}} {{block 'script'}}
+<script src="/static/build/publish_task.js"></script> {{/block}}

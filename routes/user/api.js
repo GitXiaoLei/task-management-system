@@ -100,8 +100,8 @@ const route = (app) => {
       return
     }
     try {
-      const subjectIdArr = User.getTeacherSubjectIdArr(req._userInfo.user_id)
-      Output.apiData(subjectIdArr, '获取自己所教课id程成功')
+      const subjects = await User.getSubjects(req._userInfo.user_id)
+      Output.apiData(subjects, '获取自己所教课程成功')
     } catch (e) {
       Output.apiErr(e)
     }
@@ -158,14 +158,14 @@ const route = (app) => {
     }
     try {
       const result = await User.delSubjectClassById(conditions)
-      Output.apiErr(result, '删除该课程下的该班级成功')
+      Output.apiData(result, '删除该课程下的该班级成功')
     } catch (e) {
       Output.apiErr(e)
     }
   })
-  // 老师添加题目
+  // 老师为某个科目添加题目
   app.post('/api/question/add', async (req, res) => {
-    // 没有登录
+    // 没有登录没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
       return
@@ -175,41 +175,24 @@ const route = (app) => {
       Output.apiErr({ code: 0, message: '你没有权限访问' })
       return
     }
-    let insertData = {
+    const insertData = {
       question: req.body.question,
+      answer: req.body.answer,
       type: req.body.type,
       subject_id: req.body.subject_id,
-      teacher_id: req.body.teacher_id,
+      user_id: req._userInfo.user_id,
       created_time: Moment().unix(),
       updated_time: Moment().unix()
     }
-    // 判断题目类型
-    switch (parseInt(req.body.type)) {
-      // 选择题
-      case 0:
-        insertData.solution_select = req.body.answer
-        break
-      // 判断题
-      case 1:
-        insertData.solution_judge = req.body.answer
-        break
-      // 填空题
-      case 2:
-        insertData.solution_fill = req.body.answer
-        break
-      // 主观题
-      case 3:
-        insertData.solution_text = req.body.answer
-    }
     try {
       const result = await User.addQuestion(insertData)
-      Output.apiData(result, '添加题目成功')
+      Output.apiData(result, '为该课程添加题目成功')
     } catch (e) {
       Output.apiErr(e)
     }
   })
   // 老师修改自己添加的题目
-  app.post('/api/question/update', (req, res) => {
+  app.post('/api/question/update', async (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -220,51 +203,22 @@ const route = (app) => {
       Output.apiErr({ code: 0, message: '你没有权限访问' })
       return
     }
-    let updateData = {}
-    // 更新题目
-    if (req.body.question) {
-      updateData.question = req.body.question
+    const updateData = Object.assign({}, req.body)
+    delete updateData.question_id
+    updateData.updated_time = Moment().unix()
+    const conditions = { 
+      question_id: req.body.question_id,
+      user_id: req._userInfo.user_id
     }
-    // 更新题目所属科目
-    if (req.body.subject_id) {
-      updateData.subject_id = req.body.subject_id
-    }
-    // 更新答案
-    if (req.body.answer) {
-      // 判断题目类型
-      switch (parseInt(req.body.type)) {
-        // 选择题
-        case 0:
-          updateData.solution_select = req.body.answer
-          break
-        // 判断题
-        case 1:
-          updateData.solution_judge = req.body.answer
-          break
-        // 填空题
-        case 2:
-          updateData.solution_fill = req.body.answer
-          break
-        // 主观题
-        case 3:
-          updateData.solution_text = req.body.answer
-      }
-    }
-    updateData.type = req.body.type
-    console.log('qqqqqqqqqqqqqqqqqqqqq')
-    console.log(typeof req.body.type)
-    const conditions = { question_id: req.body.question_id }
-    User
-    .updateQuestion(updateData, conditions)
-    .then((result) => {
+    try {
+      const result = await User.updateQuestion(updateData, conditions)
       Output.apiData(result, '修改题目成功')
-    })
-    .catch((e) => {
+    } catch (e) {
       Output.apiErr(e)
-    })
+    }
   })
   // 老师删除自己添加的题目
-  app.post('/api/question/del', (req, res) => {
+  app.post('/api/question/del', async (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -275,18 +229,19 @@ const route = (app) => {
       Output.apiErr({ code: 0, message: '你没有权限访问' })
       return
     }
-    const conditions = { question_id: req.body.question_id }
-    User
-    .delQuestion(conditions)
-    .then((result) => {
+    const conditions = { 
+      question_id: req.body.question_id,
+      user_id: req._userInfo.user_id
+    }
+    try {
+      const result = await User.delQuestion(conditions)
       Output.apiData(result, '删除题目成功')
-    })
-    .catch((e) => {
+    } catch (e) {
       Output.apiErr(e)
-    })
+    }
   })
   // 老师获取题目列表
-  app.get('/api/question/list', (req, res) => {
+  app.get('/api/question/list', async (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -297,14 +252,51 @@ const route = (app) => {
       Output.apiErr({ code: 0, message: '你没有权限访问' })
       return
     }
-    User
-    .getQuestion()
-    .then((questionArr) => {
-      Output.apiData(questionArr, '获取题目成功')
-    })
-    .catch((e) => {
+    const conditions = { subject_id: req.query.subject_id }
+    try {
+      const result = await User.getQuestionList(conditions)
+      Output.apiData(result, '获取该课程的题目列表成功')
+    } catch (e) {
       Output.apiErr(e)
-    })
+    }
+  })
+  // 老师获取自己某个科目下所教的班级列表
+  app.get('/api/subject_class/list', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const result = await User.getClasses(req.query.subject_id)
+      Output.apiData(result, '获取班级列表成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 老师获取某个科目下的所有题目
+  app.get('/api/subject_question/list', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const result = await User.getQuestions(req.query.subject_id)
+      Output.apiData(result, '获取问题列表成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
   })
   // 用户修改用户名、真实姓名、性别、所属院系、电话号码、qq号码
   app.post('/api/user/*/update', async (req, res) => {
@@ -323,6 +315,32 @@ const route = (app) => {
     try {
       const result = await User.updateUserInfo(updateData, { user_id: req._userInfo.user_id })
       Output.apiData(result, '修改成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 创建一条作业记录
+  app.post('/api/task/add', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const insertData = { 
+      subject_id: req.body.subject_id,
+      user_id: req._userInfo.user_id,
+      created_time: Moment().unix(),
+      updated_time: Moment().unix()
+    }
+    console.log(insertData)
+    try {
+      const result = await User.addTask(insertData)
+      Output.apiData(result, '创建作业成功')
     } catch (e) {
       Output.apiErr(e)
     }

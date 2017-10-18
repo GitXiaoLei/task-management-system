@@ -3,20 +3,28 @@ import 'jquery-confirm/dist/jquery-confirm.min.css'
 import 'jquery-confirm/dist/jquery-confirm.min.js'
 
 const jconfirm = {
-  successTips (content, delay) {
-    $.confirm({
+  successTips (content) {
+    $.alert({
       title: content,
       content: '',
       type: 'green',
-      autoClose: 'close|' + delay
+      buttons: {
+        '确定': function () {
+          window.location.reload()
+        }
+      }
     })
   },
-  failTips (content, delay) {
-    $.confirm({
+  failTips (content) {
+    $.alert({
       title: content,
       content: '',
       type: 'red',
-      autoClose: 'close|' + delay
+      buttons: {
+        '确定': function () {
+          window.location.reload()
+        }
+      }
     })
   }
 }

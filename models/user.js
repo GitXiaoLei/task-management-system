@@ -30,17 +30,12 @@ const User = {
     const userInfo = await DB.instance('r').select('user', { user_id: uid })
     return userInfo
   },
-  // 老师获取自己所教的课程id，通过user_id
-  async getTeacherSubjectIdArr (uid) {
+  // 老师获取自己所教的课程列表
+  async getSubjects (uid) {
+    let sql = 'select * from subject where subject_id in (select subject_id from teacher_subject where user_id = ' + uid + ')'
     try {
-      const teacherSubjectArr = await DB.instance('r').select('teacher_subject', { user_id: uid })
-      const subjectIdArr = []
-      if (teacherSubjectArr.length !== 0) {
-        teacherSubjectArr.forEach((teacherSubject) => {
-          subjectIdArr.push(teacherSubject.subject_id)
-        })
-      }
-      return subjectIdArr
+      const subjects = await DB.instance('r').query(sql)
+      return subjects
     } catch (e) {
       throw new Error(e)
     }
@@ -82,11 +77,12 @@ const User = {
       throw new Error(e)
     }
   },
-  // 老师删除自己的某个科目下的某个班级：teacher_subject表
+  // 老师删除自己的某个科目下的某个班级
   async delSubjectClassById (conditions) {
     try {
-      const tsIds = DB.instance('r').query('select teacher_subject_id from teacher_subject where user_id = ' + conditions.user_id + ' and subject_id = ' + conditions.subject_id)
-      const result = DB.instance('w').query('delete from teacher_subject_class where teacher_subject_id = ' + tsIds[0] + ' and class_id = ' + conditions.class_id)
+      let sql = 'select teacher_subject_id from teacher_subject where user_id = ' + conditions.user_id + ' and subject_id = ' + conditions.subject_id
+      const tsIds = await DB.instance('r').query(sql)
+      const result = await DB.instance('w').query('delete from teacher_subject_class where teacher_subject_id = ' + tsIds[0].teacher_subject_id + ' and class_id = ' + conditions.class_id)
       return result
     } catch (e) {
       throw new Error(e)
@@ -110,7 +106,6 @@ const User = {
         sql += ' teacher_subject_id = ' + teacherSubjectId
       }
     })
-    console.log(sql)
     try {
       return await DB.instance('w').query(sql)
     } catch (e) {
@@ -126,52 +121,66 @@ const User = {
     }
   },
   // 更新题目
-  updateQuestion (updateData, conditions) {
-    return new Promise((resolve, reject) => {
-      DB
-      .instance('w')
-      .update('question', updateData, conditions)
-      .then((result) => {
-        resolve(result)
-      })
-      .catch((e) => {
-        reject(e)
-      })
+  async updateQuestion (updateData, conditions) {
+    let sql = 'UPDATE question SET'
+    Object.keys(updateData).forEach((k, i, arr) => {
+      if (arr.length - 1 === i) {
+        sql += ' ' + k + '=' + "'" + updateData[k] + "'"
+      } else {
+        sql += ' ' + k + '=' + "'" + updateData[k] + "'" + ','
+      }
     })
+    sql += ' WHERE '
+    Object.keys(conditions).forEach((k, i, arr) => {
+      if (arr.length - 1 === i) {
+        sql +=  k + ' = ' + conditions[k]
+      } else {
+        sql +=  k + ' = ' + conditions[k] + ' and '
+      }
+    })
+    try {
+      return DB.instance('w').query(sql)
+    } catch (e) {
+      throw new Error(e)
+    }
   },
   // 删除题目
   delQuestion (conditions) {
-    return new Promise((resolve, reject) => {
-      DB
-      .instance('w')
-      .delete('question', conditions)
-      .then((result) => {
-        resolve(result)
-      })
-      .catch((e) => {
-        reject(e)
-      })
+    let sql = 'delete from question where'
+    Object.keys(conditions).forEach((k, i, arr) => {
+      if (arr.length - 1 === i) {
+        sql += ' ' + k + '=' + conditions[k]
+      } else {
+        sql += ' ' + k + '=' + conditions[k] + ' and '
+      }
     })
+    try {
+      return DB.instance('w').query(sql)
+    } catch (e) {
+      throw new Error(e)
+    }
   },
   // 获取题目列表
-  getQuestion () {
-    return new Promise((resolve, reject) => {
-      DB
-      .instance('w')
-      .select('question')
-      .then((questionArr) => {
-        resolve(questionArr)
-      })
-      .catch((e) => {
-        reject(e)
-      })
-    })
+  async getQuestionList (conditions) {
+    try {
+      return DB.instance('r').select('question', conditions)
+    } catch (e) {
+      throw new Error(e)
+    }
   },
   // 通过id数组获取课程
   async getSubjectByIdArr (subjectIdArr) {
     try {
       const subjects = await DB.instance('r').selectOr('subject', 'subject_id', subjectIdArr)
       return subjects
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  async getQuestions (subjectId) {
+    try {
+      const questions = await DB.instance('r').select('question', { subject_id: subjectId })
+      return questions
     } catch (e) {
       throw new Error(e)
     }
@@ -190,19 +199,11 @@ const User = {
     }
   },
   // 获取某个老师的某个课程下的班级列表
-  async getClasses (uid) {
-    const classes = {}
+  async getClasses (subjectId) {
+    let sql = 'select * from class where class_id in (select class_id from teacher_subject_class where teacher_subject_id in (select teacher_subject_id from teacher_subject where subject_id = ' + subjectId + '))'
     try {
-      const teacherSubjects = await DB.instance('r').select('teacher_subject', {}, { teacher_subject_id: 0 })
-      const ids = [],
-            subjectIds = []
-      for(let i = 0, l = teacherSubjects.length; i < l; i++) {
-        ids.push(teacherSubjects[i].teacher_subject_id)
-        subjectIds.push(teacherSubjects[i].subject_id)
-      }
-      for (let i = 0, l = subjectIds.length; i < l; i++) {
-        const subjectName = await DB.instance('r').query('select subject')
-      }
+      const classes = await DB.instance('r').query(sql)
+      return classes
     } catch (e) {
       throw new Error(e)
     }
@@ -221,11 +222,19 @@ const User = {
     try {
       const tsIds = await DB.instance('r').query('select teacher_subject_id from teacher_subject where user_id = ' + insertData.user_id + ' and subject_id = ' + insertData.subject_id)
       const result = await DB.instance('r').insert('teacher_subject_class', {
-        teacher_subject_id: tsIds[0],
+        teacher_subject_id: tsIds[0].teacher_subject_id,
         class_id: insertData.class_id,
         created_time: insertData.created_time
       })
       return result
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 创建一条作业记录
+  async addTask (insertData) {
+    try {
+      return await DB.instance('w').insert('task', insertData)
     } catch (e) {
       throw new Error(e)
     }

@@ -56,7 +56,6 @@ const route = (app) => {
     try {
       const userData = await User.getUserById(req._userInfo.user_id)
       const subjectsClasses = await User.getSubject(req._userInfo.user_id)
-      console.log(subjectsClasses[1])
       const data = {
         userData: userData[0],
         subjectsClasses: subjectsClasses
@@ -67,7 +66,7 @@ const route = (app) => {
     }
   })
   // 老师布置作业页面
-  app.get('/teacher/publish_task', (req, res) => {
+  app.get('/teacher/publish_task', async (req, res) => {
      // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -78,7 +77,16 @@ const route = (app) => {
       Output.apiErr({ code: 0, message: '你没有权限访问' })
       return
     }
-    Output.render('user/publish_task')
+    try {
+      const userData = await User.getUserById(req._userInfo.user_id)
+      const subjects = await User.getSubjects(req._userInfo.user_id)
+      Output.render('user/publish_task', {
+        userData: userData[0],
+        subjects: subjects
+      })
+    } catch (e) {
+      Output.apiErr(e)
+    }
   })
 }
 

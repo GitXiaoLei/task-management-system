@@ -8,7 +8,9 @@ const task = {
   init () {
     this.data = {
       subjectList: [],
-      curSubjectList: []
+      curSubjectList: [],
+      curClassList: [],
+      curSubjectId: 0
     }
     this.data.curSubjectList = this.getCurSubjectList()
     this.eventBinding()
@@ -87,7 +89,7 @@ const task = {
         $.post(url, data, (data) => {
           if (data.code !== 1) {
             console.log(data.message)
-            jconfirm.failTips('修改失败', 300)
+            jconfirm.failTips('修改失败')
             return
           }
           canModifi = true
@@ -95,7 +97,7 @@ const task = {
           $formGroup.find('.confirm-cancel').hide()
           $formGroup.find('.info-val').show()
           $formGroup.find('.info-val').html($formGroup.find('input').val())
-          jconfirm.successTips(data.message, 300)
+          jconfirm.successTips(data.message)
         })
       })
     })()
@@ -106,6 +108,9 @@ const task = {
         // 弹窗，里面渲染课程列表
         $.confirm({
           title: '课程列表',
+          buttons: {
+            '关闭': function () {}
+          },
           content: function () {
             const self = this
             $.ajax({
@@ -117,8 +122,7 @@ const task = {
                 jconfirm.failTips('获取课程列表失败')
                 return
               }
-              data = task.compareDeal(data)
-              console.log(data)
+              data = task.compareDealSubject(data)
               const html = require('../template/personal/subject_list_injc.art')(data)
               self.setContentAppend(html)
             })
@@ -128,7 +132,7 @@ const task = {
           }
         })
       })
-      // 点击单个课程，添加此课程
+      // 点击单个课程，添加/删除 此课程
       $(document).on('click', '.in-jc.subject-single', function () {
         const $this = $(this)
         const curId = $this.data('subjectid')
@@ -141,37 +145,122 @@ const task = {
           const data = { subject_id: $this.data('subjectid') }
           $.post('/api/teacher_subject/del', data, (data) => {
             if (data.code !== 1) {
-              jconfirm.failTips('删除课程失败', 50)
+              jconfirm.failTips('删除课程失败')
               return
             }
-            jconfirm.successTips('删除课程成功', 50)
+            jconfirm.successTips('删除课程成功')
             $this.removeClass('selected')
             // 删除本地数据
-            task.data.curSubjectList.forEach((subject, i) => {
-              if (subject.subject_id === curId) {
-                task.data.curSubjectList.splice(i, 1)
-              }
-            })
+            // task.data.curSubjectList.forEach((subject, i) => {
+            //   if (subject.subject_id === curId) {
+            //     task.data.curSubjectList.splice(i, 1)
+            //   }
+            // })
             // 重新渲染
-            task.renderCurSubjectList()
+            // task.renderCurSubjectList()
           })
         } else {
         // 添加课程
           const data = { subject_id: $this.data('subjectid') }
           $.post('/api/teacher_subject/add', data, (data) => {
             if (data.code !== 1) {
-              jconfirm.failTips('添加课程失败', 50)
+              jconfirm.failTips('添加课程失败')
               return
             }
-            jconfirm.successTips('添加课程成功', 50)
+            jconfirm.successTips('添加课程成功')
+            // $this.addClass('selected')
+            // 添加本地数据
+            // console.log(task.data.curSubjectList)
+            // addData.subject_id = data.data.insertId
+            // task.data.curSubjectList.push(addData)
+            // console.log(task.data.curSubjectList)
+            // 重新渲染
+            // task.renderCurSubjectList()
+          })
+        }
+      })
+    })()
+    // 所教班级
+    ;(function () {
+      // 点击“添加”班级按钮
+      $(document).on('click', '.add-class', function () {
+        // 记录当前所教课程的班级列表
+        task.data.curClassList = task.getCurClassList(this)
+        // 记录当前的subject_id
+        task.data.curSubjectId = $(this).prevAll('div').data('subjectid')
+        // 弹窗，里面渲染班级列表
+        $.confirm({
+          title: '班级列表',
+          buttons: {
+            '关闭': function () {}
+          },
+          content: function () {
+            const self = this
+            $.ajax({
+              url: '/api/class/list',
+              method: 'get'
+            })
+            .done(function (data) {
+              if (data.code !== 1) {
+                jconfirm.failTips('获取班级列表失败')
+                return
+              }
+              data = task.compareDealClass(data)
+              const html = require('../template/personal/class_list_injc.art')(data)
+              self.setContentAppend(html)
+            })
+            .fail(function () {
+              jconfirm.failTips('获取班级列表失败')
+            })
+          }
+        })
+      })
+      // 点击单个课程，添加/删除 此班级
+      $(document).on('click', '.in-jc.class-single', function () {
+        const $this = $(this)
+        const curId = $this.data('classid')
+        const data = {
+          subject_id: task.data.curSubjectId,
+          class_id: $(this).data('classid')
+        }
+        // 删除班级
+        if ($this.hasClass('selected')) {
+          $.post('/api/teacher_subject_class/del', data, (data) => {
+            if (data.code !== 1) {
+              jconfirm.failTips('删除课程失败')
+              return
+            }
+            jconfirm.successTips('删除课程成功')
+            window.location.reload()
+            // $this.removeClass('selected')
+            // 删除本地数据
+            // task.data.curClassList.forEach((klass, i) => {
+            //   if (klass.class_id === curId) {
+            //     task.data.curClassList.splice(i, 1)
+            //   }
+            // })
+            // 重新渲染
+            // task.renderCurClassList()
+          })
+        } else {
+        // 添加班级
+          const addData = {
+            class_id: $this.data('classid'),
+            class_name: $this.find('.name').html()
+          }
+          $.post('/api/teacher_subject_class/add', data, (data) => {
+            if (data.code !== 1) {
+              jconfirm.failTips('添加课程失败')
+              return
+            }
+            jconfirm.successTips('添加课程成功')
             $this.addClass('selected')
             // 添加本地数据
-            console.log(task.data.curSubjectList)
-            addData.subject_id = data.data.insertId
-            task.data.curSubjectList.push(addData)
-            console.log(task.data.curSubjectList)
+            // console.log(task.data.curClassList)
+            // task.data.curClassList.push(addData)
+            // console.log(task.data.curClassList)
             // 重新渲染
-            task.renderCurSubjectList()
+            // task.renderCurClassList()
           })
         }
       })
@@ -190,8 +279,20 @@ const task = {
     })
     return arr
   },
+  // 获取当前老师所教课程的班级列表：在本地数据中获取
+  getCurClassList (ele) {
+    const arr = []
+    $(ele).prevAll('div').find('span').each(function (i, ele) {
+      const obj = {
+        class_id: $(ele).data('classid'),
+        class_name: $(ele).html()
+      }
+      arr.push(obj)
+    })
+    return arr
+  },
   // 对比老师所教的课程与所有课程
-  compareDeal (data) {
+  compareDealSubject (data) {
     const dataList = data.data
     const curDataList = task.data.curSubjectList
     for (let i = 0, l1 = curDataList.length; i < l1; i++) {
@@ -209,12 +310,41 @@ const task = {
     data.data = dataList
     return data
   },
+  // 对比老师所教的班级与所有班级
+  compareDealClass (data) {
+    const dataList = data.data
+    const curDataList = task.data.curClassList
+    for (let i = 0, l1 = curDataList.length; i < l1; i++) {
+      for (let j = 0, l2 = dataList.length; j < l2; j++) {
+        if (!dataList[j].active) {
+          if (dataList[j].class_id === curDataList[i].class_id) {
+            dataList[j].active = 1
+            break
+          } else {
+            dataList[j].active = 2
+          }
+        }
+      }
+    }
+    data.data = dataList
+    return data
+  },
   // 渲染老师当前所教的科目
   renderCurSubjectList () {
     const data = {}
     data.subjects = task.data.curSubjectList
     const html = require('../template/personal/subject_list_cur.art')(data)
     $('#subject-list').html(html)
+  },
+  // 渲染老师当前所教的班级
+  renderCurClassList () {
+    const data = {}
+    data.classes = task.data.curClassList
+    const html = require('../template/personal/class_list_cur.art')(data)
+    $('#class-list').html(html)
+  },
+  reload () {
+    window.location.reload()
   }
 }
 task.init()

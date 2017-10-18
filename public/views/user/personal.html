@@ -76,17 +76,20 @@
         </div>
         {{/each}}
       </div>
-      <a class="btn btn-default add-subject" href="javascript:;" role="button">添加</a>
+      <a class="btn btn-default btn-xs add-subject" href="javascript:;" role="button">添加</a>
     </div>
     <!-- 课程对应的班级 -->
     <h3 class="head-title">所教班级</h3>
       {{each subjectsClasses}}
       <div class="class-wrap">
         <h4>{{$value.subject_num}} | {{$value.subject_name}}</h4>
-        {{each $value.classes}}
-          <span>{{$value.class_name}}</span>
-        {{/each}}
-        <a href="javascript:;" class="btn btn-default add-class" role="button">添加</a>
+        <div id="class-list" data-subjectid="{{$value.subject_id}}">
+          {{each $value.classes}}
+          <span data-classid="{{$value.class_id}}">{{$value.class_name}}</span>
+          {{/each}}
+        </div>
+        <a href="javascript:;" class="btn btn-default btn-xs add-class" role="button">添加</a>
+        <hr>
       </div>
       {{/each}}
   </section>

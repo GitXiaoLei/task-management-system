@@ -1,0 +1,43 @@
+.subject{
+  border: 1px solid #333;
+}
+#class-list>span{
+  border: 1px solid #f00;
+}
+#question-list, #publish-question{
+  float: left;
+}
+#question-list{
+  width: 360px;
+  min-height: 200px;
+}
+#publish-question{
+  width: 600px;
+}
+.subject.selected{
+  background: red;
+}
+.class.selected{
+  background: red;
+}
+.mask{
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, .4);
+  .add-question{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    min-height: 600px;
+    background: #fff;
+    border-radius: 10px;
+  }
+  h2, h3{
+    margin: 0;
+  }
+}

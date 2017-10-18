@@ -1,0 +1,5 @@
+{{each data}}
+<div class="in-jc class-single {{$value.active === 1 ? 'selected' : ''}}" data-classid="{{$value.class_id}}">
+  <span class="name">{{$value.class_name}}</span>
+</div>
+{{/each}}

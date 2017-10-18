@@ -1,0 +1,6 @@
+{{each questions}}
+<div data-questionid={{$value.question_id}}>
+  <span>{{$value.question}}</span>
+  <span>{{$value.answer}}</span>
+</div>
+{{/each}}
