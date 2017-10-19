@@ -178,8 +178,14 @@ const User = {
     }
   },
   async getQuestions (conditions) {
+    let sql = 'select * from question where subject_id=' + conditions.subjectId + ' and type=' + conditions.type
+    if (conditions.questionIds[0]) {
+      conditions.questionIds.forEach((id, i, arr) => {
+        sql += ' and question_id != ' + id
+      })
+    }
     try {
-      const questions = await DB.instance('r').select('question', conditions)
+      const questions = await DB.instance('r').query(sql)
       return questions
     } catch (e) {
       throw new Error(e)
@@ -261,14 +267,68 @@ const User = {
       throw new Error(e)
     }
   },
-  async getSubjectByTaskId (conditions) {
-    let sql = 'select * from subject where subject_id in (select subject_id from task where task_id=' + conditions.task_id + ')'
+  async getSubjectByTaskId (taskId) {
+    let sql = 'select * from subject where subject_id in (select subject_id from task where task_id=' + taskId + ')'
+    try {
+      return DB.instance('r').query(sql)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取某次课程所选的班级列表
+  async getCurClasses (taskId) {
+    let sql = 'select * from class where class_id in (select class_id from task_class where task_id=' + taskId + ')'
+    try {
+      return DB.instance('r').query(sql)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取某次作业所选的题目
+  async getCurQuestions (taskId) {
+    let sql = 'select * from question where question_id in (select question_id from task_question where task_id=' + taskId + ')'
+    try {
+      return DB.instance('r').query(sql)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 为某次作业添加题目
+  async addTaskQuestion (insertData) {
+    try {
+      return DB.instance('r').insert('task_question', insertData)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 为某次作业删除题目
+  async delTaskQuestion (conditions) {
+    let sql = 'delete from task_question where task_id=' + conditions.task_id + ' and question_id=' + conditions.question_id
+    try {
+      return DB.instance('r').query(sql)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 发布作业
+  async publishTask (taskId) {
+    let sql = 'update task set is_publish=1 where task_id=' + taskId 
+    try {
+      return DB.instance('r').query(sql)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取本次作业是否被发布了
+  async isPublish (taskId) {
+    let sql = 'select is_publish from task where task_id=' + taskId 
     try {
       return DB.instance('r').query(sql)
     } catch (e) {
       throw new Error(e)
     }
   }
+  
 }
 
 module.exports = User

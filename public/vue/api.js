@@ -32,4 +32,13 @@ export const addQuestion = params => axios.post('/api/question/add', qs.stringif
 export const getTask5 = params => axios.get('/api/task/recent', { params })
 
 // 获取某次作业的所对应的课程
-export const getSubjectsByTaskId = params => axios.get('/api/task/subject', { params })
+export const getTaskInfo = params => axios.get('/api/task/info', { params })
+
+// 为某次作业添加题目
+export const addTaskQuestion = params => axios.post('/api/task_question/add', qs.stringify(params))
+
+// 为某次作业删除题目
+export const delQuestion = params => axios.post('/api/task_question/del', qs.stringify(params))
+
+// 发布作业
+export const publishTask = params => axios.post('/api/task/publish', qs.stringify(params))

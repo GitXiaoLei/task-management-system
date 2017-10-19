@@ -312,7 +312,8 @@ const route = (app) => {
       return
     }
     const conditions = {
-      subject_id: req.query.subject_id
+      subjectId: req.query.subjectId,
+      questionIds: req.query.questionIds.split(',')
     }
     // 根据请求地址，判断题目类型
     switch (req.path) {
@@ -328,10 +329,11 @@ const route = (app) => {
       case '/api/subject_question/words/list':
       conditions.type = 3
     }
+    console.log(conditions)
     try {
       const result = await User.getQuestions(conditions)
       result.type = conditions.type
-      Output.apiData(result, '获取问题列表成功')
+      Output.apiData(result, '获取问题列表成功'+conditions.type)
     } catch (e) {
       Output.apiErr(e)
     }
@@ -452,8 +454,8 @@ const route = (app) => {
       Output.apiErr(e)
     }
   })
-  // 获取最近5条作业记录
-  app.get('/api/task/subject', async (req, res) => {
+  // 获取某条作业记录的详细信息
+  app.get('/api/task/info', async (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       Output.apiErr({ code: 0, message: '请先登录' })
@@ -464,10 +466,91 @@ const route = (app) => {
       Output.apiErr({ code: 0, message: '你没有权限访问' })
       return
     }
-    const conditions = { task_id: req.query.task_id }
+    const taskId = req.query.task_id
     try {
-      const result = await User.getSubjectByTaskId(conditions)
-      Output.apiData(result, '获取该作业所对应的课程成功')
+      // 本次作业所对应的课程
+      const curSubject = await User.getSubjectByTaskId(taskId)
+      // 此课程所对应的所有班级
+      const classes = await User.getClasses(curSubject[0].subject_id)
+      // 本次作业所选的班级
+      const curClasses = await User.getCurClasses(taskId)
+      // 本次作业所选的题目
+      const curQuestions = await User.getCurQuestions(taskId)
+      // 本次作业是否被发布
+      const isPublish = await User.isPublish(taskId)
+      const data = {
+        curSubject,
+        classes,
+        curClasses,
+        curQuestions,
+        isPublish
+      }
+      Output.apiData(data, '获取该作业详细信息成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 为某次作业添加题目
+  app.post('/api/task_question/add', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const insertData = {
+      task_id: req.body.task_id,
+      question_id: req.body.question_id
+    }
+    try {
+      const result = await User.addTaskQuestion(insertData)
+      Output.apiData(result, '添加题目成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 为某次作业删除题目
+  app.post('/api/task_question/del', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const conditions = {
+      task_id: req.body.task_id,
+      question_id: req.body.question_id
+    }
+    try {
+      const result = await User.delTaskQuestion(conditions)
+      Output.apiData(result, '删除题目成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 发布作业
+  app.post('/api/task/publish', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const result = await User.publishTask(req.body.task_id)
+      Output.apiData(result, '发布作业成功')
     } catch (e) {
       Output.apiErr(e)
     }

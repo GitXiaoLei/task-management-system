@@ -1,8 +1,8 @@
 <template>
   <div>
     <!-- 选择课程 -->
-    <div>
-      <h2>请选择课程：</h2>
+    <div style="margin-top: 40px;">
+      <h2>选择课程</h2>
       <RadioGroup v-model="subjectId" type="button" size="large">
         <Tooltip
           placement="top"
@@ -13,12 +13,13 @@
         </Tooltip>
       </RadioGroup>
       <Input v-model="taskName" placeholder="请输入作业名称" style="width: 300px" :disabled="isDisabled"></Input>
+      <!-- 创建作业按钮 -->
+      <Button type="ghost" @click="createTask" v-show="isCTShow">创建作业</Button>
     </div>
-    <!-- 创建作业按钮 -->
-    <div><Button type="ghost" @click="createTask" v-show="isCTShow">创建作业</Button></div>
+    <h1>{{taskName}}</h1>
     <!-- 选择班级 -->
-    <div>
-      <h2>请选择班级：</h2>
+    <div style="margin-top: 40px;">
+      <h2>选择班级</h2>
       <CheckboxGroup v-model="classIds">
         <Checkbox
           v-for="klass of classes"
@@ -28,25 +29,37 @@
       </CheckboxGroup>
     </div>
     <!-- 选择题目 -->
-    <div>
-      <h2>请选择题目：</h2>
-      <Button type="ghost" @click="showChooseMod">选择选择题</Button>
-      <Button type="ghost" @click="showJudgeMod">选择判断题</Button>
-      <Button type="ghost" @click="showFillMod">选择填空题</Button>
-      <Button type="ghost" @click="showWordsMod">选择主观题</Button>
-      <Button type="primary" @click="showAddMod">添加题目</Button>
+    <div style="margin-top: 40px;">
+      <h2>选择题目</h2>
+      <Button type="ghost" @click="showChooseMod" :disabled="isPublish === 1">选择选择题</Button>
+      <Button type="ghost" @click="showJudgeMod" :disabled="isPublish === 1">选择判断题</Button>
+      <Button type="ghost" @click="showFillMod" :disabled="isPublish === 1">选择填空题</Button>
+      <Button type="ghost" @click="showWordsMod" :disabled="isPublish === 1">选择主观题</Button>
+      <Button type="primary" @click="showAddMod" :disabled="isPublish === 1">添加题目</Button>
     </div>
     <!-- 已选择的题目 -->
-    <div>
-      
+    <div style="margin-top: 40px;">
+      <h2>已选择的题目</h2>
+      <Table 
+        highlight-row 
+        ref="curRowTable" 
+        :columns="questionColumn" 
+        :data="curQuestionList"></Table>
     </div>
+    <Button style="margin: 30px auto; display: block;" type="ghost" v-show="isPublish === 0" @click="publishTask">发布作业</Button>
+    <Button style="margin: 30px auto; display: block;" type="ghost" v-show="isPublish === 1" disabled>已发布</Button>
     <!-- 选择题 -->
     <Modal
       v-model="chooseMod"
       title="选择题"
       :closable="false"
       :mask-closable="false">
-      
+      <Table 
+        @on-current-change="addTaskQuestion"
+        highlight-row 
+        ref="curRowTable" 
+        :columns="questionColumn" 
+        :data="questionList"></Table>
     </Modal>
     <!-- 判断题 -->
     <Modal
@@ -54,7 +67,12 @@
       title="判断题"
       :closable="false"
       :mask-closable="false">
-      
+      <Table 
+        @on-current-change="addTaskQuestion"
+        highlight-row 
+        ref="curRowTable" 
+        :columns="questionColumn" 
+        :data="questionList"></Table>
     </Modal>
     <!-- 填空题 -->
     <Modal
@@ -63,7 +81,7 @@
       :closable="false"
       :mask-closable="false">
       <Table 
-        @on-current-change="change"
+        @on-current-change="addTaskQuestion"
         highlight-row 
         ref="curRowTable" 
         :columns="questionColumn" 
@@ -76,7 +94,7 @@
       :closable="false"
       :mask-closable="false">
       <Table 
-        @on-current-change="change"
+        @on-current-change="addTaskQuestion"
         highlight-row 
         ref="curRowTable" 
         :columns="questionColumn" 
@@ -119,317 +137,18 @@
     <span class="task-list-btn" v-show="tlBtn" @click="tlBtn = false">作业记录</span>
     <!-- 作业记录列表 -->
     <div class="task-list" v-show="!tlBtn">
-      <div v-for="task of taskes" :key="task.id" @click="getSubjectsByTaskId(task.task_id)">{{task.task_name}}</div>
+      <div style="background: #20a0ff; color: #fff;">选择作业</div>
+      <div v-for="task of taskes" :key="task.id" @click="getTaskInfo(task.task_id, task.task_name, $event)">{{task.task_name}}</div>
+      <div style="background: #58b957; color: #fff; text-align: center;" @click="toCreateTaskStatus">创建作业</div>
     </div>
   </div>
 </template>
 
 <script>
-import { getSubjects, createTask, getClasses, addTaskClass, delTaskClass, getChoose, getJudge, getFill, getWords, addQuestion, getTask5, getSubjectsByTaskId } from '../api'
 import $ from 'jquery'
 import VueMarkdown from 'vue-markdown'
-export default {
-  name: 'app',
-  components: {},
-  data () {
-    return {
-      subjects: [], // 老师所教的课程列表
-      subjectId: 0, // 选中的课程的id
-      taskName: '', // 作业名称
-      taskId: 0, // 当前作业的id
-      isDisabled: false, // 是否禁用选择课程的按钮
-      isCTShow: true, // 创建作业的按钮是否显示
-      classes: [], // 老师所教课程下的班级列表
-      classIds: [], // 被选中的班级id
-      chooseMod: false, // 选择题modal
-      judgeMod: false, // 判断题modal
-      fillMod: false, // 填空题modal
-      wordsMod: false, // 主观题modal
-      addMod: false, // 添加题目modal
-      questionList: [], // 问题列表
-      questionColumn: [ // 表格的表头数据
-        { title: '问题', key: 'question' },
-        { title: '答案', key: 'answer' }
-      ],
-      questionVal: '', // 问题
-      answerVal: '', // 答案
-      toolbars: { // markdown工具栏
-        preview: true, // 预览
-        bold: true, // 粗体
-        italic: true, // 斜体
-        header: true, // 标题
-        underline: true, // 下划线
-        strikethrough: true, // 中划线
-        fullscreen: true, // 全屏编辑
-        code: true, // code
-        ol: true, // 有序列表
-        ul: true, // 无序列表
-        mark: true, // 标记
-        subfield: true, // 单双栏模式
-      },
-      questionType: [ // 所有题目类型
-        { num: 0, name: '选择题' },
-        { num: 1, name: '判断题' },
-        { num: 2, name: '填空题' },
-        { num: 3, name: '主观题' },
-      ],
-      questionTypeNum: 0, // 题目类型
-      tlBtn: true, // 作业列表按钮 是否显示
-      taskes: [], // 最近5次作业记录列表
-    }
-  },
-  methods: {
-    change (status) {
-      this.$Message.info('开关状态：' + status);
-    },
-    // 点击某次作业，获取该作业所对应的课程
-    getSubjectsByTaskId (taskId) {
-      const params = { task_id: taskId }
-      getSubjectsByTaskId(params)
-      .then((data) => {
-        data = data.data
-        if (data.code !== 1) {
-          this.errorMsg('获取失败')
-          return
-        }
-        this.successMsg('获取成功')
-        console.log(data)
-      })
-      .catch((e) => {
-        this.errorMsg(e)
-      })
-    },
-    // 添加题目
-    addQuestion () {
-      if (this.questionVal === '') {
-        this.errorMsg('请输入问题')
-        return
-      }
-      if (this.answerVal === '') {
-        this.errorMsg('请输入答案')
-        return
-      }
-      if (this.subjectId === 0) {
-        this.errorMsg('未选择科目')
-        return
-      }
-      const params = {
-        question: this.questionVal,
-        answer: this.answerVal,
-        type: this.questionTypeNum,
-        subject_id: this.subjectId
-      }
-      addQuestion(params)
-      .then((data) => {
-        data = data.data
-        if (data.code !== 1) {
-          this.errorMsg('添加题目失败')
-          return
-        }
-        this.successMsg(data.message)
-        // 将题目添加到本地数据中...
-        
-      })
-      .catch((e) => {
-        this.errorMsg('添加题目失败')
-      })
-    },
-    // 创建作业
-    createTask () {
-      if (this.subjectId === 0) {
-        this.errorMsg('请先选择课程')
-        return
-      }
-      if (this.taskName === '') {
-        this.errorMsg('请输入作业名称')
-        return
-      }
-      const params = { 
-        subject_id: this.subjectId,
-        task_name: this.taskName
-      }
-      // 创建作业记录
-      createTask(params)
-      .then((data) => {
-        data = data.data
-        if (data.code !== 1) {
-          this.errorMsg('创建作业失败')
-          return
-        }
-        this.successMsg('创建作业成功')
-        this.taskId = data.data.insertId
-        this.isDisabled = true
-        this.isCTShow = false
-        const params = { subject_id: this.subjectId }
-        // 获取班级列表
-        getClasses(params)
-        .then((data) => {
-          data = data.data
-          if (data.code !== 1) {
-            this.errorMsg('获取班级列表失败')
-            return
-          }
-          this.classes = data.data
-        })
-        .catch((e) => {
-          this.errorMsg(e)
-        })
-      })
-      .catch((e) => {
-        this.errorMsg(e)
-      })
-    },
-    // 编辑班级：添加或删除
-    editClass (classId, e) {
-      // 添加班级
-      if (!$(e.srcElement).hasClass('ivu-checkbox-wrapper-checked')) {
-        const params = {
-          task_id: this.taskId,
-          class_id: classId
-        }
-        addTaskClass(params)
-        .then((data) => {
-          data = data.data
-          if (data.code !== 1) {
-            this.errorMsg('添加班级失败')
-            return
-          }
-          this.successMsg('添加班级成功')
-        })
-        .catch((e) => {
-          this.errorMsg(e)
-        })
-      } else {
-      // 删除班级
-        const params = {
-          task_id: this.taskId,
-          class_id: classId
-        }
-        delTaskClass(params)
-        .then((data) => {
-          data = data.data
-          if (data.code !== 1) {
-            this.errorMsg('删除班级失败')
-            return
-          }
-          this.successMsg('删除班级成功')
-        })
-        .catch((e) => {
-          this.errorMsg(e)
-        })
-      }
-    },
-    // 添加题目modal
-    showAddMod () {
-      this.addMod = true
-    },
-    change (cur, old) {
-      console.log(cur)
-      console.log(old)
-    },
-    // 选择题
-    showChooseMod () {
-      this.chooseMod = true
-      getChoose({ subject_id: this.subjectId })
-      .then((data) => {
-        data = data.data
-        if (data.code !== 1) {
-          this.errorMsg('获取选择题失败')
-          return
-        }
-        this.questionList = data.data
-      })
-      .catch((e) => {
-        this.errorMsg(e)
-      })
-    },
-    // 判断题
-    showJudgeMod () {
-      this.judgeMod = true
-      getJudge({ subject_id: this.subjectId })
-      .then((data) => {
-        data = data.data
-        if (data.code !== 1) {
-          this.errorMsg('获取判断题失败')
-          return
-        }
-        this.questionList = data.data
-      })
-      .catch((e) => {
-        this.errorMsg(e)
-      })
-    },
-    // 填空题
-    showFillMod () {
-      this.fillMod = true
-      getFill({ subject_id: this.subjectId })
-      .then((data) => {
-        data = data.data
-        if (data.code !== 1) {
-          this.errorMsg('获取填空题失败')
-          return
-        }
-        this.questionList = data.data
-      })
-      .catch((e) => {
-        this.errorMsg(e)
-      })
-    },
-    // 主观题
-    showWordsMod () {
-      this.wordsMod = true
-      getWords({ subject_id: this.subjectId })
-      .then((data) => {
-        data = data.data
-        if (data.code !== 1) {
-          this.errorMsg('获取主观题失败')
-          return
-        }
-        this.questionList = data.data
-      })
-      .catch((e) => {
-        this.errorMsg(e)
-      })
-    },
-    // 成功消息提示
-    successMsg (msg) {
-      this.$Message.success(msg)
-    },
-    // 错误消息提示
-    errorMsg (msg) {
-      this.$Message.error(msg)
-    }
-  },
-  created () {
-    // 获取自己所教的课程
-    getSubjects()
-    .then((data) => {
-      data = data.data
-      if (data.code !== 1) {
-        this.errorMsg('获取课程列表失败')
-        return
-      }
-      this.subjects = data.data
-      // 获取最近5次作业记录
-      getTask5()
-      .then((data) => {
-        data = data.data
-        if (data.code !== 1) {
-          this.errorMsg('获取最近5次作业记录失败')
-          return
-        }
-        this.taskes = data.data
-      })
-      .catch((e) => {
-        this.errorMsg(e)
-      })
-    })
-    .catch((e) => {
-      this.errorMsg(e)
-    })
-    
-  }
-}
+import vueObj from './publish_task'
+export default vueObj
 </script>
 
 <style scoped>
