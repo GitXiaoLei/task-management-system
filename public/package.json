@@ -32,12 +32,16 @@
     "iview": "^2.5.1",
     "jquery": "^3.2.1",
     "jquery-confirm": "^3.3.2",
+    "less": "^3.0.0-alpha.3",
+    "less-loader": "^4.0.5",
     "mavon-editor": "^2.2.10",
     "minireset.css": "0.0.3",
     "postcss-loader": "^2.0.6",
     "qs": "^6.5.1",
     "simplemde": "^1.11.2",
     "vue": "^2.4.4",
-    "vue-markdown": "^2.2.4"
+    "vue-markdown": "^2.2.4",
+    "vue-router": "^3.0.1",
+    "vue-template-compiler": "^2.5.2"
   }
 }

@@ -1,3 +1,0 @@
-{{each classes}}
-<span class="class" data-classid={{$value.class_id}}>{{$value.class_name}}</span>
-{{/each}}

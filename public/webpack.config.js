@@ -6,14 +6,19 @@ const config = {
   entry: {
     index: './entry/index',
     publish_task: './entry/publish_task',
-    personal: './entry/personal'
+    personal: './entry/personal',
+    student: './entry/student'
   },
   output: {
     path: path.resolve(__dirname, './build'),
     filename: '[name].js'
   },
   resolve: {
-    extensions: ['.js', '.vue']
+    extensions: ['.js', '.vue'],
+    // 配置vue单页面需要
+    alias: {
+      'vue$': 'vue/dist/vue.js'
+    }
   },
   module: {
     rules: [
@@ -28,6 +33,10 @@ const config = {
       {
         test: /\.scss$/,
         use: ['style-loader', 'css-loader', 'sass-loader']
+      },
+      {
+        test: /\.less$/,
+        use: ['style-loader', 'css-loader', 'less-loader']
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

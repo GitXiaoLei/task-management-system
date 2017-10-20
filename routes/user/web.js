@@ -35,10 +35,7 @@ const route = (app) => {
     }
     // 学生
     if (req._role[0] === 'student') {
-      Output.render('user/index', {
-        userInfo: req._userInfo,
-        title: '同学，你已经登录了'
-      })
+      Output.render('user/student')
     }
   })
   // 老师个人中心页面
@@ -61,6 +58,24 @@ const route = (app) => {
         subjectsClasses: subjectsClasses
       }
       Output.render('user/personal', data)
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 学生页面
+  app.get('/student', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      Output.render('user/student')
     } catch (e) {
       Output.apiErr(e)
     }

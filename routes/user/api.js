@@ -555,6 +555,54 @@ const route = (app) => {
       Output.apiErr(e)
     }
   })
+  // 获取用户信息
+  app.get('/api/user/info', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const result = await User.getUserById(req._userInfo.user_id)
+      Output.apiData(result, '获取用户信息成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 修改用户信息
+  app.post('/api/student/update', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const updateData = {
+      username: req.body.userName,
+      real_name: req.body.realName,
+      sex: req.body.sex,
+      department_name: req.body.departmentName,
+      class_name: req.body.className,
+      phone_num: req.body.phoneNum,
+      qq_num: req.body.qqNum
+    }
+    const conditions = { user_id: req._userInfo.user_id }
+    try {
+      const result = await User.updateUserInfo(updateData, conditions)
+      Output.apiData(result, '修改用户信息成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
 }
 
 module.exports = route
