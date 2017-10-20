@@ -7,7 +7,8 @@ const config = {
     index: './entry/index',
     publish_task: './entry/publish_task',
     personal: './entry/personal',
-    student: './entry/student'
+    student: './entry/student',
+    teacher: './entry/teacher'
   },
   output: {
     path: path.resolve(__dirname, './build'),

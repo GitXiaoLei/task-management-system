@@ -28,10 +28,7 @@ const route = (app) => {
     }
     // 老师
     if (req._role[0] === 'teacher') {
-      Output.render('user/index', {
-        userInfo: req._userInfo,
-        title: '老师，你已经登录了'
-      })
+      Output.render('user/teacher')
     }
     // 学生
     if (req._role[0] === 'student') {
