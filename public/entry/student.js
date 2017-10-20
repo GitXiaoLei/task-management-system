@@ -7,6 +7,15 @@ import 'iview/dist/styles/iview.css'
 import '../common/style/common.scss'
 
 Vue.use(iView)
+// 加载进度条
+router.beforeEach((to, from, next) => {
+  iView.LoadingBar.start()
+  next()
+})
+router.afterEach(route => {
+  iView.LoadingBar.finish()
+})
+
 Vue.config.productionTip = false
 
 new Vue({

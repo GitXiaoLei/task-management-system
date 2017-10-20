@@ -3,9 +3,9 @@
     <div class="layout">
       <div class="layout-ceiling">
         <div class="layout-ceiling-main">
-          <a href="#">做作业</a> |
-          <a href="#">查看作业</a> |
-          <a href="#">个人中心</a>
+          <router-link to="/student/do">做作业</router-link>
+          <router-link to="/student/see">查看作业</router-link>
+          <router-link to="/student/personal">个人中心</router-link>
           <Dropdown placement="bottom-end" trigger="click">
             <a href="javascript:;">
               {{userName}} 同学

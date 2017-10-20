@@ -13,7 +13,7 @@ export default {
 #content{
   width: 1000px;
   margin: 0 auto;
-  min-height: 600px;
+  min-height: 700px;
   background: #fff;
   overflow: hidden;
 }

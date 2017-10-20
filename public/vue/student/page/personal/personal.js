@@ -31,15 +31,17 @@ export default {
     handleModifi (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          console.log(valid)
+          this.$Loading.start()
           const params = Object.assign({}, this.form)
           updateStudentInfo(params)
           .then((data) => {
             data = data.data
             if (data.code !== 1) {
+              this.$Loading.error()
               this.errorMsg('修改信息失败')
               return
             }
+            this.$Loading.finish()
             this.formSource = Object.assign({}, this.form)
             this.modifi = false
             this.successMsg('修改信息成功')
@@ -56,6 +58,8 @@ export default {
     cancel() {
       this.form = Object.assign({}, this.formSource)
       this.modifi = false
+      // 隐藏错误提示框
+      $('.ivu-form-item-error-tip').hide()
     },
     // 成功消息提示
     successMsg(msg) {

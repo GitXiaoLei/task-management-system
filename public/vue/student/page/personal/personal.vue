@@ -57,6 +57,10 @@
   display: inline-block;
   height: 21px;
   line-height: 21px;
+  font-weight: bold;
+}
+.ivu-card{
+  transition: .3s;
 }
 </style>
 
