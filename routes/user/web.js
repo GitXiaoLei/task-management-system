@@ -49,6 +49,7 @@ const route = (app) => {
     }
     try {
       const userData = await User.getUserById(req._userInfo.user_id)
+      delete userData.password
       const subjectsClasses = await User.getSubject(req._userInfo.user_id)
       const data = {
         userData: userData[0],

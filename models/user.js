@@ -327,8 +327,44 @@ const User = {
     } catch (e) {
       throw new Error(e)
     }
+  },
+  // 获取某位老师所教的课程已经课程对应的班级
+  async getSubjectClass (userId) {
+    const data = []
+    try {
+      const teacherSubject = await DB.instance('r').query('select * from teacher_subject where user_id=' + userId)
+      const sIds = []
+      const tsIds = []
+      teacherSubject.forEach((teacherSubject) => {
+        sIds.push(teacherSubject.subject_id)
+        tsIds.push(teacherSubject.teacher_subject_id)
+      })
+      for (let i = 0, l = sIds.length; i < l; i++) {
+        // 获取subject_id所对应的课程信息
+        const subject = await DB.instance('r').query('select * from subject where subject_id=' + sIds[i])
+        const obj = subject[0]
+        // 获取teacher_subject_id所对应的班级信息
+        const classes = await DB.instance('r').query('select * from class where class_id in (select class_id from teacher_subject_class where teacher_subject_id='+ tsIds[i] +')')
+        obj.classes = classes
+        // 给每个班级信息加上subject_id
+        obj.classes.forEach((klass) => {
+          klass.subject_id = sIds[i]
+        })
+        data.push(obj)
+      }
+      return data
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取课程列表
+  async getSubjectList () {
+    try {
+      return DB.instance('r').select('subject')
+    } catch (e) {
+      throw new Error(e)
+    }
   }
-  
 }
 
 module.exports = User

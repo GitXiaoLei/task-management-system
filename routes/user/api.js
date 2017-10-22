@@ -99,6 +99,7 @@ const route = (app) => {
       Output.apiErr({ code: 0, message: '你没有权限访问' })
       return
     }
+    console.log(req._userInfo.user_id)
     try {
       const subjects = await User.getSubjects(req._userInfo.user_id)
       Output.apiData(subjects, '获取自己所教课程成功')
@@ -603,6 +604,31 @@ const route = (app) => {
       Output.apiErr(e)
     }
   })
+  // 获取老师个人中心页面初始化数据：老师个人信息、所教课程、所教班级
+  app.get('/api/teacher/personal', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const userData = await User.getUserById(req._userInfo.user_id)
+      const subjectClassData = await User.getSubjectClass(req._userInfo.user_id)
+      const data = {
+        userData,
+        subjectClassData
+      }
+      Output.apiData(data, '获取页面信息成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  
 }
 
 module.exports = route
