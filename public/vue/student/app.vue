@@ -12,7 +12,7 @@
               <Icon type="arrow-down-b"></Icon>
             </a>
             <DropdownMenu slot="list">
-              <DropdownItem>退出登录</DropdownItem>
+              <DropdownItem @click.native="loginout">退出登录</DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </div>
@@ -23,13 +23,50 @@
 </template>
 
 <script>
-import app from "./app.js"
+import { loginout, getUserData } from "../teacher/api.js"
 export default {
   name: 'app',
   data () {
     return {
+      userData: {},
       userName: 'xl'
     }
+  },
+  methods: {
+    loginout () {
+      loginout()
+      .then((data) => {
+        data = data.data
+        if (data.code !== 1) {
+          this.errorMsg('退出登录失败')
+          return
+        }
+        window.location.href = '/'
+      })
+    },
+    // 成功消息提示
+    successMsg (msg) {
+      this.$Message.success(msg)
+    },
+    // 失败消息提示
+    errorMsg (msg) {
+      this.$Message.error(msg)
+    }
+  },
+  created () {
+    getUserData()
+    .then((data) => {
+      data = data.data
+      if (data.code !== 1) {
+        this.errorMsg('获取个人信息失败')
+        return
+      }
+      this.userData = data.data[0]
+      console.log(this.userData)
+    })
+    .catch((e) => {
+      this.errorMsg(e)
+    })
   }
 }
 // export default app;

@@ -14406,6 +14406,69 @@ exports.isBuffer = function isBuffer(obj) {
 
 /***/ }),
 
+/***/ 277:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_axios__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_qs__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_qs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_qs__);
+
+
+
+// 获取个人中心页面初始化数据：用户信息、所教课程、所教班级
+const getPersonalWebData = (params) => __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get('/api/teacher/personal', { params })
+/* harmony export (immutable) */ __webpack_exports__["i"] = getPersonalWebData;
+
+// 获取课程列表
+const getSubjectList = (params) => __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get('/api/subject/list', { params })
+/* harmony export (immutable) */ __webpack_exports__["g"] = getSubjectList;
+
+
+// 修改学生的信息
+const updateStudentInfo = (params) => __WEBPACK_IMPORTED_MODULE_0_axios___default.a.post('/api/student/update', __WEBPACK_IMPORTED_MODULE_1_qs___default.a.stringify(params))
+/* harmony export (immutable) */ __webpack_exports__["h"] = updateStudentInfo;
+
+
+// 删除自己所教的课程
+const delSubject = (params) => __WEBPACK_IMPORTED_MODULE_0_axios___default.a.post('/api/teacher_subject/del', __WEBPACK_IMPORTED_MODULE_1_qs___default.a.stringify(params))
+/* harmony export (immutable) */ __webpack_exports__["f"] = delSubject;
+
+
+// 添加自己所教的课程
+const addSubject = (params) => __WEBPACK_IMPORTED_MODULE_0_axios___default.a.post('/api/teacher_subject/add', __WEBPACK_IMPORTED_MODULE_1_qs___default.a.stringify(params))
+/* harmony export (immutable) */ __webpack_exports__["e"] = addSubject;
+
+
+// 为某个课程添加班级
+const addClass = (params) => __WEBPACK_IMPORTED_MODULE_0_axios___default.a.post('/api/teacher_subject_class/add', __WEBPACK_IMPORTED_MODULE_1_qs___default.a.stringify(params))
+/* harmony export (immutable) */ __webpack_exports__["c"] = addClass;
+
+
+// 删除某个课程下的某个班级
+const delClass = (params) => __WEBPACK_IMPORTED_MODULE_0_axios___default.a.post('/api/teacher_subject_class/del', __WEBPACK_IMPORTED_MODULE_1_qs___default.a.stringify(params))
+/* harmony export (immutable) */ __webpack_exports__["b"] = delClass;
+
+
+// 获取班级列表
+const getClassList = (params) => __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get('/api/class/list', { params })
+/* harmony export (immutable) */ __webpack_exports__["d"] = getClassList;
+
+
+// 退出登录
+const loginout = (params) => __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get('/loginout', { params })
+/* harmony export (immutable) */ __webpack_exports__["a"] = loginout;
+
+
+// 退出登录
+const getUserData = (params) => __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get('/api/user/info', { params })
+/* harmony export (immutable) */ __webpack_exports__["j"] = getUserData;
+
+
+
+/***/ }),
+
 /***/ 287:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -49521,7 +49584,7 @@ module.exports = Axios;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__app_js__ = __webpack_require__(572);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__teacher_api_js__ = __webpack_require__(277);
 //
 //
 //
@@ -49552,8 +49615,45 @@ module.exports = Axios;
   name: 'app',
   data () {
     return {
+      userData: {},
       userName: 'xl'
     }
+  },
+  methods: {
+    loginout () {
+      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__teacher_api_js__["a" /* loginout */])()
+      .then((data) => {
+        data = data.data
+        if (data.code !== 1) {
+          this.errorMsg('退出登录失败')
+          return
+        }
+        window.location.href = '/'
+      })
+    },
+    // 成功消息提示
+    successMsg (msg) {
+      this.$Message.success(msg)
+    },
+    // 失败消息提示
+    errorMsg (msg) {
+      this.$Message.error(msg)
+    }
+  },
+  created () {
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__teacher_api_js__["j" /* getUserData */])()
+    .then((data) => {
+      data = data.data
+      if (data.code !== 1) {
+        this.errorMsg('获取个人信息失败')
+        return
+      }
+      this.userData = data.data[0]
+      console.log(this.userData)
+    })
+    .catch((e) => {
+      this.errorMsg(e)
+    })
   }
 });
 // export default app;
@@ -50201,7 +50301,19 @@ var render = function() {
                   _c(
                     "DropdownMenu",
                     { attrs: { slot: "list" }, slot: "list" },
-                    [_c("DropdownItem", [_vm._v("退出登录")])],
+                    [
+                      _c(
+                        "DropdownItem",
+                        {
+                          nativeOn: {
+                            click: function($event) {
+                              _vm.loginout($event)
+                            }
+                          }
+                        },
+                        [_vm._v("退出登录")]
+                      )
+                    ],
                     1
                   )
                 ],
@@ -50583,24 +50695,6 @@ const updateStudentInfo = (params) => __WEBPACK_IMPORTED_MODULE_0_axios___defaul
 /* harmony export (immutable) */ __webpack_exports__["a"] = updateStudentInfo;
 
 
-
-/***/ }),
-
-/***/ 572:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* unused harmony default export */ var _unused_webpack_default_export = ({
-  name: 'app',
-  data () {
-    return {
-      userName: 'xl'
-    }
-  },
-  methods: {
- 
-  }
-});
 
 /***/ }),
 

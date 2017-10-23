@@ -57,19 +57,6 @@ app.use(RBAC.init)
 require('./routes/admin/admin')(app)
 require('./routes/user/api')(app)
 require('./routes/user/web')(app)
-// require('./routes/admin/department')(app);
-// require('./routes/admin/subject')(app);
-// require('./routes/admin/teacher')(app);
-// require('./routes/admin/student')(app);
-
-// app.get('*', (req, res) => {
-  // 返回404页面
-  // if (req.path.indexOf('admin') === -1) {
-  //   Output.apiData({}, '404')
-  //   return
-  // }
-  // Output.render('admin/index')
-// })
 
 app.listen(port, (err) => {
   if (err) {

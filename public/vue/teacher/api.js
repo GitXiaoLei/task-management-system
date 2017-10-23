@@ -26,3 +26,6 @@ export const getClassList = (params) => axios.get('/api/class/list', { params })
 
 // 退出登录
 export const loginout = (params) => axios.get('/loginout', { params })
+
+// 退出登录
+export const getUserData = (params) => axios.get('/api/user/info', { params })

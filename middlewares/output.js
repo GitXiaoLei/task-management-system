@@ -10,6 +10,38 @@ const Output = {
   init (req, res, next) {
     _req = req
     _res = res
+    // 发送json数据：正确
+    res.apiData = function (data = {}, message = '', code = 1) {
+      res.json({
+        code: code,
+        message: message,
+        data: data
+      })
+    }
+    // 发送cookie
+    res.cookies = function (name, val, expires) {
+      res.cookie(name, val, {
+        path: '/',
+        expires: expires,
+        httpOnly: true
+      })
+    }
+    // 发送json数据：错误
+    res.apiErr = function (err = {}, data) {
+      let code = err.code || 0
+      let message = err.message || '未知错误'
+      res.json({
+        code: code,
+        message: message,
+        data: data
+      })
+    }
+    res.renderPage = function (view, data = {}) {
+      res.render(view, data)
+    }
+    res.redirectPage = function (url) {
+      res.redirect(url)
+    }
     next()
   },
   /**
