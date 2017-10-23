@@ -23,6 +23,7 @@
     "webpack-notifier": "^1.5.0"
   },
   "dependencies": {
+    "async": "^2.5.0",
     "autoprefixer": "^7.1.4",
     "axios": "^0.16.2",
     "bootstrap": "^3.3.7",
@@ -42,6 +43,7 @@
     "vue": "^2.4.4",
     "vue-markdown": "^2.2.4",
     "vue-router": "^3.0.1",
-    "vue-template-compiler": "^2.5.2"
+    "vue-template-compiler": "^2.5.2",
+    "xlsx": "^0.11.6"
   }
 }

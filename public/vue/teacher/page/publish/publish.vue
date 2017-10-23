@@ -1,52 +1,73 @@
 <template>
   <contents>
-    <!-- 选择课程 -->
-    <div style="margin-top: 40px;">
-      <h2>选择课程</h2>
+    <!-- 创建作业 -->
+    <Card style="width:350px; margin: 40px auto;">
+      <h2 slot="title">创建作业</h2>
+      <!-- 选择课程 -->
+      <h3 style="margin: 10px 0;">选择课程</h3>
       <RadioGroup v-model="subjectId" type="button" size="large">
         <Tooltip
           placement="top"
           v-for="subject of subjects" 
-          :key="subject.id" 
+          :key="subject.id"
           :content="subject.subject_num">
-          <Radio :label="subject.subject_id" :disabled="isDisabled">{{subject.subject_name}}</Radio>
+          <Radio :label="subject.subject_id" :disabled="isDisabled" style="margin-left: 10px;">{{subject.subject_name}}</Radio>
         </Tooltip>
       </RadioGroup>
-      <Input v-model="taskName" placeholder="请输入作业名称" style="width: 300px" :disabled="isDisabled"></Input>
+      <h3 style="margin: 10px 0;">作业名称</h3>
+      <Input v-model="taskName" placeholder="请输入作业名称" :disabled="isDisabled" style="width: 306px; margin-left: 10px;"></Input>
       <!-- 创建作业按钮 -->
-      <Button type="ghost" @click="createTask" v-show="isCTShow">创建作业</Button>
+      <Button type="primary" @click="createTask" :disabled="isDisabled" style="float: right; margin: 10px 0;">创建作业</Button>
+    </Card>
+    <div class="line"></div>
+    <!-- 选项：班级选项、题目选项 -->
+    <div class="option-wrap">
+      <h1>&nbsp;{{taskName}} </h1>
+      <!-- 班级选项 -->
+      <div style="margin: 40px; float: left;">
+        <Card style="width: 350px;">
+          <h2 slot="title">班级选项</h2>
+          <h3 style="margin: 10px 0;">选择班级</h3>
+          <CheckboxGroup v-model="classIds">
+            <Checkbox
+              class="checkbox"
+              v-for="klass of classes"
+              :key="klass.id"
+              :label="klass.class_id"
+              @click.native.self="editClass(klass.class_id, $event)">{{klass.class_name}}</Checkbox>
+          </CheckboxGroup>
+        </Card>
+      </div>
+      <!-- 题目选项 -->
+      <div style="margin: 40px; float: left;">
+        <Card style="width: 480px;">
+          <h2 slot="title">题目选项</h2>
+          <!-- 选择题目 -->
+          <h3 style="margin: 10px 0;">选择题目</h3>
+          <div style="text-align: center;">
+            <Button type="ghost" @click="showChooseMod" :disabled="isPublish === 1">选择题</Button>
+            <Button type="ghost" @click="showJudgeMod" :disabled="isPublish === 1">判断题</Button>
+            <Button type="ghost" @click="showFillMod" :disabled="isPublish === 1">填空题</Button>
+            <Button type="ghost" @click="showWordsMod" :disabled="isPublish === 1">主观题</Button>
+          </div>
+          <!-- 添加题目 -->
+          <h3 style="margin: 10px 0;">添加题目</h3>
+          <div style="text-align: center;">
+            <Button type="primary" @click="showAddMod" :disabled="isPublish === 1">添加题目</Button>
+          </div>
+          <!-- 已选择的题目 -->
+          <h3 style="margin: 10px 0;">已选题目</h3>
+          <Table
+            no-data-text="未选择题目"
+            highlight-row 
+            ref="curRowTable" 
+            :columns="questionColumn" 
+            :data="curQuestionList"></Table>
+        </Card>
+      </div>
     </div>
-    <h1>{{taskName}}</h1>
-    <!-- 选择班级 -->
-    <div style="margin-top: 40px;">
-      <h2>选择班级</h2>
-      <CheckboxGroup v-model="classIds">
-        <Checkbox
-          v-for="klass of classes"
-          :key="klass.id"
-          :label="klass.class_id"
-          @click.native.self="editClass(klass.class_id, $event)">{{klass.class_name}}</Checkbox>
-      </CheckboxGroup>
-    </div>
-    <!-- 选择题目 -->
-    <div style="margin-top: 40px;">
-      <h2>选择题目</h2>
-      <Button type="ghost" @click="showChooseMod" :disabled="isPublish === 1">选择选择题</Button>
-      <Button type="ghost" @click="showJudgeMod" :disabled="isPublish === 1">选择判断题</Button>
-      <Button type="ghost" @click="showFillMod" :disabled="isPublish === 1">选择填空题</Button>
-      <Button type="ghost" @click="showWordsMod" :disabled="isPublish === 1">选择主观题</Button>
-      <Button type="primary" @click="showAddMod" :disabled="isPublish === 1">添加题目</Button>
-    </div>
-    <!-- 已选择的题目 -->
-    <div style="margin-top: 40px;">
-      <h2>已选择的题目</h2>
-      <Table 
-        highlight-row 
-        ref="curRowTable" 
-        :columns="questionColumn" 
-        :data="curQuestionList"></Table>
-    </div>
-    <Button style="margin: 30px auto; display: block;" type="ghost" v-show="isPublish === 0" @click="publishTask">发布作业</Button>
+    <div class="line"></div>
+    <Button style="margin: 30px auto; display: block;" type="primary" v-show="isPublish === 0" @click="publishTask">发布作业</Button>
     <Button style="margin: 30px auto; display: block;" type="ghost" v-show="isPublish === 1" disabled>已发布</Button>
     <!-- 选择题 -->
     <Modal
@@ -105,32 +126,47 @@
       ok-text="添加"
       width="900"
       v-model="addMod"
-      title="添加题目"
       :closable="false"
       :mask-closable="false"
       @on-ok="addQuestion">
+      <h2 slot="header">添加题目</h2>
       <div class="add-question-wrap">
-        <!-- 选择题目类型 -->
-        <div class="task-add-question choose-type">
-          <h1>题目类型：</h1>
-          <RadioGroup v-model="questionTypeNum" type="button" size="large">
-            <Radio 
-              v-for="typee of questionType"
-              :key="typee.id" 
-              :label="typee.num">{{typee.name}}</Radio>
-          </RadioGroup>
-        </div>
-        <br>
-        <!-- 题目 -->
-        <div class="task-add-question fill-question">
-          <h3>题目：</h3>
-          <mavon-editor style="" v-model="questionVal" :editable="true" :toolbars="toolbars"></mavon-editor>
-        </div>
-        <!-- 答案 -->
-        <div class="task-add-question fill-answer">
-          <h3>答案：</h3>
-          <mavon-editor style="" v-model="answerVal" :editable="true" :toolbars="toolbars"></mavon-editor>
-        </div>
+        <Tabs type="card" :name="1">
+          <!-- 文字添加 -->
+          <TabPane label="文字添加">
+            <!-- 选择题目类型 -->
+            <div class="task-add-question choose-type">
+              <h3>题目类型：</h3>
+              <RadioGroup v-model="questionTypeNum" type="button" size="large" style="margin-left: 20px;">
+                <Radio
+                  v-for="typee of questionType"
+                  :key="typee.id" 
+                  :label="typee.num">{{typee.name}}</Radio>
+              </RadioGroup>
+            </div>
+            <br>
+            <!-- 题目 -->
+            <div class="task-add-question fill-question">
+              <h3>题目</h3>
+              <mavon-editor style="" v-model="questionVal" :editable="true" :toolbars="toolbars"></mavon-editor>
+            </div>
+            <!-- 答案 -->
+            <div class="task-add-question fill-answer">
+              <h3>答案</h3>
+              <mavon-editor style="" v-model="answerVal" :editable="true" :toolbars="toolbars"></mavon-editor>
+            </div>
+          </TabPane>
+          <!-- 文件导入 -->
+          <TabPane label="文件导入">
+            <div style="float: left; margin-left: 22px;">
+              <h3>excel导入</h3>
+              <input type="file" @change="readFile">
+            </div>
+            <div class="progress">
+              <Progress :percent="percent" status="active" v-show="progressShow"></Progress>
+            </div>
+          </TabPane>
+        </Tabs>
       </div>
     </Modal>
     <!-- 显示作业记录列表按钮 -->

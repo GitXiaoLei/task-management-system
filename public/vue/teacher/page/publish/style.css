@@ -1,7 +1,7 @@
 .add-question-wrap{
   overflow: hidden;
 }
-.add-question-wrap>div{
+.add-question-wrap .task-add-question{
   float: left;
 }
 .task-add-question{
@@ -47,13 +47,46 @@
   background: #20a0ff;
   color: #fff;
 }
-h2{
+/* h2{
   font-size: 20px;
   border-left: 2px solid #20a0ff;
   text-indent: 10px;
   margin-bottom: 10px;
-}
+} */
 h1{
-  text-align: center;
-  margin: 50px 0 20px;
+  margin: 20px 40px;
+  font-size: 20px;
+  font-weight: normal;
+  text-indent: 20px;
+  border-left: 4px solid #2d8cf0;
+}
+h3{
+  font-weight: normal;
+  text-indent: 10px;
+  border-left: 2px solid #2d8cf0;
+  margin: 10px;
+}
+.ivu-card-body{
+  overflow: hidden;
+}
+.line{
+  width: 96%;
+  height: 1px;
+  background: #dddee1;
+  margin: 0 auto;
+}
+.checkbox{
+  display: block; 
+  margin-left: 12px;
+  line-height: 24px;
+}
+.checkbox:hover{
+  background: #f3f3f3;
+}
+.option-wrap{
+  overflow: hidden;
+}
+.progress{
+  margin-top: 200px;
+  padding: 0 150px;
 }

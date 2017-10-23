@@ -1,5 +1,7 @@
 import { getSubjects, createTask, getClasses, addTaskClass, delTaskClass, getChoose, getJudge, getFill, getWords, addQuestion, getTask5, getTaskInfo, addTaskQuestion, delQuestion, publishTask } from '../../../api.js'
 import contents from '../../../components/content.vue'
+import XLSX from 'xlsx'
+import series from 'async/series'
 export default {
   name: 'personal',
   components: { contents },
@@ -40,7 +42,8 @@ export default {
                   marginRight: '5px'
                 },
                 on: {
-                  click: () => {
+                  click: (event) => {
+                    event.stopPropagation()
                     this.delQuestion(params.row, params.index)
                   }
                 }
@@ -54,7 +57,6 @@ export default {
       toolbars: { // markdown工具栏
         preview: true, // 预览
         bold: true, // 粗体
-        italic: true, // 斜体
         header: true, // 标题
         underline: true, // 下划线
         strikethrough: true, // 中划线
@@ -62,7 +64,6 @@ export default {
         code: true, // code
         ol: true, // 有序列表
         ul: true, // 无序列表
-        mark: true, // 标记
         subfield: true, // 单双栏模式
       },
       questionType: [ // 所有题目类型
@@ -76,9 +77,116 @@ export default {
       taskes: [], // 最近5次作业记录列表
       isSelected: false, // 某条作业是否被选中
       publishBtn: true, // 发布作业按钮是否显示
+      percent: 0, // excel文件导入进度条百分比
+      progressShow: false, // 进度条是否显示
     }
   },
   methods: {
+    // 以文件形式添加问题
+    addQuestions (question, answer, type, i) {
+      const params = {
+        question: question,
+        answer: answer,
+        type: type,
+        subject_id: this.subjectId
+      }
+      addQuestion(params)
+      .then((data) => {
+        data = data.data
+        if (data.code !== 1) {
+          this.errorMsg('添加题目失败')
+          return false
+        }
+        console.log('第 ' + i + ' 个题目上传成功')
+        // 将题目添加到本地数据中...
+        return true
+      })
+      .catch((e) => {
+        console.error('第 ' + i + ' 个题目上传失败')
+        return false
+      })
+    },
+    // 读取文件
+    readFile (e) {
+      this.progressShow = true
+      const that = this
+      const rABS = true
+      const files = e.target.files
+      const f = files[0]
+      const reader = new FileReader()
+      reader.onload = function (e) {
+        let data = e.target.result
+        if (!rABS) {
+          data = new Uint8Array(data)
+        }
+        const workbook = XLSX.read(data, {type: rABS ? 'binary' : 'array'})
+        /* DO SOMETHING WITH workbook HERE */
+        const first_worksheet = workbook.Sheets[workbook.SheetNames[0]]
+        const arr = XLSX.utils.sheet_to_json(first_worksheet, { header: 1 })
+        arr.length = arr.length - 1
+        console.log(arr)
+        // 上传题目
+        function addQuestions(arrIndex) {
+          const index = arrIndex
+          return function (cb) {
+            const params = {
+              question: arr[arrIndex][0],
+              answer: arr[arrIndex][1],
+              type: arr[arrIndex][2],
+              subject_id: that.subjectId
+            }
+            new Promise((resolve, reject) => {
+              addQuestion(params)
+              .then((data) => {
+                data = data.data
+                if (data.code !== 1) {
+                  this.errorMsg('添加题目失败')
+                  reject('false')
+                }
+                console.log('第 ' + (arrIndex+1) + ' 个题目上传成功')
+                that.percent = (arrIndex+1)*100/arr.length
+                if (that.percent === 100) {
+                  setTimeout(() => {
+                    that.progressShow = false
+                  }, 1000)
+                  that.successMsg('上传成功')
+                }
+                resolve('true')
+                // 将题目添加到本地数据中...
+              })
+              .catch((e) => {
+                console.error('第 ' + (arrIndex+1) + ' 个题目上传失败')
+                reject('false')
+              })
+            })
+            .then((result) => {
+              cb(null, true)
+            })
+            .catch((e) => {
+              console.error(e)
+              cb(null, false)
+            })
+          }
+        }
+        const fnArr = []
+        for (let i = 0, l = arr.length; i < l; i++) {
+          fnArr.push(addQuestions(i))
+        }
+        console.log(fnArr)
+        series(fnArr, (err, result) => {
+          if (err) {
+            console.error(err)
+            return
+          }
+          console.log(result)
+        })
+      }
+      if (rABS) {
+        reader.readAsBinaryString(f)
+       } else {
+         reader.readAsArrayBuffer(f)
+       }
+    },
     // 删除某个题目
     delQuestion (row, i) {
       const params = {

@@ -10,6 +10,9 @@ export default {
 </script>
 
 <style>
+body{
+  padding-bottom: 50px;
+}
 #content{
   width: 1000px;
   margin: 0 auto;

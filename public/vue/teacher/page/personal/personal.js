@@ -462,18 +462,18 @@ export default {
       })
     },
     // 取消修改
-    cancel() {
+    cancel () {
       this.form = Object.assign({}, this.formSource)
       this.modifi = false
       // 隐藏错误提示框
       $('.ivu-form-item-error-tip').hide()
     },
     // 成功消息提示
-    successMsg(msg) {
+    successMsg (msg) {
       this.$Message.success(msg)
     },
     // 失败消息提示
-    errorMsg(msg) {
+    errorMsg (msg) {
       this.$Message.error(msg)
     }
   },
