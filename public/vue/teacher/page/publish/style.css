@@ -90,3 +90,32 @@ h3{
   margin-top: 200px;
   padding: 0 150px;
 }
+
+/* 读取文件 */
+input[type=file], .input-style {
+  width: 420px;
+  height: 120px;
+  line-height: 120px;
+  text-align: center;
+  border: 2px dashed #dddee1;
+  border-radius: 10px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -160%);
+  opacity: 0;
+  cursor: pointer;
+}
+input[type=file] {
+  z-index: 2;
+}
+.input-style {
+  z-index: 1;
+  opacity: 1;
+}
+.help {
+  margin-left: 228px;
+}
+.help img{
+  width: 300px;
+}

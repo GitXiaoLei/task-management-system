@@ -157,13 +157,22 @@
             </div>
           </TabPane>
           <!-- 文件导入 -->
-          <TabPane label="文件导入">
-            <div style="float: left; margin-left: 22px;">
-              <h3>excel导入</h3>
-              <input type="file" @change="readFile">
+          <TabPane label="文件导入" style="position: relative;">
+            <div>
+              <input type="file" @change="readFile" @drag="readFile">
+              <div class="input-style">点击或将文件拖拽到这里上传</div>
             </div>
             <div class="progress">
               <Progress :percent="percent" status="active" v-show="progressShow"></Progress>
+            </div>
+            <div class="help">
+              <h3>Excel文件格式说明</h3>
+              <ul>
+                <li>1.请严格按照下图所示的格式填写Excel表格</li>
+                <li>2.上传的文件格式为Excel</li>
+                <li>3.A列表示问题，B列表示答案，C列表示题目类型（0表示选择题；1表示判断题；2表示填空；3表示主观题）</li>
+              </ul>
+              <img src="../../../../common/img/help.png" alt="help">
             </div>
           </TabPane>
         </Tabs>

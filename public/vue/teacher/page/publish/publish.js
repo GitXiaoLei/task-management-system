@@ -144,10 +144,11 @@ export default {
                   reject('false')
                 }
                 console.log('第 ' + (arrIndex+1) + ' 个题目上传成功')
-                that.percent = (arrIndex+1)*100/arr.length
+                that.percent = parseInt((arrIndex+1)*100/arr.length)
                 if (that.percent === 100) {
                   setTimeout(() => {
                     that.progressShow = false
+                    that.percent = 0
                   }, 1000)
                   that.successMsg('上传成功')
                 }
