@@ -1,8 +1,8 @@
 import axios from 'axios'
 import qs from 'qs'
 
-// 获取老师所教的课程
-export const getSubjects = params => axios.get('/api/teacher_subject/list', { params })
+// 获取布置作业页面初始化所需的数据
+export const getPublishWebData = params => axios.get('/api/teacher/publish', { params })
 
 // 创建一条作业记录
 export const createTask = params => axios.post('/api/task/add', qs.stringify(params))
@@ -37,8 +37,17 @@ export const getTaskInfo = params => axios.get('/api/task/info', { params })
 // 为某次作业添加题目
 export const addTaskQuestion = params => axios.post('/api/task_question/add', qs.stringify(params))
 
+// 删除某个课程下的某个题目
+export const delSubjectQuestion = params => axios.post('/api/question/del', qs.stringify(params))
+
+// 修改某个课程下的某个题目
+export const modifiSubjectQuestion = params => axios.post('/api/question/update', qs.stringify(params))
+
 // 为某次作业删除题目
 export const delQuestion = params => axios.post('/api/task_question/del', qs.stringify(params))
 
 // 发布作业
 export const publishTask = params => axios.post('/api/task/publish', qs.stringify(params))
+
+// 删除作业
+export const delTask = params => axios.post('/api/task/del', qs.stringify(params))

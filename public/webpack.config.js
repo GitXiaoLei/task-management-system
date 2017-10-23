@@ -5,7 +5,6 @@ const WebpackNotifier = require('webpack-notifier')
 const config = {
   entry: {
     index: './entry/index',
-    publish_task: './entry/publish_task',
     personal: './entry/personal',
     student: './entry/student',
     teacher: './entry/teacher'

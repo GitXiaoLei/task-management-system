@@ -364,6 +364,46 @@ const User = {
     } catch (e) {
       throw new Error(e)
     }
+  },
+  // 获取已发布的作业列表
+  async getPublishedTask (userId) {
+    try {
+      return DB.instance('r').select('task', { user_id: userId, is_publish: 1 }, { task_id: 1 })
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取未发布的作业列表
+  async getNoPublishedTask (userId) {
+    try {
+      return DB.instance('r').select('task', { user_id: userId, is_publish: 0 }, { task_id: 1 })
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 通过task_id删除task表中的作业记录
+  async delTask (taskId) {
+    try {
+      return DB.instance('r').query('delete from task where task_id=' + taskId)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 通过task_id删除task_class表中的记录
+  async delTaskClassByTaskId (taskId) {
+    try {
+      return DB.instance('r').query('delete from task_class where task_id=' + taskId)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 通过task_id删除task_question表中的记录
+  async delTaskQuestionByTaskId (taskId) {
+    try {
+      return DB.instance('r').query('delete from task_question where task_id=' + taskId)
+    } catch (e) {
+      throw new Error(e)
+    }
   }
 }
 

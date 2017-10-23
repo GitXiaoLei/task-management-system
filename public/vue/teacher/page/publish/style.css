@@ -116,6 +116,46 @@ input[type=file] {
 .help {
   margin-left: 228px;
 }
-.help img{
+.help img {
   width: 300px;
+}
+.create-task-wrap, .task-record-wrap {
+  float: left;
+}
+.create-wrap {
+  overflow: hidden;
+}
+.task-record-wrap ul{
+  overflow: hidden;
+}
+.task-record-wrap ul li{
+  float: left;
+  width: 50%;
+  line-height: 24px;
+}
+ul.head {
+  font-weight: bold;
+}
+ul.head li {
+  padding: 4px;
+}
+.ul-list {
+  cursor: pointer;
+  position: relative;
+}
+.del-task {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  display: none;
+  z-index: 2;
+}
+.ul-list.selected {
+  background: #dddee1;
+}
+.ul-list:hover {
+  background: #dddee1;
+}
+.ul-list:hover > .del-task {
+  display: inline-block;
 }

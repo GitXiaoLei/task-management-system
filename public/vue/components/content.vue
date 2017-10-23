@@ -19,5 +19,6 @@ body{
   min-height: 500px;
   background: #fff;
   overflow: hidden;
+  position: relative;
 }
 </style>

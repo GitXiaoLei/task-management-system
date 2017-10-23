@@ -1,12 +1,14 @@
-import { getSubjects, createTask, getClasses, addTaskClass, delTaskClass, getChoose, getJudge, getFill, getWords, addQuestion, getTask5, getTaskInfo, addTaskQuestion, delQuestion, publishTask } from '../../../api.js'
+import { getPublishWebData, createTask, getClasses, addTaskClass, delTaskClass, getChoose, getJudge, getFill, getWords, addQuestion, getTask5, getTaskInfo, addTaskQuestion, delQuestion, publishTask, delSubjectQuestion, modifiSubjectQuestion, delTask } from '../../../api.js'
 import contents from '../../../components/content.vue'
 import XLSX from 'xlsx'
 import series from 'async/series'
+import moment from 'moment'
 export default {
   name: 'personal',
   components: { contents },
   data () {
     return {
+      userData: {}, // 用户信息
       isPublish: 0, // 本次作业是否发布了，0表示没有发布，1表示发布了 
       subjects: [], // 老师所教的课程列表
       subjectId: 0, // 选中的课程的id
@@ -20,10 +22,60 @@ export default {
       judgeMod: false, // 判断题modal
       fillMod: false, // 填空题modal
       wordsMod: false, // 主观题modal
+      modifiMod: false, // 修改题目modal
       addMod: false, // 添加题目modal
       questionList: [], // 问题列表问题列表
+      questionColumn: [ // 某个课程的所有题目的表格的表头数据
+        { title: '问题', key: 'question' },
+        { title: '答案', key: 'answer' },
+        {
+          title: '操作',
+          key: 'action',
+          width: 150,
+          align: 'center',
+          render: (h, params) => {
+            // 只能删除自己添加的题目
+            if (params.row.user_id === this.userData.user_id) {
+              return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'error',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    click: (event) => {
+                      event.stopPropagation()
+                      this.delSubjectQuestion(params.row, params.index)
+                    }
+                  }
+                }, '删除'),
+                h('Button', {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    click: (event) => {
+                      event.stopPropagation()
+                      this.modifiSubjectQuestion(params.row, params.index)
+                    }
+                  }
+                }, '修改')
+              ])
+            } else {
+              return h('div', '')
+            }
+          }
+        }
+      ],
       curQuestionList: [], // 已选题目列表
-      questionColumn: [ // 表格的表头数据
+      curQuestionColumn: [ // 已选题目表格的表头数据
         { title: '问题', key: 'question' },
         { title: '答案', key: 'answer' },
         {
@@ -79,9 +131,78 @@ export default {
       publishBtn: true, // 发布作业按钮是否显示
       percent: 0, // excel文件导入进度条百分比
       progressShow: false, // 进度条是否显示
+      overdueTime: 0, // 过期时间
+      publishedTaskList: [], // 已发布的作业列表
+      noPublishedTaskList: [], // 未发布的作业列表
+      questionId: 0, // 修改的题目的id
     }
   },
   methods: {
+    click () {
+      
+    },
+    // 删除作业
+    delTask (taskId, event) {
+      event.stopPropagation()
+      const params = { task_id: taskId }
+      delTask(params)
+      .then((data) => {
+        data = data.data
+        if (data.code !== 1) {
+          this.errorMsg('删除作业失败')
+          return
+        }
+        this.successMsg('删除作业成功')
+        // 删除本地数据
+        this.noPublishedTaskList.forEach((noPublishedTask, i, arr) => {
+          if (noPublishedTask.task_id === taskId) {
+            arr.splice(i, 1)
+          }
+        })
+        this.publishedTaskList.forEach((publishedTask, i, arr) => {
+          if (publishedTask.task_id === taskId) {
+            arr.splice(i, 1)
+          }
+        })
+      })
+      .catch((e) => {
+        this.errorMsg(e)
+      })
+    },
+    // 修改题目
+    modifiSubjectQuestion () {
+      const params = {
+        question_id: this.questionId,
+        type: this.questionTypeNum,
+        question: this.questionVal,
+        answer: this.answerVal
+      }
+      modifiSubjectQuestion(params)
+      .then((data) => {
+        data = data.data
+        if (data.code !== 1) {
+          this.errorMsg('修改题目失败')
+          return
+        }
+        this.successMsg('修改题目成功')
+        this.questionTypeNum = 0
+        this.questionVal = ''
+        this.answerVal = ''
+      })
+    },
+    // 显示修改modal修改自己添加的题目
+    showModifiQuestionMod (row, i) {
+      this.chooseMod = false
+      this.judgeMod = false
+      this.fillMod = false
+      this.wordsMod = false
+      this.modifiMod = true
+      this.questionId = row.question_id
+      this.questionTypeNum = row.type
+      this.questionVal = row.question
+      this.answerVal = row.answer
+      console.log(this.answerVal)
+    },
     // 以文件形式添加问题
     addQuestions (question, answer, type, i) {
       const params = {
@@ -188,7 +309,25 @@ export default {
          reader.readAsArrayBuffer(f)
        }
     },
-    // 删除某个题目
+    // 删除某个课程的并且是自己出的题目
+    delSubjectQuestion (row, i) {
+      console.log(row, i)
+      const params = { question_id: row.question_id }
+      delSubjectQuestion(params)
+      .then((data) => {
+        data = data.data
+        if (data.code !== 1) {
+          this.errorMsg('删除题目失败')
+          return
+        }
+        this.successMsg('删除题目成功')
+        this.questionList.splice(i, 1)
+      })
+      .catch((e) => {
+        this.errorMsg('删除题目失败')
+      })
+    },
+    // 删除已选的某个题目
     delQuestion (row, i) {
       const params = {
         task_id: this.taskId,
@@ -223,8 +362,44 @@ export default {
         }
         this.successMsg('发布作业成功')
         this.publishBtn = false
-        // 删除“删除按钮”
-        
+        this.isPublish = 1
+        // 禁用已选题目的“删除”按钮
+        this.curQuestionColumn = [
+          { title: '问题', key: 'question' },
+          { title: '答案', key: 'answer' },
+          {
+            title: '操作',
+            key: 'action',
+            width: 150,
+            align: 'center',
+            render: (h, params) => {
+              return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'error',
+                    size: 'small',
+                    disabled: true
+                  },
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    click: (event) => {
+                      event.stopPropagation()
+                      this.delQuestion(params.row, params.index)
+                    }
+                  }
+                }, '删除')
+              ])
+            }
+          }
+        ]
+        // 将作业记录从“未发布”移到“已发布”
+        this.noPublishedTaskList.forEach((noPublishedTask, i, arr) => {
+          if (noPublishedTask.task_id === this.taskId) {
+            this.publishedTaskList.unshift(arr.splice(i, 1))
+          }
+        })
       })
       .catch((e) => {
         this.errorMsg(e)
@@ -242,10 +417,12 @@ export default {
       this.curQuestionList = []
       this.publishBtn = true
       this.isPublish = 0
+      this.overdueTime = 0
+      $('.task-record-wrap ul').removeClass('selected')
     },
     // 点击某次作业，获取该作业的详细信息
     getTaskInfo (taskId, taskName, event) {
-      const $ele = $(event.srcElement)
+      const $ele = $(event.srcElement).parent()
       const params = { task_id: taskId }
       getTaskInfo(params)
       .then((data) => {
@@ -257,8 +434,72 @@ export default {
         data = data.data
         this.successMsg('获取成功')
         this.isPublish = data.isPublish[0].is_publish
+        // 删除按钮状态
+        if (this.isPublish === 1) {
+          this.curQuestionColumn = [
+            { title: '问题', key: 'question' },
+            { title: '答案', key: 'answer' },
+            {
+              title: '操作',
+              key: 'action',
+              width: 150,
+              align: 'center',
+              render: (h, params) => {
+                return h('div', [
+                  h('Button', {
+                    props: {
+                      type: 'error',
+                      size: 'small',
+                      disabled: true
+                    },
+                    style: {
+                      marginRight: '5px'
+                    },
+                    on: {
+                      click: (event) => {
+                        event.stopPropagation()
+                        this.delQuestion(params.row, params.index)
+                      }
+                    }
+                  }, '删除')
+                ])
+              }
+            }
+          ]
+        } else {
+          this.curQuestionColumn = [
+            { title: '问题', key: 'question' },
+            { title: '答案', key: 'answer' },
+            {
+              title: '操作',
+              key: 'action',
+              width: 150,
+              align: 'center',
+              render: (h, params) => {
+                return h('div', [
+                  h('Button', {
+                    props: {
+                      type: 'error',
+                      size: 'small'
+                    },
+                    style: {
+                      marginRight: '5px'
+                    },
+                    on: {
+                      click: (event) => {
+                        event.stopPropagation()
+                        this.delQuestion(params.row, params.index)
+                      }
+                    }
+                  }, '删除')
+                ])
+              }
+            }
+          ]
+        }
         this.taskId = taskId
         this.subjectId = data.curSubject[0].subject_id
+        this.overdueTime = $ele.find('.overdue-time').html()
         this.classes = data.classes
         this.classIds = []
         data.curClasses.forEach((ele) => {
@@ -269,8 +510,8 @@ export default {
         this.taskName = taskName
         this.isDisabled = true
         this.isSelected = true
+        $('.task-record-wrap ul').removeClass('selected')
         $ele.addClass('selected')
-        $ele.siblings().removeClass('selected')
       })
       .catch((e) => {
         this.errorMsg(e)
@@ -321,9 +562,15 @@ export default {
         this.errorMsg('请输入作业名称')
         return
       }
+      if (typeof this.overdueTime !== 'object') {
+        this.errorMsg('请选择过期时间')
+        return
+      }
+      const overdue_time = moment(this.overdueTime).unix()
       const params = { 
         subject_id: this.subjectId,
-        task_name: this.taskName
+        task_name: this.taskName,
+        overdue_time: overdue_time
       }
       // 创建作业记录
       createTask(params)
@@ -337,6 +584,14 @@ export default {
         this.taskId = data.data.insertId
         this.isDisabled = true
         this.isCTShow = false
+        // 将新创建的作业记录加入到“未发布”的列表中
+        const obj = {
+          task_id: this.taskId,
+          task_name: this.taskName,
+          overdue_time: moment(this.overdueTime).format('YYYY-MM-DD')
+        }
+        this.noPublishedTaskList.unshift(obj)
+        $('.no-publish.ul-list:nth-of-type(2)').addClass('selected')
         const params = { subject_id: this.subjectId }
         // 获取班级列表
         getClasses(params)
@@ -428,6 +683,7 @@ export default {
     },
     // 选择题
     showChooseMod () {
+      const that = this
       if (this.taskId === 0) {
         this.errorMsg('请先创建一次作业或选择之前所创建的作业')
         return
@@ -447,6 +703,55 @@ export default {
           return
         }
         this.questionList = data.data
+        this.questionColumn = [
+          { title: '问题', key: 'question' },
+          { title: '答案', key: 'answer' },
+          {
+            title: '操作',
+            key: 'action',
+            width: 150,
+            align: 'center',
+            render: (h, params) => {
+              // 只能删除、修改自己添加的题目
+              if (params.row.user_id === that.userData.user_id) {
+                return h('div', [
+                  h('Button', {
+                    props: {
+                      type: 'error',
+                      size: 'small'
+                    },
+                    style: {
+                      marginRight: '5px'
+                    },
+                    on: {
+                      click: (event) => {
+                        event.stopPropagation()
+                        this.delSubjectQuestion(params.row, params.index)
+                      }
+                    }
+                  }, '删除'),
+                  h('Button', {
+                    props: {
+                      type: 'primary',
+                      size: 'small'
+                    },
+                    style: {
+                      marginRight: '5px'
+                    },
+                    on: {
+                      click: (event) => {
+                        event.stopPropagation()
+                        this.showModifiQuestionMod(params.row, params.index)
+                      }
+                    }
+                  }, '修改')
+                ])
+              } else {
+                return h('div', '')
+              }
+            }
+          }
+        ]
       })
       .catch((e) => {
         this.errorMsg(e)
@@ -537,31 +842,30 @@ export default {
     // 错误消息提示
     errorMsg (msg) {
       this.$Message.error(msg)
+    },
+    // 将从后台获取到的时间戳转换为一定格式的字符串
+    timeFormat (arrObj) {
+      arrObj.forEach((obj) => {
+        obj.overdue_time = moment.unix(obj.overdue_time).format('YYYY-MM-DD')
+      })
     }
   },
   created () {
     // 获取自己所教的课程
-    getSubjects()
+    getPublishWebData()
     .then((data) => {
       data = data.data
       if (data.code !== 1) {
-        this.errorMsg('获取课程列表失败')
+        this.errorMsg('页面初始化失败')
         return
       }
-      this.subjects = data.data
-      // 获取最近5次作业记录
-      getTask5()
-      .then((data) => {
-        data = data.data
-        if (data.code !== 1) {
-          this.errorMsg('获取最近5次作业记录失败')
-          return
-        }
-        this.taskes = data.data
-      })
-      .catch((e) => {
-        this.errorMsg(e)
-      })
+      this.userData = data.data.userData[0]
+      this.subjects = data.data.subjects
+      this.publishedTaskList = data.data.publishedTask
+      this.noPublishedTaskList = data.data.noPublishedTask
+      // 格式化时间戳
+      this.timeFormat(this.publishedTaskList)
+      this.timeFormat(this.noPublishedTaskList)
     })
     .catch((e) => {
       this.errorMsg(e)

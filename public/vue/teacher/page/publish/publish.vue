@@ -1,24 +1,67 @@
 <template>
-  <contents>
-    <!-- 创建作业 -->
-    <Card style="width:350px; margin: 40px auto;">
-      <h2 slot="title">创建作业</h2>
-      <!-- 选择课程 -->
-      <h3 style="margin: 10px 0;">选择课程</h3>
-      <RadioGroup v-model="subjectId" type="button" size="large">
-        <Tooltip
-          placement="top"
-          v-for="subject of subjects" 
-          :key="subject.id"
-          :content="subject.subject_num">
-          <Radio :label="subject.subject_id" :disabled="isDisabled" style="margin-left: 10px;">{{subject.subject_name}}</Radio>
-        </Tooltip>
-      </RadioGroup>
-      <h3 style="margin: 10px 0;">作业名称</h3>
-      <Input v-model="taskName" placeholder="请输入作业名称" :disabled="isDisabled" style="width: 306px; margin-left: 10px;"></Input>
-      <!-- 创建作业按钮 -->
-      <Button type="primary" @click="createTask" :disabled="isDisabled" style="float: right; margin: 10px 0;">创建作业</Button>
-    </Card>
+  <contents @click.native="click">
+    <div class="create-wrap">
+      <!-- 创建作业 -->
+      <div class="create-task-wrap">
+        <Card style="width:380px; margin: 40px;">
+          <h2 slot="title">创建作业</h2>
+          <!-- 选择课程 -->
+          <h3 style="margin: 10px 0;">选择课程</h3>
+          <RadioGroup v-model="subjectId" type="button" size="large">
+            <Tooltip
+              placement="top"
+              v-for="subject of subjects" 
+              :key="subject.id"
+              :content="subject.subject_num">
+              <Radio :label="subject.subject_id" :disabled="isDisabled" style="margin-left: 10px;">{{subject.subject_name}}</Radio>
+            </Tooltip>
+          </RadioGroup>
+          <h3 style="margin: 10px 0;">作业名称</h3>
+          <Input v-model="taskName" placeholder="请输入作业名称" :disabled="isDisabled" style="width: 336px; margin-left: 10px;"></Input>
+          <h3 style="margin: 10px 0;">过期时间</h3>
+          <DatePicker :disabled="isDisabled" placement="top-start" type="date" placeholder="选择作业过期时间" style="width: 336px; margin-left: 10px;" v-model="overdueTime"></DatePicker>
+          <!-- 创建作业按钮 -->
+          <Button type="primary" @click="createTask" :disabled="isDisabled" style="float: right; margin: 10px 0;">创建</Button>
+        </Card>
+      </div>
+      <!-- 作业记录 -->
+      <div class="task-record-wrap">
+        <Card style="width:380px; margin: 40px;">
+          <div slot="title" style="overflow: hidden;">
+            <h2 style="float: left;">作业记录</h2>
+            <Button type="primary" size="small" style="float: right;" @click="toCreateTaskStatus">创建作业</Button>
+          </div>
+          
+          <Tabs type="card">
+            <TabPane label="未发布">
+              <ul class="head"><li>作业名称</li><li>过期时间</li></ul>
+              <ul 
+                v-for="noPublishedTask of noPublishedTaskList" :key="noPublishedTask.id" 
+                class="ul-list no-publish"
+                @click="getTaskInfo(noPublishedTask.task_id, noPublishedTask.task_name, $event)">
+                <li>{{noPublishedTask.task_name}}</li>
+                <li class="overdue-time">{{noPublishedTask.overdue_time}}</li>
+                <Button type="error" size="small" class="del-task" @click="delTask(noPublishedTask.task_id, $event)">删除</Button>
+              </ul>
+            </TabPane>
+            <TabPane label="已发布">
+              <ul class="head"><li>作业名称</li><li>过期时间</li></ul>
+              <ul 
+                v-for="publishedTask of publishedTaskList" :key="publishedTask.id" 
+                class="ul-list"
+                @click="getTaskInfo(publishedTask.task_id, publishedTask.task_name, $event)">
+                <li>{{publishedTask.task_name}}</li>
+                <li class="overdue-time">{{publishedTask.overdue_time}}</li>
+                <Button type="error" size="small" class="del-task" @click="delTask(publishedTask.task_id, $event)">删除</Button>
+              </ul>
+            </TabPane>
+          </Tabs>
+
+        </Card>
+      </div>
+    </div>
+    
+    
     <div class="line"></div>
     <!-- 选项：班级选项、题目选项 -->
     <div class="option-wrap">
@@ -60,8 +103,8 @@
           <Table
             no-data-text="未选择题目"
             highlight-row 
-            ref="curRowTable" 
-            :columns="questionColumn" 
+            ref="curRowTable"
+            :columns="curQuestionColumn" 
             :data="curQuestionList"></Table>
         </Card>
       </div>
@@ -178,14 +221,39 @@
         </Tabs>
       </div>
     </Modal>
-    <!-- 显示作业记录列表按钮 -->
-    <span class="task-list-btn" v-show="tlBtn" @click="tlBtn = false">作业记录</span>
-    <!-- 作业记录列表 -->
-    <div class="task-list" v-show="!tlBtn">
-      <div style="background: #20a0ff; color: #fff;">选择作业</div>
-      <div v-for="task of taskes" :key="task.id" @click="getTaskInfo(task.task_id, task.task_name, $event)">{{task.task_name}}</div>
-      <div style="background: #58b957; color: #fff; text-align: center;" @click="toCreateTaskStatus">创建作业</div>
-    </div>
+    <!-- 修改题目 -->
+    <Modal
+      ok-text="修改"
+      width="900"
+      v-model="modifiMod"
+      :closable="false"
+      :mask-closable="false"
+      @on-ok="modifiSubjectQuestion">
+      <h2 slot="header">修改题目</h2>
+      <div class="add-question-wrap">
+        <!-- 选择题目类型 -->
+        <div class="task-add-question choose-type">
+          <h3>题目类型</h3>
+          <RadioGroup v-model="questionTypeNum" type="button" size="large" style="margin-left: 20px;">
+            <Radio
+              v-for="typee of questionType"
+              :key="typee.id" 
+              :label="typee.num">{{typee.name}}</Radio>
+          </RadioGroup>
+        </div>
+        <br>
+        <!-- 题目 -->
+        <div class="task-add-question fill-question">
+          <h3>题目</h3>
+          <mavon-editor style="" v-model="questionVal" :editable="true" :toolbars="toolbars"></mavon-editor>
+        </div>
+        <!-- 答案 -->
+        <div class="task-add-question fill-answer">
+          <h3>答案</h3>
+          <mavon-editor style="" v-model="answerVal" :editable="true" :toolbars="toolbars"></mavon-editor>
+        </div>
+      </div>
+    </Modal>
   </contents>
 </template>
 

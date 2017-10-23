@@ -376,12 +376,39 @@ const route = (app) => {
       subject_id: req.body.subject_id,
       user_id: req._userInfo.user_id,
       task_name: req.body.task_name,
+      overdue_time: req.body.overdue_time,
       created_time: Moment().unix(),
       updated_time: Moment().unix()
     }
     try {
       const result = await User.addTask(insertData)
       Output.apiData(result, '创建作业成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
+  // 删除一条作业记录
+  app.post('/api/task/del', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const result1 = await User.delTask(req.body.task_id)
+      const result2 = await User.delTaskClassByTaskId(req.body.task_id)
+      const result3 = await User.delTaskQuestionByTaskId(req.body.task_id)
+      
+      Output.apiData({
+        result1,
+        result2,
+        result3
+      }, '删除作业成功')
     } catch (e) {
       Output.apiErr(e)
     }
@@ -619,16 +646,48 @@ const route = (app) => {
     try {
       const userData = await User.getUserById(req._userInfo.user_id)
       const subjectClassData = await User.getSubjectClass(req._userInfo.user_id)
+      const publishedTask = await User.getPublishedTask(req._userInfo.user_id)
+      const noPublishedTask = await User.getNoPublishedTask(req._userInfo.user_id)
       const data = {
         userData,
-        subjectClassData
+        subjectClassData,
+        publishedTask,
+        noPublishedTask
       }
       Output.apiData(data, '获取页面信息成功')
     } catch (e) {
       Output.apiErr(e)
     }
   })
-  
+  // 获取老师布置作业页面初始化数据：老师个人信息、所教课程、已发布的作业列表、未发布的作业列表
+  app.get('/api/teacher/publish', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      Output.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      Output.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const userData = await User.getUserById(req._userInfo.user_id)
+      delete userData.password
+      const subjects = await User.getSubjects(req._userInfo.user_id)
+      const publishedTask = await User.getPublishedTask(req._userInfo.user_id)
+      const noPublishedTask = await User.getNoPublishedTask(req._userInfo.user_id)
+      const data = {
+        userData,
+        subjects,
+        publishedTask,
+        noPublishedTask
+      }
+      Output.apiData(data, '获取页面信息成功')
+    } catch (e) {
+      Output.apiErr(e)
+    }
+  })
 }
 
 module.exports = route
