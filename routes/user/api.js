@@ -98,7 +98,6 @@ const route = (app) => {
       res.apiErr({ code: 0, message: '你没有权限访问' })
       return
     }
-    console.log(req._userInfo.user_id)
     try {
       const subjects = await User.getSubjects(req._userInfo.user_id)
       res.apiData(subjects, '获取自己所教课程成功')
@@ -272,7 +271,6 @@ const route = (app) => {
       res.apiErr({ code: 0, message: '你没有权限访问' })
       return
     }
-    console.log(req.query.subject_id)
     try {
       const result = await User.getClasses(req.query.subject_id)
       res.apiData(result, '获取班级列表成功')
@@ -329,7 +327,6 @@ const route = (app) => {
       case '/api/subject_question/words/list':
       conditions.type = 3
     }
-    console.log(conditions)
     try {
       const result = await User.getQuestions(conditions)
       result.type = conditions.type

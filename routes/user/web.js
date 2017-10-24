@@ -6,7 +6,6 @@ const User = require('../../models/user')
 const route = (app) => {
   // 首页
   app.get('/', (req, res) => {
-    // console.log(req._role)
     // 游客
     if (typeof req._role === 'string' && req._role === 'guest') {
       res.render('user/index', {

@@ -3,7 +3,6 @@
 const Admin = require('../../models/admin')
 const Moment = require('moment')
 const Async = require('async')
-// const DBError = require('../../errors/db_error');
 
 const route = (app) => {
   // 后台管理(单页应用)页面的token验证

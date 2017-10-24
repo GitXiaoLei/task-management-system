@@ -174,7 +174,7 @@
       @on-ok="addQuestion">
       <h2 slot="header">添加题目</h2>
       <div class="add-question-wrap">
-        <Tabs type="card" :name="1">
+        <Tabs type="card">
           <!-- 文字添加 -->
           <TabPane label="文字添加">
             <!-- 选择题目类型 -->
