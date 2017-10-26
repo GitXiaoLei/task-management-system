@@ -3,8 +3,12 @@ import App from '../vue/student/app.vue'
 import router from '../vue/student/router.js'
 import iView from 'iview'
 import 'iview/dist/styles/iview.css'
-// import '../my-theme/index.less'
 import '../common/style/common.scss'
+
+// markdown
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+Vue.use(mavonEditor)
 
 Vue.use(iView)
 // 加载进度条

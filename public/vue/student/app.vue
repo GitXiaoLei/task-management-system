@@ -3,12 +3,13 @@
     <div class="layout">
       <div class="layout-ceiling">
         <div class="layout-ceiling-main">
-          <router-link to="/student/work">做作业</router-link>
+          <router-link to="/home">首页</router-link>
+          <router-link to="/student/work" :class="{'do-task': havaTask}">做作业</router-link>
           <router-link to="/student/grade">查看作业</router-link>
           <router-link to="/student/personal">个人中心</router-link>
           <Dropdown placement="bottom-end" trigger="click">
             <a href="javascript:;">
-              {{userName}} 同学
+              {{userData.username}} 同学
               <Icon type="arrow-down-b"></Icon>
             </a>
             <DropdownMenu slot="list">
@@ -24,12 +25,13 @@
 
 <script>
 import { loginout, getUserData } from "../teacher/api.js"
+import { getStudentTaskId } from './api.js'
 export default {
   name: 'app',
   data () {
     return {
       userData: {},
-      userName: 'xl'
+      havaTask: true
     }
   },
   methods: {
@@ -54,6 +56,7 @@ export default {
     }
   },
   created () {
+    // 获取用户信息
     getUserData()
     .then((data) => {
       data = data.data
@@ -62,18 +65,28 @@ export default {
         return
       }
       this.userData = data.data[0]
-      console.log(this.userData)
+    })
+    .catch((e) => {
+      this.errorMsg(e)
+    })
+    // 获取用户是否有未提交的作业
+    getStudentTaskId()
+    .then((data) => {
+      data = data.data
+      if (data.code !== 1) {
+        this.errorMsg('获取个人信息失败')
+        return
+      }
+      this.havaTask = data.data.is_submit
     })
     .catch((e) => {
       this.errorMsg(e)
     })
   }
 }
-// export default app;
 </script>
 
-<style lang="less">
-@primary-color: #464c5b;
+<style scoped>
 .layout {
   border: 1px solid #d7dde4;
   background: #f5f7f9;
@@ -94,5 +107,19 @@ export default {
   /* color: #9ba7b5; */
   color: #eee;
   margin-left: 20px;
+}
+.do-task {
+  position: relative;
+}
+.do-task:after {
+  content: '';
+  display: block;
+  position: absolute;
+  right: -5px;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f00;
 }
 </style>

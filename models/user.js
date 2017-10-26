@@ -312,9 +312,25 @@ const User = {
   },
   // 发布作业
   async publishTask (taskId) {
-    let sql = 'update task set is_publish=1 where task_id=' + taskId 
     try {
-      return DB.instance('r').query(sql)
+      // 将task表中的is_publish字段改为1,
+      const result1 = await DB.instance('r').query('update task set is_publish=1 where task_id=' + taskId)
+      // 向student_task表中添加记录
+      const userIdsArr = await DB.instance('w').query('select user_id from user where class_id in (select class_id from task_class where task_id=' + taskId + ')')
+      const userIds = []
+      userIdsArr.forEach((obj) => {
+        userIds.push(obj.user_id)
+      })
+      let sql = 'insert into student_task(user_id, task_id) values'
+      userIds.forEach((userId, i, arr) => {
+        if (arr.length - 1 === i) {
+          sql += '(' + userId + ', ' + taskId + ')'
+        } else {
+          sql += '(' + userId + ', ' + taskId + '),'
+        }
+      })
+      const result2 = await DB.instance('w').query(sql)
+      return { result1, result2 }
     } catch (e) {
       throw new Error(e)
     }
@@ -404,7 +420,57 @@ const User = {
     } catch (e) {
       throw new Error(e)
     }
-  }
+  },
+  // 查询学生要做的作业id
+  async getStudentTask (userId) {
+    try {
+      return DB.instance('r').query('select is_submit from student_task where user_id=' + userId + ' and is_submit=0')
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取已经提交了的作业记录
+  async getSubmited (userId) {
+    try {
+      return DB.instance('r').query('select * from task where task_id in (select task_id from student_task where user_id=' + userId + ' and is_submit=1)')
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取未提交的作业记录
+  async getNoSubmited (userId) {
+    try {
+      return DB.instance('r').query('select * from task where task_id in (select task_id from student_task where user_id=' + userId + ' and is_submit=0)')
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取某次作业的题目和题目的回答
+  async getQuestiones (taskId) {
+    try {
+      const questionList = await DB.instance('r').query('select * from question where question_id in (select question_id from task_question where task_id=' + taskId + ')')
+      for (let i = 0, l = questionList.length; i < l; i++) {
+        let sql = 'select answer from answer where question_id=' + questionList[i].question_id + ' and task_id=' + taskId
+        let answer = await DB.instance('r').query(sql)
+        if (answer.length > 0) {
+          questionList[i].answer = answer[0].answer
+        } else {
+          questionList[i].answer = ''
+        }
+      }
+      return questionList
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 提交单个题目的回答
+  async addAnswer (insertData) {
+    try {
+      return DB.instance('w').insert('answer', insertData)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
 }
 
 module.exports = User

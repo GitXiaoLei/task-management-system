@@ -687,6 +687,92 @@ const route = (app) => {
       res.apiErr(e)
     }
   })
+  // 是否有没提交的作业的作业
+  app.get('/api/student/is_submit', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const data = await User.getStudentTask(req._userInfo.user_id)
+      const is_submit = data.length > 0 ? true : false
+      res.apiData({ is_submit }, '获取用户是否有未提交的作业成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  // 是否有没提交的作业的作业
+  app.get('/api/student/work', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const submited = await User.getSubmited(req._userInfo.user_id)
+      const noSubmited = await User.getNoSubmited(req._userInfo.user_id)
+      res.apiData({
+        submited,
+        noSubmited
+      }, '获取做作业页面初始化数据成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  // 获取某次作业的题目和题目的回答
+  app.post('/api/task_question/list', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const questionList = await User.getQuestiones(req.body.task_id)
+      res.apiData(questionList, '获取题目成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  // 提交单个题目的回答
+  app.post('/api/answer/add', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    const insertData = {
+      answer: req.body.answer,
+      question_id: req.body.question_id,
+      task_id: req.body.task_id
+    }
+    try {
+      const result = await User.addAnswer(insertData)
+      res.apiData(result, '提交回答成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
 }
 
 module.exports = route
