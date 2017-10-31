@@ -471,6 +471,15 @@ const User = {
       throw new Error(e)
     }
   },
+  // 交作业
+  async addIsSubmit (taskId, userId) {
+    let sql = 'update student_task set is_submit=1 where task_id=' + taskId + ' and user_id=' + userId
+    try {
+      return DB.instance('w').query(sql)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
 }
 
 module.exports = User

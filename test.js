@@ -1,4 +1,8 @@
-const Util = require('./helper/util');
+const fs = require('fs')
 
-const newArr = Util.removeSome([1, 1, 2, 3, 4, 3, 2]);
-console.log(newArr);
+fs.readFile('./db.js', (err, data) => {
+  if (err) {
+    return console.error(err)
+  }
+  console.log('异步读取：' + data.toString())
+})

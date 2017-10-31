@@ -5,7 +5,7 @@
         <div class="layout-ceiling-main">
           <router-link to="/home">首页</router-link>
           <router-link to="/student/work" :class="{'do-task': havaTask}">做作业</router-link>
-          <router-link to="/student/grade">查看作业</router-link>
+          <router-link to="/student/grade">查看成绩</router-link>
           <router-link to="/student/personal">个人中心</router-link>
           <Dropdown placement="bottom-end" trigger="click">
             <a href="javascript:;">

@@ -773,6 +773,26 @@ const route = (app) => {
       res.apiErr(e)
     }
   })
+  // 交作业
+  app.post('/api/student_task/submit', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const result = await User.addIsSubmit(req.body.task_id, req._userInfo.user_id)
+      res.apiData(result, '交作业成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  
 }
 
 module.exports = route

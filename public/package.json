@@ -45,6 +45,7 @@
     "vue": "^2.4.4",
     "vue-markdown": "^2.2.4",
     "vue-router": "^3.0.1",
+    "vue-scrollbar-custom": "^1.0.9",
     "vue-template-compiler": "^2.5.2",
     "xlsx": "^0.11.6"
   }

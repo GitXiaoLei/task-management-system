@@ -18,3 +18,6 @@ export const getTaskQuestion = (params) => axios.post('/api/task_question/list',
 
 // 提交单个题目的回答
 export const addAnswer = (params) => axios.post('/api/answer/add', qs.stringify(params))
+
+// 交作业
+export const addIsSubmit = (params) => axios.post('/api/student_task/submit', qs.stringify(params))

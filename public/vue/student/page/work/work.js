@@ -1,6 +1,6 @@
 import contents from '../../../components/content.vue'
 // import { getUserInfo, updateStudentInfo } from '../../api.js'
-import { getWorkWebData, getTaskQuestion, addAnswer } from '../../api.js'
+import { getWorkWebData, getTaskQuestion, addAnswer, addIsSubmit } from '../../api.js'
 import moment from 'moment'
 import showdown from 'showdown'
 import $ from 'jquery'
@@ -37,9 +37,26 @@ export default {
       questionId: 0, // 问题id
       taskId: 0, // 作业id
       questionIndex: -1, // 题目索引
+      taskIndex: -1, // 作业索引
     }
   },
   methods: {
+    // 交作业
+    addIsSubmit () {
+      const params = { task_id: this.taskId }
+      addIsSubmit(params)
+      .then((data) => {
+        data = data.data
+        if (data.code !== 1) {
+          this.errorMsg('交作业失败')
+          return
+        }
+        this.successMsg('交作业成功')
+        // 修改本地数据
+        this.submitedTaskList.push(this.noSubmitTaskList.splice(this.taskId, 1))
+      })
+    },
+    // 点击取消题目的modal
     cancelMod () {
       this.questionMod = false
       this.cardShow = false
@@ -115,7 +132,8 @@ export default {
       $(event.srcElement).closest('.question-list').addClass('selected')
     },
     // 获取某次作业的题目
-    getTaskQuestion (taskId, taskName, overdueTime, isSubmit, event) {
+    getTaskQuestion (taskId, taskName, overdueTime, isSubmit, index, event) {
+      this.taskIndex = index
       this.isBorder = false
       $('.question').html('')
       const params = { task_id: taskId }
