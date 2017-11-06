@@ -569,9 +569,9 @@ if(false) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery_confirm_dist_jquery_confirm_min_css__ = __webpack_require__(516);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery_confirm_dist_jquery_confirm_min_css__ = __webpack_require__(515);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery_confirm_dist_jquery_confirm_min_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_jquery_confirm_dist_jquery_confirm_min_css__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_jquery_confirm_dist_jquery_confirm_min_js__ = __webpack_require__(415);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_jquery_confirm_dist_jquery_confirm_min_js__ = __webpack_require__(414);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_jquery_confirm_dist_jquery_confirm_min_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_jquery_confirm_dist_jquery_confirm_min_js__);
 
 
@@ -983,7 +983,7 @@ task.init()
 
 /*! art-template@runtime | https://github.com/aui/art-template */
 
-var detectNode = __webpack_require__(411);
+var detectNode = __webpack_require__(410);
 var runtime = Object.create(detectNode ? global : window);
 var ESCAPE_REG = /["&'<>]/;
 
@@ -1472,7 +1472,7 @@ function updateLink (link, options, obj) {
 
 /***/ }),
 
-/***/ 411:
+/***/ 410:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {module.exports = false;
@@ -1486,7 +1486,7 @@ try {
 
 /***/ }),
 
-/***/ 415:
+/***/ 414:
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(jQuery) {/*!
@@ -1503,7 +1503,7 @@ if(typeof jQuery==="undefined"){throw new Error("jquery-confirm requires jQuery"
 
 /***/ }),
 
-/***/ 516:
+/***/ 515:
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag

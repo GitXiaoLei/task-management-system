@@ -399,7 +399,7 @@ const route = (app) => {
       const result1 = await User.delTask(req.body.task_id)
       const result2 = await User.delTaskClassByTaskId(req.body.task_id)
       const result3 = await User.delTaskQuestionByTaskId(req.body.task_id)
-      
+      const result4 = await User.delStudentTask(req.body.task_id)
       res.apiData({
         result1,
         result2,
@@ -701,6 +701,7 @@ const route = (app) => {
     }
     try {
       const data = await User.getStudentTask(req._userInfo.user_id)
+      console.log(data)
       const is_submit = data.length > 0 ? true : false
       res.apiData({ is_submit }, '获取用户是否有未提交的作业成功')
     } catch (e) {

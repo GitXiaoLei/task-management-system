@@ -480,6 +480,15 @@ const User = {
       throw new Error(e)
     }
   },
+   // 删除student_task表中的数据
+   async delStudentTask (taskId) {
+    let sql = 'delete from student_task where task_id=' + taskId
+    try {
+      return DB.instance('w').query(sql)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
 }
 
 module.exports = User

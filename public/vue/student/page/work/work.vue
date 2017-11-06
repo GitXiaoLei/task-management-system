@@ -1,9 +1,5 @@
 <template>
   <contents>
-    <!-- 题目列表 -->
-    <div>
-      
-    </div>
     <!-- 作业情况列表 -->
     <div class="task-list">
       <Card>
@@ -33,9 +29,45 @@
         </Tabs>
       </Card>
     </div>
-    
+    <!-- 题目 -->
+    <Modal
+      v-model="questionMod"
+      :closable="false"
+      :mask-closable="false"
+      ok-text="交"
+      width="600">
+      <div slot="header">
+        <h2>{{taskTitle}} <span style="font-size: 12px; float: right; display: inline-block; line-height: 24px;">{{overdueTime}}</span></h2>
+      </div>
+      <div style="height: 460px; overflow: auto; position: relative;" id="question-body">
+        <!-- 每一题 -->
+        <div 
+          v-for="(question, index) of questionList"
+          :key="question.id"
+          :class="{ 'question-list': isBorder }">
+          <!-- 题目 -->
+          <div :class="'question-' + index" class="question">
 
+          </div>
+          <!-- 回答 -->
+          <div :class="'answer-' + index" class="answer">
 
+          </div>
+          <Button type="primary" v-show="question.answer === '' && submitBtn" @click="cardShowFn(question, index, $event)" class="replay-btn">答题</Button>
+          
+          <Button type="ghost" v-show="question.answer !== ''" disabled class="have-replay-btn">已回答</Button>
+        </div>
+        <!-- 作业加载进度条 -->
+        <Progress :percent="percent" style="position: absolute;
+        left: 50%; top: 50%; transform: translate(-50%, -50%); display: block;" v-show="progressShow"></Progress>
+      </div>
+      <div slot="footer">
+        <Button type="text" @click="questionMod = false; cardShow = false;" v-show="submitBtn">取消</Button>
+        <Button type="text" @click="cancelMod" v-show="!submitBtn">关闭</Button>
+        <Button type="primary" v-show="submitBtn" @click="addIsSubmit">交</Button>
+        <Button type="primary" v-show="!submitBtn" disabled>已交</Button>
+      </div>
+    </Modal>
     <!-- 答题card -->
     <Card :bordered="false" class="cardMarkdown" v-show="cardShow" :padding="0">
       <h3 slot="title">第{{questionNum}}题</h3>
@@ -48,7 +80,8 @@
   </contents>
 </template>
 
-<style>
+<style lang="scss">
+@import url('./markdown.scss');
 .cardMarkdown {
   width: 400px; 
   position: absolute; 
@@ -85,7 +118,7 @@
 }
 .task-list {
   width: 400px;
-  margin: 40px 0 0 0;
+  margin: 40px auto;
 }
 ul.head {
   font-weight: bold;

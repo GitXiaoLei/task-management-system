@@ -52,8 +52,14 @@ export default {
           return
         }
         this.successMsg('交作业成功')
+        this.cardShow = false
+        this.questionMod = false
         // 修改本地数据
-        this.submitedTaskList.push(this.noSubmitTaskList.splice(this.taskId, 1))
+        this.noSubmitTaskList.forEach((noSubmitTask, i, arr) => {
+          if (noSubmitTask.task_id === this.taskId) {
+            this.submitedTaskList.push(arr.splice(i, 1)[0])
+          }
+        })
       })
     },
     // 点击取消题目的modal
