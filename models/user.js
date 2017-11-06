@@ -245,17 +245,54 @@ const User = {
       throw new Error(e)
     }
   },
+  // 为作业添加班级
   async addTaskClass (insertData) {
     try {
-      return await DB.instance('w').insert('task_class', insertData)
+      const result1 =  await DB.instance('w').insert('task_class', insertData)
+      // 向student_task表中插入记录
+      const userIdArr = await DB.instance('r').query('select user_id from user where class_id=' + insertData.class_id)
+      const userIds = []
+      userIdArr.forEach((userId, i, arr) => {
+        userIds.push(userId.user_id)
+      })
+      let sql = 'insert into student_task(user_id, task_id) values'
+      userIds.forEach((userId, i, arr) => {
+        if (arr.length - 1 === i) {
+          sql += '(' + userId + ', ' + insertData.task_id + ')'
+        } else {
+          sql += '(' + userId + ', ' + insertData.task_id + '),'
+        }
+      })
+      const result2 = await DB.instance('w').query(sql)
+      return { result1, result2 }
     } catch (e) {
       throw new Error(e)
     }
   },
+  // 为作业删除班级
   async delTaskClass (conditions) {
-    let sql = 'delete from task_class where task_id=' + conditions.task_id + ' and class_id=' + conditions.class_id 
     try {
-      return await DB.instance('w').query(sql)
+      // 删除task_class表中的数据
+      const result1 =  await DB.instance('w').query('delete from task_class where task_id=' + conditions.task_id + ' and class_id=' + conditions.class_id)
+      // 删除student_task表中的数据
+      const userIdsArr = await DB.instance('w').query('select user_id from user where class_id=' + conditions.class_id)
+      const userIds = []
+      userIdsArr.forEach((userId, i, arr) => {
+        userIds.push(userId.user_id)
+      })
+      let sql = 'delete from student_task where task_id=' + conditions.task_id + ' and user_id in ('
+      userIds.forEach((userId, i, arr) => {
+        if (i === arr.length - 1) {
+          sql += userId + ')'
+        } else {
+          sql += userId + ', '
+        }
+      })
+      let result2 = []
+      if (userIds.length) {
+        result2 = DB.instance('w').query(sql)
+      }
+      return { result1, result2 }
     } catch (e) {
       throw new Error(e)
     }
@@ -316,21 +353,22 @@ const User = {
       // 将task表中的is_publish字段改为1,
       const result1 = await DB.instance('r').query('update task set is_publish=1 where task_id=' + taskId)
       // 向student_task表中添加记录
-      const userIdsArr = await DB.instance('w').query('select user_id from user where class_id in (select class_id from task_class where task_id=' + taskId + ')')
-      const userIds = []
-      userIdsArr.forEach((obj) => {
-        userIds.push(obj.user_id)
-      })
-      let sql = 'insert into student_task(user_id, task_id) values'
-      userIds.forEach((userId, i, arr) => {
-        if (arr.length - 1 === i) {
-          sql += '(' + userId + ', ' + taskId + ')'
-        } else {
-          sql += '(' + userId + ', ' + taskId + '),'
-        }
-      })
-      const result2 = await DB.instance('w').query(sql)
-      return { result1, result2 }
+      // const userIdsArr = await DB.instance('w').query('select user_id from user where class_id in (select class_id from task_class where task_id=' + taskId + ')')
+      // const userIds = []
+      // userIdsArr.forEach((obj) => {
+      //   userIds.push(obj.user_id)
+      // })
+      // let sql = 'insert into student_task(user_id, task_id) values'
+      // userIds.forEach((userId, i, arr) => {
+      //   if (arr.length - 1 === i) {
+      //     sql += '(' + userId + ', ' + taskId + ')'
+      //   } else {
+      //     sql += '(' + userId + ', ' + taskId + '),'
+      //   }
+      // })
+      // const result2 = await DB.instance('w').query(sql)
+      // return { result1, result2 }
+      return result1
     } catch (e) {
       throw new Error(e)
     }

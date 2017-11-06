@@ -447,7 +447,8 @@ const route = (app) => {
     }
     const conditions = { 
       task_id: req.body.task_id,
-      class_id: req.body.class_id
+      class_id: req.body.class_id,
+      user_id: req._userInfo.user_id
     }
     try {
       const result = await User.delTaskClass(conditions)
@@ -765,7 +766,8 @@ const route = (app) => {
     const insertData = {
       answer: req.body.answer,
       question_id: req.body.question_id,
-      task_id: req.body.task_id
+      task_id: req.body.task_id,
+      user_id: req._userInfo.user_id
     }
     try {
       const result = await User.addAnswer(insertData)
