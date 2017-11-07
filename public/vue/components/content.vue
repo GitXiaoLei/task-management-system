@@ -20,5 +20,6 @@ body{
   background: #fff;
   overflow: hidden;
   position: relative;
+  padding-bottom: 100px;
 }
 </style>

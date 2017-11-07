@@ -29,3 +29,21 @@ export const loginout = (params) => axios.get('/loginout', { params })
 
 // 退出登录
 export const getUserData = (params) => axios.get('/api/user/info', { params })
+
+// 获取批改作业页面初始化数据
+export const getCheckWebData = (params) => axios.get('/api/teacher/check', { params })
+
+// 获取某个作业所对应的班级
+export const getTaskClass = (params) => axios.post('/api/task_class/list', qs.stringify(params))
+
+// 获取某个班级的所有学生
+export const getClassStudent = (params) => axios.get('/api/class_student/list', { params })
+
+// 获取某次作业某个同学的答案
+export const getStudentAnswer = (params) => axios.get('/api/student_answer/list', { params })
+
+// 为某题添加分数
+export const submitScore = (params) => axios.post('/api/question_score/add', qs.stringify(params))
+
+// 提交批改完的作业
+export const addChecked = (params) => axios.post('/api/student_task/checked', qs.stringify(params))

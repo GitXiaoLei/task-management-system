@@ -484,11 +484,11 @@ const User = {
     }
   },
   // 获取某次作业的题目和题目的回答
-  async getQuestiones (taskId) {
+  async getQuestiones (taskId, userId) {
     try {
       const questionList = await DB.instance('r').query('select * from question where question_id in (select question_id from task_question where task_id=' + taskId + ')')
       for (let i = 0, l = questionList.length; i < l; i++) {
-        let sql = 'select answer from answer where question_id=' + questionList[i].question_id + ' and task_id=' + taskId
+        let sql = 'select answer from answer where question_id=' + questionList[i].question_id + ' and task_id=' + taskId + ' and user_id=' + userId
         let answer = await DB.instance('r').query(sql)
         if (answer.length > 0) {
           questionList[i].answer = answer[0].answer
@@ -518,11 +518,90 @@ const User = {
       throw new Error(e)
     }
   },
-   // 删除student_task表中的数据
-   async delStudentTask (taskId) {
+  // 删除student_task表中的数据
+  async delStudentTask (taskId) {
     let sql = 'delete from student_task where task_id=' + taskId
     try {
       return DB.instance('w').query(sql)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取某个作业所对应的班级
+  async getTaskClass (taskId) {
+    try {
+       return await DB.instance('w').query('select * from class where class_id in (select class_id from task_class where task_id=' + taskId + ')')
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取某个班级的所有学生
+  async getClassStudent (classId, taskId) {
+    try {
+      const users = await DB.instance('r').query('select * from user where class_id=' + classId)
+      for (let i = 0, l = users.length; i < l; i++) {
+        delete users[i].password
+        let isSubmitObj = await DB.instance('r').query('select is_submit from student_task where user_id=' + users[i].user_id + ' and task_id=' + taskId)
+        users[i].is_submit = isSubmitObj[0].is_submit
+      }
+      return users
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取某个学生某次作业的答案
+  async getStudentAnswer (taskId, userId) {
+    try {
+      // 获取某次作业的所有题目id
+      const questionIdArr = await DB.instance('r').query('select question_id from task_question where task_id=' + taskId)
+      const questionArr = []
+      for (let i = 0, l = questionIdArr.length; i < l; i++) {
+        // 获取题目
+        const question = await DB.instance('r').query('select * from question where question_id=' + questionIdArr[i].question_id)
+        
+        // 获取学生的回答获取学生的回答
+        const answer = await DB.instance('r').query('select answer,score from answer where task_id=' + taskId + ' and user_id=' + userId + ' and question_id=' + questionIdArr[i].question_id)
+        console.log(answer)
+        question[0].answer = answer.length > 0 ? answer[0].answer : ''
+        question[0].score = answer.length > 0 ? answer[0].score : ''
+        questionArr.push(question[0])
+      }
+      let isChecked = await DB.instance('r').query('select is_check from student_task where user_id=' + userId + ' and task_id=' + taskId)
+      isChecked = isChecked[0].is_check
+      return { isChecked, questionArr }
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 添加某个同学某次作业某题的分数
+  async addAnswerScore (questionId, taskId, userId, score) {
+    try {
+      // 本次作业的总分数
+      let sumScore = await DB.instance('r').query('select score from student_task where user_id=' + userId + ' and task_id=' + taskId)
+      // 当前题目的分数
+      let curScore = await DB.instance('r').query('select score from answer where question_id=' + questionId + ' and task_id=' + taskId + ' and user_id=' + userId)
+
+      sumScore = parseInt(sumScore[0].score) - curScore[0].score + score
+      // 超出100分
+      if (sumScore > 100) {
+        return false
+      }
+      // 每一题插入分数
+      const result1 = await DB.instance('w').query('update answer set score=' + score + ' where question_id=' + questionId + ' and task_id=' + taskId + ' and user_id=' + userId)
+      
+      // 添加到总分上去
+      const result2 = await DB.instance('w').query('update student_task set score=' + sumScore + ' where user_id=' + userId + ' and task_id=' + taskId)
+      
+      return { result1, result2 }
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 提交批改完的作业
+  async addChecked (userId, taskId) {
+    try {
+      // 本次作业的总分数
+      return await DB.instance('r').query('update student_task set is_check=1 where user_id=' + userId + ' and task_id=' + taskId)
     } catch (e) {
       throw new Error(e)
     }

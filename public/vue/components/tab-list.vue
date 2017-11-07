@@ -23,7 +23,7 @@
             <li>{{list.task_name}}</li>
             <li class="overdue-time bb aa">{{list.overdue_time}}</li>
             <div v-show="list.length === 0" style="text-align: center;">暂无记录</div>
-            <Button type="error" size="small" class="button-del" @click.stop="liDel(list, $event)">删除</Button>
+            <Button v-show="delBtnShow" type="error" size="small" class="button-del" @click.stop="liDel(list, $event)">删除</Button>
           </ul>
         </TabPane>
       </Tabs>
@@ -48,6 +48,10 @@ export default {
     width: { // 宽度
       type: [String, Number],
       default: 300
+    },
+    delBtnShow: { // 是否显示删除按钮
+      type: Boolean,
+      default: true
     }
   },
   data () {

@@ -745,7 +745,7 @@ const route = (app) => {
       return
     }
     try {
-      const questionList = await User.getQuestiones(req.body.task_id)
+      const questionList = await User.getQuestiones(req.body.task_id, req._userInfo.user_id)
       res.apiData(questionList, '获取题目成功')
     } catch (e) {
       res.apiErr(e)
@@ -791,6 +791,124 @@ const route = (app) => {
     try {
       const result = await User.addIsSubmit(req.body.task_id, req._userInfo.user_id)
       res.apiData(result, '交作业成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  // 获取老师批改作业页面初始化数据
+  app.get('/api/teacher/check', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const publishedTask = await User.getPublishedTask(req._userInfo.user_id)
+      res.apiData(publishedTask, '获取批改作业页面初始化数据成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  // 获取老师批改作业页面初始化数据
+  app.post('/api/task_class/list', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const classData = await User.getTaskClass(req.body.task_id)
+      res.apiData(classData, '获取作业所对应的班级成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  // 获取某个班级的所有学生
+  app.get('/api/class_student/list', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const studentData = await User.getClassStudent(req.query.class_id, req.query.task_id)
+      res.apiData(studentData, '获取班级的所有学生成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  // 获取某个同学某次作业的答案
+  app.get('/api/student_answer/list', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const answerData = await User.getStudentAnswer(req.query.task_id, req.query.user_id)
+      res.apiData(answerData, '获取学生答案成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  // 添加某个同学某次作业某题的分数
+  app.post('/api/question_score/add', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const data = await User.addAnswerScore(req.body.question_id, req.body.task_id, req.body.user_id, parseInt(req.body.score))
+      if (!data) {
+        res.apiErr({ code: 0, message: '分数超出100分,请调整分数！' })
+        return
+      }
+      res.apiData(data, '提交分数成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  // 提交批改完的作业
+  app.post('/api/student_task/checked', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const data = await User.addChecked(req.body.user_id, req.body.task_id)
+      res.apiData(data, '提交成功')
     } catch (e) {
       res.apiErr(e)
     }
