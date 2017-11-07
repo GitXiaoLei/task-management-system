@@ -1,11 +1,12 @@
 import { getPublishWebData, createTask, getClasses, addTaskClass, delTaskClass, getChoose, getJudge, getFill, getWords, addQuestion, getTask5, getTaskInfo, addTaskQuestion, delQuestion, publishTask, delSubjectQuestion, modifiSubjectQuestion, delTask } from '../../../api.js'
 import contents from '../../../components/content.vue'
+import tabList from '../../../components/tab-list.vue'
 import XLSX from 'xlsx'
 import series from 'async/series'
 import moment from 'moment'
 export default {
   name: 'personal',
-  components: { contents },
+  components: { contents, tabList },
   data () {
     return {
       userData: {}, // 用户信息
@@ -142,9 +143,8 @@ export default {
       
     },
     // 删除作业
-    delTask (taskId, event) {
-      event.stopPropagation()
-      const params = { task_id: taskId }
+    delTask (row, event) {
+      const params = { task_id: row.task_id }
       delTask(params)
       .then((data) => {
         data = data.data
@@ -155,18 +155,18 @@ export default {
         this.successMsg('删除作业成功')
         // 删除本地数据
         this.noPublishedTaskList.forEach((noPublishedTask, i, arr) => {
-          if (noPublishedTask.task_id === taskId) {
+          if (noPublishedTask.task_id === row.task_id) {
             arr.splice(i, 1)
           }
         })
         this.publishedTaskList.forEach((publishedTask, i, arr) => {
-          if (publishedTask.task_id === taskId) {
+          if (publishedTask.task_id === row.task_id) {
             arr.splice(i, 1)
           }
         })
       })
       .catch((e) => {
-        this.errorMsg(e)
+        console.error(e)
       })
     },
     // 修改题目
@@ -421,9 +421,9 @@ export default {
       $('.task-record-wrap ul').removeClass('selected')
     },
     // 点击某次作业，获取该作业的详细信息
-    getTaskInfo (taskId, taskName, event) {
+    getTaskInfo (row, event) {
       const $ele = $(event.srcElement).parent()
-      const params = { task_id: taskId }
+      const params = { task_id: row.task_id }
       getTaskInfo(params)
       .then((data) => {
         data = data.data
@@ -497,7 +497,7 @@ export default {
             }
           ]
         }
-        this.taskId = taskId
+        this.taskId = row.task_id
         this.subjectId = data.curSubject[0].subject_id
         this.overdueTime = $ele.find('.overdue-time').html()
         this.classes = data.classes
@@ -507,7 +507,7 @@ export default {
         })
         this.curQuestionList = data.curQuestions
         this.isCTShow = false
-        this.taskName = taskName
+        this.taskName = row.task_name
         this.isDisabled = true
         this.isSelected = true
         $('.task-record-wrap ul').removeClass('selected')

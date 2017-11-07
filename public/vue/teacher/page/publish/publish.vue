@@ -25,7 +25,7 @@
         </Card>
       </div>
       <!-- 作业记录 -->
-      <div class="task-record-wrap">
+      <!-- <div class="task-record-wrap">
         <Card style="width:380px; margin: 40px;">
           <div slot="title" style="overflow: hidden;">
             <h2 style="float: left;">作业记录</h2>
@@ -58,7 +58,20 @@
           </Tabs>
 
         </Card>
+      </div> -->
+      <!-- 作业记录:使用tab-list组件 -->
+      <div class="task-record-wrap">
+        <tab-list
+          width="380"
+          title="作业记录"
+          :tabs-name="['未发布', '已发布']"
+          :data="[noPublishedTaskList, publishedTaskList]"
+          @li-selected="getTaskInfo"
+          @li-del="delTask">
+            <Button @click="toCreateTaskStatus" type="primary" size="small" slot="headButton">创建作业</Button>
+        </tab-list>
       </div>
+      
     </div>
     
     

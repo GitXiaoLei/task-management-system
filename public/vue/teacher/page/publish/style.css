@@ -122,6 +122,9 @@ input[type=file] {
 .create-task-wrap, .task-record-wrap {
   float: left;
 }
+.task-record-wrap {
+  margin: 40px;
+}
 .create-wrap {
   overflow: hidden;
 }
