@@ -1,9 +1,6 @@
 <template>
   <contents>
-    <!-- 表格 -->
-    <div id="hot-preview">
-      <HotTable :root="root" :settings="hotSettings"></HotTable>
-    </div>
+    
     <!-- 选择课程、班级 -->
     <div class="create-task-wrap">
       <Card style="width:380px;">
@@ -30,23 +27,39 @@
         </RadioGroup>
       </Card>
     </div>
-    
-    <Button type="ghost" @click="exportExcel">点击</Button>
-    <a href="" download="这里是下载的文件名.xlsx" id="hf"></a>
+    <!-- 表格 -->
+    <div id="hot-preview">
+      <HotTable :root="root" :settings="hotSettings"></HotTable>
+      <Button size="small" class="download-btn" type="ghost" @click="exportExcel" v-if="isDown">下载</Button>
+    </div>
+    <a href="" download="成绩单.xlsx" id="hf"></a>
   </contents>
 </template>
 
 <style scoped>
-.create-task-wrap {
-  position: absolute;
-  right: 10px;
-  top: 20px;
+#hot-preview {
+  position: relative;
 }
- #test-hot {
-  width: 600px;
+.create-task-wrap {
+  margin: 20px;
+}
+.download-btn {
+  position: absolute;
+  left: 24px;
+  top: 0;
+  z-index: 1000;
+  background: #fff;
+  display: none;
+}
+#test-hot {
+  position: relative;
+  width: 100%;
   min-height: 200px;
   overflow: auto;
   margin: 20px 0 0 20px;
+}
+#test-hot + .download-btn {
+  display: inline-block;
 }
 h3 {
   text-indent: 10px;

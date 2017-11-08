@@ -679,45 +679,56 @@ const User = {
 
       console.log('userArr:')
       console.log(userArr)
+      console.log(userArr.length)
 
       const taskIdArr = await DB.instance('r').query('select task_id, task_name from task where subject_id=' + subjectId + ' and user_id=' + userId)
 
       console.log('taskIdArr:')
       console.log(taskIdArr)
+      console.log(taskIdArr.length)
+      console.log('---------------------------------')
       
       const data = []
       data[0] = ['学号', '姓名']
-      for (let i = 0, l = userArr.length; i < l; i++) {
+      for (let i = 0, l1 = userArr.length; i < l1; i++) {
         const singleData = []
         singleData.push(userArr[i].student_num) // 学号
         singleData.push(userArr[i].real_name) // 姓名
 
-
-        for(let j = 0, l = taskIdArr.length; j < l; j++) {
-          const score = await DB.instance('r').query('select score from student_task where user_id=' + userArr[i].user_id + ' and task_id=' + taskIdArr[j].task_id)
-
+        for(let j = 0, l2 = taskIdArr.length; j < l2; j++) {
+          let score = await DB.instance('r').query('select score from student_task where user_id=' + userArr[i].user_id + ' and task_id=' + taskIdArr[j].task_id)
+          console.log(j)
           if (score.length) {
-            data[0].push(taskIdArr[j].task_name)
+            let flag = false
+            data[0].forEach((data) => {
+              if (data === taskIdArr[j].task_name) {
+                flag = true
+              }
+            })
+            if (!flag) {
+              data[0].push(taskIdArr[j].task_name)
+            }
             singleData.push(score[0].score)
-            console.log(data)
-            console.log(singleData)
           }
         }
-        console.log('222222222221111111111111')
         // 平均分
-        data[0].push('平均分')
+        if (data[0][data[0].length - 1] !== '平均分') {
+          data[0].push('平均分')
+        }
         const scoreArr = singleData.slice(2)
         console.log(scoreArr)
         let sum = 0, average
         scoreArr.forEach((score) => {
           sum += score
         })
-        average = sum/scoreArr.length
+        if (!scoreArr.length) {
+          average = 0
+        } else {
+          average = (sum/scoreArr.length).toFixed(2)
+        }
         singleData.push(average)
         data.push(singleData)
-        console.log(data)
       }
-      console.log('hehehehheeheheheheheheh')
       return data
     } catch (e) {
       throw new Error(e)

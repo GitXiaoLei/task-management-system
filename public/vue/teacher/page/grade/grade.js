@@ -14,80 +14,8 @@ export default {
       subjectId: 0,
       classData: [], // 课程下所教的班级
       classId: 0,
-      data: [
-        {
-          "学号": "1",
-          "姓名": "小1",
-          "1": "98",
-          "2": "87",
-          "3": "90",
-          "4": "78",
-          "5": "69",
-          "6": "98",
-          "平均分": "86"
-        },
-        {
-          "学号": "2",
-          "姓名": "小2",
-          "1": "98",
-          "2": "87",
-          "3": "90",
-          "4": "78",
-          "5": "69",
-          "6": "98",
-          "平均分": "86"
-        },
-        {
-          "学号": "3",
-          "姓名": "小3",
-          "1": "98",
-          "2": "87",
-          "3": "90",
-          "4": "78",
-          "5": "69",
-          "6": "98",
-          "平均分": "86"
-        },
-        {
-          "学号": "4",
-          "姓名": "小4",
-          "1": "98",
-          "2": "87",
-          "3": "90",
-          "4": "78",
-          "5": "69",
-          "6": "98",
-          "平均分": "86"
-        },
-        {
-          "学号": "5",
-          "姓名": "小5",
-          "1": "98",
-          "2": "87",
-          "3": "90",
-          "4": "78",
-          "5": "69",
-          "6": "98",
-          "平均分": "86"
-        },
-        {
-          "学号": "6",
-          "姓名": "小6",
-          "1": "98",
-          "2": "87",
-          "3": "90",
-          "4": "78",
-          "5": "69",
-          "6": "98",
-          "平均分": "86"
-        }
-      ],
-      newData: [
-        ["", "Tesla", "Volvo", "Toyota", "Honda"],
-        ["2017", 10, 11, 12, 13],
-        ["2018", 20, 11, 14, 13],
-        ["2019", 30, 15, 12, 13]
-      ],
+      data: [], // 要下载的文件数据
+      isDown: false,
       root: 'test-hot',
       hotSettings: {
         data: [
@@ -99,6 +27,7 @@ export default {
     }
   },
   methods: {
+    // 获取成绩单
     getReportCard () {
       const params = {
         subject_id: this.subjectId,
@@ -113,6 +42,9 @@ export default {
         }
         this.successMsg('获取成绩单成功')
         this.hotSettings.data = data.data
+        this.data = []
+        jQuery.extend(true, this.data, data.data)
+        this.isDown = true
       })
       .catch((e) => {
         console.error(e)
@@ -130,6 +62,7 @@ export default {
         }
         this.successMsg('获取班级成功')
         this.classData = data.data
+        this.isDown = false
       })
       .catch((e) => {
         console.error(e)
