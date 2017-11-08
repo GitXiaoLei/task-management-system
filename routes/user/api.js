@@ -105,7 +105,7 @@ const route = (app) => {
       res.apiErr(e)
     }
   })
-  // 老师删除自己所教的科目,同时也要删除subject_class表中对应的记录
+  // 老师删除自己所教的科目,同时也要删除teacher_subject_class表中对应的记录
   app.post('/api/teacher_subject/del', async (req, res) => {
     // 没有登录
     if (!req._authInfo) {
@@ -126,11 +126,18 @@ const route = (app) => {
       const teacherSubjectArr = await User.getTeacherSubjectById(conditions)
       const teacherSubjectIdArr = []
       teacherSubjectArr.forEach((teacherSubject) => {
-        teacherSubjectIdArr.push(teacherSubject.subject_id)
+        teacherSubjectIdArr.push(teacherSubject.teacher_subject_id)
       })
+      // 是否可以删除该课程；如果该课程没有作业记录，则可以删除，否则禁止删除！
+      const canDel = await User.canDelSubject(conditions.subject_id)
+      if (!canDel) {
+        res.apiErr({ code: 0, message: '该课程已有布置的作业，禁止删除！' })
+        return
+      }
       // 没有要删除的科目
       if (teacherSubjectIdArr.length === 0) {
         res.apiData({}, '你没有相关的科目需要删除', 0)
+        return
       }
       const result = await Promise.all([User.delTeacherSubject(conditions), User.delTeacherSubjectClass(teacherSubjectIdArr)])
       res.apiData(result, '删除课程成功')
@@ -156,6 +163,12 @@ const route = (app) => {
       class_id: req.body.class_id
     }
     try {
+      const canDel = await User.canDelClass(conditions)
+      console.log(canDel)
+      if (!canDel) {
+        res.apiErr({ code: 0, message: '该班级有布置的作业记录，禁止删除！' })
+        return
+      }
       const result = await User.delSubjectClassById(conditions)
       res.apiData(result, '删除该课程下的该班级成功')
     } catch (e) {

@@ -606,6 +606,42 @@ const User = {
       throw new Error(e)
     }
   },
+  // 是否可以删除该课程
+  async canDelSubject (subjectId) {
+    try {
+      const data = await DB.instance('r').query('select * from task where subject_id='  + subjectId)
+      let flag = false
+      if (data.length === 0) {
+        flag = true
+      }
+      return flag
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 是否可以删除该班级
+  async canDelClass (conditions) {
+    try {
+      const taskIdArr = await DB.instance('r').query('select task_id from task where subject_id=' + conditions.subject_id + ' and user_id=' + conditions.user_id)
+      if (taskIdArr.length === 0) {
+        return true
+      }
+      const taskIds = []
+      taskIdArr.forEach((taskId) => {
+        taskIds.push(taskId.task_id)
+      })
+      let flag = true
+      for (let i = 0, l = taskIds.length; i < l; i++) {
+        let result = await DB.instance('r').query('select * from task_class where task_id=' + taskIds[i] + ' and class_id=' + conditions.class_id)
+        if (result.length > 0) {
+          flag = false
+        }
+      }
+      return flag
+    } catch (e) {
+      throw new Error(e)
+    }
+  }
 }
 
 module.exports = User

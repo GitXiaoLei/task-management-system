@@ -198,7 +198,7 @@ export default {
       .then((data) => {
         data = data.data
         if (data.code !== 1) {
-          this.errorMsg('删除班级失败')
+          this.errorMsg(data.message)
           return
         }
         this.successMsg('删除班级成功')
@@ -397,7 +397,7 @@ export default {
       .then((data) => {
         data = data.data
         if (data.code !== 1) {
-          this.errorMsg('删除课程失败')
+          this.errorMsg(data.message)
           return
         }
         this.successMsg('删除课程成功')
