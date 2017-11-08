@@ -1,20 +1,62 @@
-{{extend '../common/layout.html'}}
+<!DOCTYPE html>
+<html lang="en">
 
-{{block 'title'}}首页{{/block}}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" type="text/css" href="/static/common/style/iview.css">
+  <script type="text/javascript" src="/static/common/script/vue.min.js"></script>
+  <script type="text/javascript" src="/static/common/script/iview.min.js"></script>
+  <title>作业管理系统 - 登录</title>
+  <style>
+    .form-wrap {
+      width: 350px;
+      height: 200px;
+      margin: 100px auto;
+      border: 1px solid #dddee1;
+      border-color: #e9eaec;
+    }
 
-{{block 'content'}}
+    .login-btn {
+      float: right;
+      margin: 10px 0;
+    }
+    input:-webkit-autofill,
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 1000px white inset;
+    }
+    input[type=text]:focus,
+    input[type=password]:focus,
+    textarea:focus {
+      -webkit-box-shadow: 0 0 0 1000px white inset;
+    }
+  </style>
+</head>
 
-{{title}}
-<br>
-<!-- 没登录 -->
-{{if !userInfo}}
-<input type="text" id="username">
-<input type="password" id="password">
-<button type="button" class="login">登录</button>
-{{/if}}
-<!-- 登录了 -->
-{{if userInfo}}
-<button type="button" class="loginout">退出登录</button>
-{{/if}}
-<script src="/static/build/index.js"></script>
-{{/block}}
+<body>
+  <div id="app">
+    <Card class="form-wrap">
+      <h2 slot="title">
+        登录
+      </h2>
+      <i-form ref="formInline" :model="formInline">
+        <FormItem prop="user">
+          <i-input type="text" v-model="formInline.user" placeholder="用户名">
+            <Icon type="ios-person-outline" slot="prepend"></Icon>
+            </Input>
+        </FormItem>
+        <FormItem prop="password">
+          <i-input type="password" v-model="formInline.password" placeholder="密码">
+            <Icon type="ios-locked-outline" slot="prepend"></Icon>
+          </i-input>
+        </FormItem>
+        <i-button type="primary" @click="handleSubmit" class="login-btn">登录</i-button>
+      </i-form>
+    </Card>
+  </div>
+  <script src="/static/build/index.js"></script>
+</body>
+
+</html>

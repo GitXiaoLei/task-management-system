@@ -19,7 +19,7 @@ export default {
       root: 'test-hot',
       hotSettings: {
         data: [
-          ["学号", "姓名", "1", "2", "3", "4", "5", "6", '平均分'],
+          ["学号", "姓名", '作业名称', '平均分'],
         ],
         colHeaders: true,
         rowHeaders: true

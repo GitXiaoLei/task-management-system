@@ -1,31 +1,45 @@
-require('./common')
-// 登录
-$(document).on('click', '.login', function () {
-  $.post({
-    url: '/login',
-    data: {
-      username: $('#username').val(),
-      password: $('#password').val()
-    },
-    success: function (data) {
-      console.log(data)
-      data = data.data
-      window.location.href = '/'
-    },
-    error: function (data) {
-      console.error(data)
+new Vue({
+  el: '#app',
+  data: {
+    formInline: {
+      user: '',
+      password: ''
     }
-  })
-})
-// 退出登录
-$(document).on('click', '.loginout', function () {
-  $.get({
-    url: '/loginout',
-    success (data) {
-      window.location.href = '/'
-    },
-    error (e) {
-      console.log(e)
+  },
+  methods: {
+    handleSubmit() {
+      var that = this
+      if (this.formInline.user === '') {
+        this.$Notice.error({
+          title: '请输入用户名！'
+        })
+        return
+      }
+      if (this.formInline.password === '') {
+        this.$Notice.error({
+          title: '请输入密码'
+        })
+        return
+      }
+      $.post({
+        url: '/login',
+        data: {
+          username: that.formInline.user,
+          password: that.formInline.password
+        },
+        success: function (data) {
+          if (data.code !== 1) {
+            that.$Message.error('用户名或密码错误')
+            return
+          } else {
+            window.location.href = '/'
+          }
+        },
+        error: function (data) {
+          console.error(data)
+        }
+      })
     }
-  })
+  }
 })
+
