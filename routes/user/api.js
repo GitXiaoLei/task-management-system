@@ -945,7 +945,7 @@ const route = (app) => {
       res.apiErr(e)
     }
   })
-  // 获取成绩单
+  // 获取成绩单：老师
   app.get('/api/report_card/list', async (req, res) => {
     // 没有登录
     if (!req._authInfo) {
@@ -959,6 +959,46 @@ const route = (app) => {
     }
     try {
       const reportCardData = await User.getReportCard(req.query.subject_id, req.query.class_id, req._userInfo.user_id)
+      res.apiData(reportCardData, '获取成绩单数据成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  // 学生查看成绩页面初始化数据
+  app.get('/api/student/grade', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const subjectData = await User.getSubjectStudent(req._userInfo.user_id)
+      res.apiData(subjectData, '获取学生查看成绩页面初始化数据成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  // 获取成绩单：学生
+  app.get('/api/student/report_card', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const classId = await User.getStudentClassId(req._userInfo.user_id)
+      const teacherUserId = await User.getTeacherUserId(req.query.subject_id, classId)
+      const reportCardData = await User.getReportCard(req.query.subject_id, classId, teacherUserId)
       res.apiData(reportCardData, '获取成绩单数据成功')
     } catch (e) {
       res.apiErr(e)

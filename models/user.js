@@ -733,7 +733,33 @@ const User = {
     } catch (e) {
       throw new Error(e)
     }
-  }
+  },
+  // 获取学生查看成绩页面初始化数据
+  async getSubjectStudent (userId) {
+    try {
+       return await DB.instance('r').query('select * from subject where subject_id in(select subject_id from teacher_subject where teacher_subject_id in(select teacher_subject_id from teacher_subject_class where class_id in (select class_id from user where user_id=' + userId + ')))')
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取学生所属的班级id
+  async getStudentClassId (userId) {
+    try {
+       const classIdArr = await DB.instance('r').query('select class_id from user where user_id=' + userId)
+       return classIdArr[0].class_id
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取学生在该课程下，所被教的老师的id
+  async getTeacherUserId (subjectId, classId) {
+    try {
+       const userIdArr = await DB.instance('r').query('select user_id from teacher_subject where subject_id=' + subjectId + ' and teacher_subject_id in(select teacher_subject_id from teacher_subject_class where class_id='+ classId +')')
+       return userIdArr[0].user_id
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
   
 }
 

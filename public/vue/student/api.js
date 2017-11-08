@@ -21,3 +21,9 @@ export const addAnswer = (params) => axios.post('/api/answer/add', qs.stringify(
 
 // 交作业
 export const addIsSubmit = (params) => axios.post('/api/student_task/submit', qs.stringify(params))
+
+// 获取“查看成绩页面”的初始化数据
+export const getStudentGradeWebData = (params) => axios.get('/api/student/grade', { params })
+
+// 获取成绩单：学生
+export const getReportCard = (params) => axios.get('/api/student/report_card', { params })
