@@ -10,6 +10,10 @@
   <script type="text/javascript" src="/static/common/script/iview.min.js"></script>
   <title>作业管理系统 - 登录</title>
   <style>
+    body {
+      background-image: url('/static/common/img/bg.jpg');
+      background-size: cover;
+    }
     .form-wrap {
       width: 350px;
       height: 200px;
@@ -39,7 +43,7 @@
   <div id="app">
     <Card class="form-wrap">
       <h2 slot="title">
-        登录
+        作业管理系统 登录
       </h2>
       <i-form ref="formInline" :model="formInline">
         <FormItem prop="user">
