@@ -926,6 +926,44 @@ const route = (app) => {
       res.apiErr(e)
     }
   })
+  // 获取查看成绩页面初始化数据
+  app.get('/api/teacher_student/grade', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const subjectData = await User.getGradeWebData(req._userInfo.user_id)
+      res.apiData(subjectData, '获取查看成绩页面初始化数据成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  // 获取成绩单
+  app.get('/api/report_card/list', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const reportCardData = await User.getReportCard(req.query.subject_id, req.query.class_id, req._userInfo.user_id)
+      res.apiData(reportCardData, '获取成绩单数据成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
   
 }
 

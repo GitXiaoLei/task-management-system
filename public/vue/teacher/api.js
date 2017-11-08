@@ -47,3 +47,13 @@ export const submitScore = (params) => axios.post('/api/question_score/add', qs.
 
 // 提交批改完的作业
 export const addChecked = (params) => axios.post('/api/student_task/checked', qs.stringify(params))
+
+// 提交批改完的作业
+export const getGradeWebData = (params) => axios.get('/api/teacher_student/grade', { params })
+
+// 获取自己某个科目下所教的班级列表
+export const getSubjectClass = (params) => axios.get('/api/subject_class/list', { params })
+
+// 获取成绩单
+export const getReportCard = (params) => axios.get('/api/report_card/list', { params })
+

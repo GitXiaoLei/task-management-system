@@ -641,7 +641,89 @@ const User = {
     } catch (e) {
       throw new Error(e)
     }
+  },
+  // 获取查看成绩页面初始化数据
+  async getGradeWebData (userId) {
+    try {
+      const subjectIdArr = await DB.instance('r').query('select subject_id from teacher_subject where user_id=' + userId)
+      const subjectIds = []
+      subjectIdArr.forEach((subjectId) => {
+        subjectIds.push(subjectId.subject_id)
+      })
+      if (!subjectIds.length) {
+        return []
+      }
+      let sql = 'select * from subject where subject_id in ('
+      subjectIds.forEach((subjectId, i, arr) => {
+        if (arr.length - 1 === i) {
+          sql += subjectId + ')'
+        } else {
+          sql += subjectId + ', '
+        }
+      })
+      return await DB.instance('r').query(sql)
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取成绩单
+  // [
+  //   ["学号", "姓名", "1", "2", "3", "4", "5", "6", '平均分'],
+  //   ["1", '小1', 11, 12, 13, 13, 13, 13, 13, '平均分'],
+  //   ["2", '小2', 11, 14, 13, 13, 13, 13, 13, '平均分'],
+  //   ["3", '小3', 15, 12, 13, 13, 13, 13, 13, '平均分']
+  // ]
+  async getReportCard (subjectId, classId, userId) {
+    try {
+      const userArr = await DB.instance('r').query('select user_id, real_name, student_num from user where class_id=' + classId)
+
+      console.log('userArr:')
+      console.log(userArr)
+
+      const taskIdArr = await DB.instance('r').query('select task_id, task_name from task where subject_id=' + subjectId + ' and user_id=' + userId)
+
+      console.log('taskIdArr:')
+      console.log(taskIdArr)
+      
+      const data = []
+      data[0] = ['学号', '姓名']
+      for (let i = 0, l = userArr.length; i < l; i++) {
+        const singleData = []
+        singleData.push(userArr[i].student_num) // 学号
+        singleData.push(userArr[i].real_name) // 姓名
+
+
+        for(let j = 0, l = taskIdArr.length; j < l; j++) {
+          const score = await DB.instance('r').query('select score from student_task where user_id=' + userArr[i].user_id + ' and task_id=' + taskIdArr[j].task_id)
+
+          if (score.length) {
+            data[0].push(taskIdArr[j].task_name)
+            singleData.push(score[0].score)
+            console.log(data)
+            console.log(singleData)
+          }
+        }
+        console.log('222222222221111111111111')
+        // 平均分
+        data[0].push('平均分')
+        const scoreArr = singleData.slice(2)
+        console.log(scoreArr)
+        let sum = 0, average
+        scoreArr.forEach((score) => {
+          sum += score
+        })
+        average = sum/scoreArr.length
+        singleData.push(average)
+        data.push(singleData)
+        console.log(data)
+      }
+      console.log('hehehehheeheheheheheheh')
+      return data
+    } catch (e) {
+      throw new Error(e)
+    }
   }
+  
 }
 
 module.exports = User
