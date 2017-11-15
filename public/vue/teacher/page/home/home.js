@@ -1,11 +1,12 @@
 import contents from '../../../components/content.vue'
 // import { getUserInfo, updateStudentInfo } from '../../api.js'
+import { getTeacherIndexWebData } from '../../api.js'
 export default {
   name: 'home',
   components: { contents },
   data() {
     return {
-      
+      taskData: []
     }
   },
   methods: {
@@ -23,5 +24,19 @@ export default {
   },
   created() {
     
+  },
+  mounted () {
+    getTeacherIndexWebData()
+    .then((data) => {
+      data = data.data
+      if (data.code !== 1) {
+        this.errorMsg('获取页面初始化数据失败')
+        return
+      }
+      this.taskData = data.data
+    })
+    .catch((e) => {
+      console.error(e)
+    })
   }
 }

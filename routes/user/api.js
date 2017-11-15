@@ -1004,7 +1004,25 @@ const route = (app) => {
       res.apiErr(e)
     }
   })
-  
+  // 获取老师首页页面的初始化数据
+  app.get('/api/teacher/index', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const taskData = await User.getTeacherIndexWebData(req._userInfo.user_id)
+      res.apiData(taskData, '获取老师首页初始化数据成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
 }
 
 module.exports = route

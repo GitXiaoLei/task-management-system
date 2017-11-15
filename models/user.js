@@ -760,6 +760,71 @@ const User = {
       throw new Error(e)
     }
   },
+  // 获取老师首页页面的初始化数据
+  // [
+  //   {
+  //     task_name: '第一次css作业',
+  //     class_name: '信A1411',
+  //     checkCount: 10, 已经批改的
+  //     finishCount: 12, 已经提交的
+  //     count: 20 总人数
+  //   }
+  // ]
+
+  // [
+  //   {
+  //     task_name: '第一次css作业',
+  //     classes: [
+  //       {
+  //         class_name: '信A1411',
+  //         checkCount: 10, 已经批改的
+  //         finishCount: 12, 已经提交的
+  //         count: 20 总人数
+  //       }
+  //     ]
+  //   }
+  // ]
+  async getTeacherIndexWebData (userId) {
+    try {
+      const data = []
+      const taskIdArr = await DB.instance('r').query('select task_id from task where user_id=' + userId)
+      // 循环taskIdArr
+      for (let i = 0, l1 = taskIdArr.length; i < l1; i++) {
+        const taskObj = {}
+        const classes = []
+        const taskNameArr = await DB.instance('r').query('select task_name from task where task_id=' + taskIdArr[i].task_id)
+        const classIdArr = await DB.instance('r').query('select class_id from task_class where task_id=' + taskIdArr[i].task_id)
+        // 循环classIdArr
+        for (let j = 0, l2 = classIdArr.length; j < l2; j++) {
+          const classNameArr = await DB.instance('r').query('select class_name from class where class_id=' + classIdArr[j].class_id)
+          const userIdArr = await DB.instance('r').query('select user_id from user where class_id=' + classIdArr[j].class_id)
+          let str = ' ('
+          userIdArr.forEach((userId, i, arr) => {
+            if (arr.length - 1 === i) {
+              str += userId.user_id + ') '
+            } else {
+              str += userId.user_id + ', '
+            }
+          })
+          const count =  await DB.instance('r').query('select count(*) from student_task where user_id in ' + str + ' and task_id=' + taskIdArr[i].task_id)
+          const finishCount = await DB.instance('r').query('select count(*) from student_task where user_id in ' + str + ' and task_id=' + taskIdArr[i].task_id + ' and is_submit=1')
+          const checkCount = await DB.instance('r').query('select count(*) from student_task where user_id in ' + str + ' and task_id=' + taskIdArr[i].task_id + ' and is_submit=1 and is_check=1')
+          classes.push({
+            class_name: classNameArr[0].class_name,
+            finishCount: finishCount[0]['count(*)'],
+            checkCount: checkCount[0]['count(*)'],
+            count: count[0]['count(*)']
+          })
+          taskObj.task_name = taskNameArr[0].task_name
+        }
+        taskObj.classes = classes
+        data.push(taskObj)
+      }
+      return data
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
   
 }
 

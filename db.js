@@ -212,7 +212,7 @@ class DB {
     // 留出一个空格
     if (sortby) {
       sortby = sortby + ' '
-    }
+    } 
     return sortby
   }
   /**

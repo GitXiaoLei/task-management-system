@@ -57,3 +57,5 @@ export const getSubjectClass = (params) => axios.get('/api/subject_class/list', 
 // 获取成绩单
 export const getReportCard = (params) => axios.get('/api/report_card/list', { params })
 
+// 获取老师首页页面初始化数据
+export const getTeacherIndexWebData = (params) => axios.get('/api/teacher/index', { params })
