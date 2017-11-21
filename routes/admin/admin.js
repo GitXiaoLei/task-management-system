@@ -7,7 +7,6 @@ const Async = require('async')
 const route = (app) => {
   // 后台管理(单页应用)页面的token验证
   app.get('/admin/*', (req, res) => {
-    console.log(req.path)
     // 没有登录
     if (!req._authInfo) {
       res.apiData({}, '你没有权限访问', -1)
@@ -572,6 +571,33 @@ const route = (app) => {
     .catch((err) => {
       res.apiErr(err)
     })
+  })
+  // 批量添加用户
+  app.post('/api/userlist/add', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 超级管理员才能访问
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const userObjArr = JSON.parse(req.body.userObjArr).userObjArr
+      const result = await Admin.addUsers(userObjArr)
+      console.log('result.length: ' + result.length)
+      console.log('userObjArr.length: ' + userObjArr.length)
+      
+      if (result.length < userObjArr.length) {
+        res.apiErr({ message: '前 ' + result.length + ' 个学生导入成功，后' + (userObjArr.length - result.length) + '个学生班级名称错误，不能导入！' })
+        return
+      }
+      res.apiData(result, '所有用户添加成功')
+    } catch (e) {
+      res.apiErr({ message: '用户导入失败' })
+    }
   })
   // 删除院系
   app.post('/api/department/del', (req, res) => {

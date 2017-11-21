@@ -760,17 +760,6 @@ const User = {
       throw new Error(e)
     }
   },
-  // 获取老师首页页面的初始化数据
-  // [
-  //   {
-  //     task_name: '第一次css作业',
-  //     class_name: '信A1411',
-  //     checkCount: 10, 已经批改的
-  //     finishCount: 12, 已经提交的
-  //     count: 20 总人数
-  //   }
-  // ]
-
   // [
   //   {
   //     task_name: '第一次css作业',
@@ -784,6 +773,7 @@ const User = {
   //     ]
   //   }
   // ]
+  // 获取老师首页页面初始化数据
   async getTeacherIndexWebData (userId) {
     try {
       const data = []
@@ -825,7 +815,69 @@ const User = {
       throw new Error(e)
     }
   },
-  
+  // 获取学生首页页面初始化数据
+  // [
+  //   {
+  //     class_name: '信A1411', // 班级名称 1
+  //     count: 30, // 班级人数 1
+  //     task_name: 'css作业', // 作业名称  1
+  //     finish_count: 10, // 完成本作业的人数 1
+  //     is_finish: 0 // 自己是否完成该作业 1
+  //   }
+  // ]
+
+  // {
+  //   class_name: '信A1411',
+  //   count: 30,
+  //   task:[
+  //     {
+  //       task_name: 'css作业',
+  //       finish_count: 10,
+  //       is_finish: 1
+  //     }
+  //   ]
+  // }
+  async getStudentIndexWebData (userId) {
+    try {
+      const data = {}
+      // 班级名称
+      const classNameArr = await DB.instance('r').query('select class_name from class where class_id in (select class_id from user where user_id=' + userId + ')')
+      // 所有的作业id：task_id
+      const taskIdArr = await DB.instance('r').query('select task_id from task_class where class_id in (select class_id from user where user_id=' + userId + ')')
+      // 所有同学的id：user_id
+      const userIdArr = await DB.instance('r').query('select user_id from user where class_id in (select class_id from user where user_id=' + userId + ')')
+      // 班级总人数
+      const count = userIdArr.length
+      data.class_name = classNameArr[0].class_name
+      data.count = count
+      const taskArr = []
+      // 循环所有作业：task_id，来得到task_name、finish_count和is_finish
+      for (let i = 0, l1 = taskIdArr.length; i < l1; i++) {
+        const obj = {}
+        const taskNameArr = await DB.instance('r').query('select task_name from task where task_id=' + taskIdArr[i].task_id)
+        let sql = 'select count(*) from student_task where is_submit=1 and task_id=' + taskIdArr[i].task_id + ' and user_id in ('
+        userIdArr.forEach((userId, i, arr) => {
+          if (i === arr.length - 1) {
+            sql += ' ' + userId.user_id + ')'
+          } else {
+            sql += ' ' + userId.user_id + ', '
+          }
+        })
+        // 完成作业的总人数
+        const finishCountArr = await DB.instance('r').query(sql)
+        // 自己是否完成作业
+        const isFinish = await DB.instance('r').query('select is_submit from student_task where user_id=' + userId + ' and task_id=' + taskIdArr[i].task_id)
+        obj.task_name = taskNameArr[0].task_name
+        obj.finish_count = finishCountArr[0]['count(*)']
+        obj.is_finish = isFinish[0].is_submit
+        taskArr.push(obj)
+      }
+      data.task = taskArr
+      return data
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
 }
 
 module.exports = User

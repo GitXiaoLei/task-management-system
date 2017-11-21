@@ -81,3 +81,6 @@ export const delClass = params => axios.post('/api/class/del', qs.stringify(para
 
 // 退出登录
 export const loginout = () => axios.get('/loginout')
+
+// 批量添加用户
+export const addUsers = params => axios.post('/api/userlist/add', qs.stringify({ 'userObjArr': JSON.stringify(params) }))

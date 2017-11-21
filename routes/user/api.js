@@ -1023,6 +1023,25 @@ const route = (app) => {
       res.apiErr(e)
     }
   })
+  // 获取学生首页页面的初始化数据
+  app.get('/api/student/index', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const data = await User.getStudentIndexWebData(req._userInfo.user_id)
+      res.apiData(data, '获取学生首页初始化数据成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
 }
 
 module.exports = route

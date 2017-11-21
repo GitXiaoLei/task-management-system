@@ -3,14 +3,31 @@
     <!-- 有权限访问该页面 -->
     <div v-if="canVisit === 1">
       <!-- 添加用户 -->
-      <h2>添加用户</h2>
+      <h2>添加单个用户</h2>
       <el-form :inline="true" :model="addUserForm" ref="addUserForm" class="add-form">
         <el-form-item label="用户名" required>
           <el-input v-model="addUserForm.username" placeholder="请输入用户名"></el-input>
         </el-form-item>
         <el-button type="primary" @click="addUser('addUserForm')">添加</el-button>
         </el-form-item>
+        
       </el-form>
+      <el-popover
+        ref="popover"
+        placement="right"
+        title="Excel文件格式说明"
+        width="800"
+        trigger="click">
+        <img src="../../../common/img/admin-help.png" alt="" style="width: 800px;">
+        <p style="font-weight: bold; margin-top: 10px;">*请严格按照上面图片的格式导入用户</p>
+      </el-popover>
+      <h2>批量添加用户
+        <i style="color: #20a0ff; cursor: pointer;" v-popover:popover class="el-icon-information"></i>
+      </h2>
+      <div class="file-wrap">
+        <input type="file" @change="readFile" @drag="readFile">
+        <div>点击选择文件</div>
+      </div>
       <!-- 用户列表 -->
       <h2>用户列表</h2>
       <el-table
@@ -42,7 +59,7 @@
           label="所属班级">
         </el-table-column>
         <el-table-column
-          prop="student_id"
+          prop="student_num"
           label="学号">
         </el-table-column>
         <el-table-column
@@ -134,7 +151,8 @@
 </template>
 
 <script>
-import { getUser, addUser, delUser, getDepartment, updateUser, getRole, getUserRole, addUserRole, delUserRole } from '../api'
+import { getUser, addUser, delUser, getDepartment, updateUser, getRole, getUserRole, addUserRole, delUserRole, addUsers } from '../api'
+import XLSX from 'xlsx'
 export default {
   name: 'user',
   data () {
@@ -165,6 +183,79 @@ export default {
     }
   },
   methods: {
+    // 得到“批量添加用户”中后台所要的数据
+    getAddUsersParams (arr) {
+      const datas = []
+      for (let i = 0, len = arr.length; i < len; i++) {
+        const obj = {
+          username: arr[i][0],
+          real_name: arr[i][1],
+          student_num: arr[i][2],
+          sex: arr[i][3],
+          class_name: arr[i][4],
+          department_name: arr[i][5],
+          phone_num: arr[i][6],
+          qq_num: arr[i][7]
+        }
+        datas.push(obj)
+      }
+      if (datas[0].username !== '用户名' || datas[0].real_name !== '真实姓名' || datas[0].student_num !== '学号' || datas[0].sex !== '性别' || datas[0].class_name !== '班级' || datas[0].department_name !== '院系' || datas[0].phone_num !== '电话号码' || datas[0].qq_num !== 'qq号码') {
+        this.errorMsg('Excel文件格式不正确，请按照规则的格式进行导入。')
+        return false
+      }
+      datas.shift()
+      return datas
+    },
+    // 读取文件
+    readFile (e) {
+      const that = this
+      const rABS = true
+      const files = e.target.files
+      const f = files[0]
+      const reader = new FileReader()
+      reader.onload = function (e) {
+        let data = e.target.result
+        if (!rABS) {
+          data = new Uint8Array(data)
+        }
+        const workbook = XLSX.read(data, {type: rABS ? 'binary' : 'array'})
+        /* DO SOMETHING WITH workbook HERE */
+        const firstWorksheet = workbook.Sheets[workbook.SheetNames[0]]
+        const arr = XLSX.utils.sheet_to_json(firstWorksheet, { header: 1 })
+        arr.length = arr.length
+        console.log(arr)
+        const datas = that.getAddUsersParams(arr)
+        if (!datas) {
+          return
+        }
+        const params = {
+          userObjArr: datas
+        }
+        addUsers(params)
+        .then((data) => {
+          data = data.data
+          if (data.code !== 1) {
+            that.getUser()
+            that.$notify({
+              message: data.message,
+              type: 'warning',
+              duration: 0
+            })
+            return
+          }
+          that.successMsg('批量添加用户成功！')
+          that.getUser()
+        })
+        .catch((e) => {
+          console.error(e)
+        })
+      }
+      if (rABS) {
+        reader.readAsBinaryString(f)
+      } else {
+        reader.readAsArrayBuffer(f)
+      }
+    },
     // 获取用户
     getUser () {
       getUser()
@@ -385,5 +476,37 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.file-wrap {
+  position: relative;
+  height: 120px;
+  overflow: hidden;
+}
+.file-wrap input {
+  width: 420px;
+  height: 120px;
+  line-height: 120px;
+  border: 2px dashed #dddee1;
+  border-radius: 10px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+.file-wrap div {
+  width: 420px;
+  height: 116px;
+  line-height: 120px;
+  text-align: center;
+  border: 2px dashed #dddee1;
+  border-radius: 10px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 1;
+  cursor: pointer;
+}
 </style>

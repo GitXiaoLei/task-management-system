@@ -27,3 +27,6 @@ export const getStudentGradeWebData = (params) => axios.get('/api/student/grade'
 
 // 获取成绩单：学生
 export const getReportCard = (params) => axios.get('/api/student/report_card', { params })
+
+// 获取学生首页页面初始化数据
+export const getStudentWebData = (params) => axios.get('/api/student/index', { params })

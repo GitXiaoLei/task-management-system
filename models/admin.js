@@ -3,6 +3,7 @@
 const DB = require('../db')
 const Async = require('async')
 const Util = require('../public/utils/util')
+const moment = require('moment')
 
 /**
  * Admin模型
@@ -468,6 +469,39 @@ const Admin = {
         reject(err)
       })
     })
+  },
+  // 批量添加用户
+  async addUsers (userObjArr) {
+    try {
+      const resultArr = []
+      for (let i = 0, len = userObjArr.length; i < len; i++) {
+        const sql = 'select class_id from class where class_name="' + userObjArr[i].class_name + '"'
+        const classIdArr = await DB.instance('r').query(sql)
+        // 班级不存在
+        console.log(classIdArr)
+        if (classIdArr.length === 0) {
+          return resultArr
+        }
+        const insertData = {
+          username: userObjArr[i].username,
+          real_name: userObjArr[i].real_name,
+          student_num: userObjArr[i].student_num,
+          sex: userObjArr[i].sex,
+          class_name: userObjArr[i].class_name,
+          department_name: userObjArr[i].department_name,
+          phone_num: userObjArr[i].phone_num,
+          qq_num: userObjArr[i].qq_num,
+          created_time: moment().unix(),
+          updated_time: moment().unix(),
+          class_id: classIdArr[0].class_id
+        }
+        const result = await DB.instance('w').insert('user', insertData)
+        resultArr.push(result)
+      }
+      return resultArr
+    } catch (e) {
+      throw new Error(e)
+    }
   },
   // 删除院系
   delDepartment (conditions) {

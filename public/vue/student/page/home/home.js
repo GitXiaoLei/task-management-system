@@ -1,11 +1,12 @@
 import contents from '../../../components/content.vue'
 // import { getUserInfo, updateStudentInfo } from '../../api.js'
+import { getStudentWebData } from '../../api.js'
 export default {
   name: 'home',
   components: { contents },
   data() {
     return {
-      
+      data: {}
     }
   },
   methods: {
@@ -18,10 +19,18 @@ export default {
       this.$Message.error(msg)
     }
   },
-  computed: {
-    
-  },
-  created() {
- 
+  mounted () {
+    getStudentWebData()
+    .then((data) => {
+      data = data.data
+      if (data.code !== 1) {
+        console.error('获取页面初始化数据失败')
+        return
+      }
+      this.data = data.data
+    })
+    .catch((e) => {
+      console.error(e)
+    })
   }
 }
