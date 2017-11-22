@@ -491,9 +491,28 @@ const User = {
         let sql = 'select answer from answer where question_id=' + questionList[i].question_id + ' and task_id=' + taskId + ' and user_id=' + userId
         let answer = await DB.instance('r').query(sql)
         if (answer.length > 0) {
-          questionList[i].answer = answer[0].answer
+          questionList[i].replay = answer[0].answer
         } else {
-          questionList[i].answer = ''
+          questionList[i].replay = ''
+        }
+        delete questionList[i].answer
+      }
+      return questionList
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  // 获取某次作业的题目和标准答案
+  async getQuestionesAnswer (taskId, userId) {
+    try {
+      const questionList = await DB.instance('r').query('select * from question where question_id in (select question_id from task_question where task_id=' + taskId + ')')
+      for (let i = 0, l = questionList.length; i < l; i++) {
+        let sql = 'select answer from answer where question_id=' + questionList[i].question_id + ' and task_id=' + taskId + ' and user_id=' + userId
+        let answer = await DB.instance('r').query(sql)
+        if (answer.length > 0) {
+          questionList[i].replay = answer[0].answer
+        } else {
+          questionList[i].replay = ''
         }
       }
       return questionList
@@ -778,6 +797,7 @@ const User = {
     try {
       const data = []
       const taskIdArr = await DB.instance('r').query('select task_id from task where user_id=' + userId)
+      console.log(taskIdArr)
       // 循环taskIdArr
       for (let i = 0, l1 = taskIdArr.length; i < l1; i++) {
         const taskObj = {}
@@ -796,15 +816,28 @@ const User = {
               str += userId.user_id + ', '
             }
           })
-          const count =  await DB.instance('r').query('select count(*) from student_task where user_id in ' + str + ' and task_id=' + taskIdArr[i].task_id)
-          const finishCount = await DB.instance('r').query('select count(*) from student_task where user_id in ' + str + ' and task_id=' + taskIdArr[i].task_id + ' and is_submit=1')
-          const checkCount = await DB.instance('r').query('select count(*) from student_task where user_id in ' + str + ' and task_id=' + taskIdArr[i].task_id + ' and is_submit=1 and is_check=1')
-          classes.push({
-            class_name: classNameArr[0].class_name,
-            finishCount: finishCount[0]['count(*)'],
-            checkCount: checkCount[0]['count(*)'],
-            count: count[0]['count(*)']
-          })
+          // 班级没有学生
+          if (str === ' (') {
+            classes.push({
+              class_name: classNameArr[0].class_name,
+              finishCount: 0,
+              checkCount: 0,
+              count: 0
+            })
+          } else {
+            const count =  await DB.instance('r').query('select count(*) from student_task where user_id in ' + str + ' and task_id=' + taskIdArr[i].task_id)
+            
+            const finishCount = await DB.instance('r').query('select count(*) from student_task where user_id in ' + str + ' and task_id=' + taskIdArr[i].task_id + ' and is_submit=1')
+            
+            const checkCount = await DB.instance('r').query('select count(*) from student_task where user_id in ' + str + ' and task_id=' + taskIdArr[i].task_id + ' and is_submit=1 and is_check=1')
+            
+            classes.push({
+              class_name: classNameArr[0].class_name,
+              finishCount: finishCount[0]['count(*)'],
+              checkCount: checkCount[0]['count(*)'],
+              count: count[0]['count(*)']
+            })
+          }
           taskObj.task_name = taskNameArr[0].task_name
         }
         taskObj.classes = classes

@@ -1,6 +1,6 @@
 import contents from '../../../components/content.vue'
 // import { getUserInfo, updateStudentInfo } from '../../api.js'
-import { getWorkWebData, getTaskQuestion, addAnswer, addIsSubmit } from '../../api.js'
+import { getWorkWebData, getTaskQuestion, addAnswer, addIsSubmit, getTaskQuestionAnswer } from '../../api.js'
 import moment from 'moment'
 import showdown from 'showdown'
 import $ from 'jquery'
@@ -37,7 +37,8 @@ export default {
       questionId: 0, // 问题id
       taskId: 0, // 作业id
       questionIndex: -1, // 题目索引
-      taskIndex: -1, // 作业索引
+      taskIndex: -1, // 作业索引,
+      isOverDueTime: false, // 作业是否过期
     }
   },
   methods: {
@@ -94,12 +95,12 @@ export default {
           return
         }
         this.successMsg('提交答案成功')
-        this.questionList[this.questionIndex].answer = this.answerVal
+        this.questionList[this.questionIndex].replay = this.answerVal
         this.questionList.forEach((question, i) => {
           const questionHtml = converter.makeHtml(question.question)
-          const answerHtml = converter.makeHtml(question.answer)
+          const replayHtml = converter.makeHtml(question.replay)
           $('.question-' + i).html(questionHtml)
-          $('.answer-' + i).html(answerHtml)
+          $('.replay-' + i).html(replayHtml)
         })
         $('.question-list').removeClass('selected')
       })
@@ -139,51 +140,106 @@ export default {
     },
     // 获取某次作业的题目
     getTaskQuestion (taskId, taskName, overdueTime, isSubmit, index, event) {
-      this.taskIndex = index
-      this.isBorder = false
-      $('.question').html('')
-      const params = { task_id: taskId }
-      getTaskQuestion(params)
-      .then((data) => {
-        data = data.data
-        if (data.code !== 1) {
-          this.errorMsg('获取题目失败')
-          return
-        }
-        this.taskId = taskId
-        this.progressShow = true
-        this.questionList = data.data
-        this.questionList.forEach((question, i) => {
-          question.question = (i+1) + '、' + question.question 
-        })
-        if (isSubmit) {
-          this.submitBtn = false
-        } else {
-          this.submitBtn = true
-        }
-        const timer = setInterval(() => {
-          this.percent += 100
-          if (this.percent === 100) {
-            clearInterval(timer)
-            this.percent = 0
-            this.progressShow = false
-            this.isBorder = true
-            this.questionList.forEach((question, i) => {
-              const questionHtml = converter.makeHtml(question.question)
-              const answerHtml = converter.makeHtml(question.answer)
-              $('.question-' + i).html(questionHtml)
-              $('.answer-' + i).html(answerHtml)
-            })
+      overdueTime = moment(overdueTime).unix()
+      const curTime = moment().unix()
+      // 超期
+      if (curTime > overdueTime) {
+        this.errorMsg('作业已过期，不能提交答案')
+        this.isOverDueTime = true
+        // 获取题目和答案（过期了能够看到答案）
+        const params = { task_id: taskId }
+        getTaskQuestionAnswer(params)
+        .then((data) => {
+          data = data.data
+          if (data.code !== 1) {
+            this.errorMsg('获取题目和标准答案失败')
+            return
           }
-        }, 200)
-      })
-      .catch((e) => {
-        this.errorMsg((e))
-      })
-      this.questionMod = true
-      this.taskTitle = taskName
-      this.overdueTime = moment(overdueTime).format('YYYY-MM-DD')
-      
+          this.taskId = taskId
+          this.progressShow = true
+          this.questionList = data.data
+          this.questionList.forEach((question, i) => {
+            question.question = (i+1) + '、' + question.question 
+          })
+          if (isSubmit) {
+            this.submitBtn = false
+          } else {
+            this.submitBtn = true
+          }
+          const timer = setInterval(() => {
+            this.percent += 100
+            if (this.percent === 100) {
+              clearInterval(timer)
+              this.percent = 0
+              this.progressShow = false
+              this.isBorder = true
+              this.questionList.forEach((question, i) => {
+                const questionHtml = converter.makeHtml(question.question)
+                const replayHtml = converter.makeHtml(question.replay)
+                question.answer = '【参考答案】<br>' + question.answer
+                const answerHtml = converter.makeHtml(question.answer)
+                $('.question-' + i).html(questionHtml)
+                $('.replay-' + i).html(replayHtml)
+                $('.answer-' + i).html(answerHtml)
+              })
+            }
+          }, 200)
+        })
+        .catch((e) => {
+          this.errorMsg((e))
+        })
+        this.questionMod = true
+        this.taskTitle = taskName
+        this.overdueTime = moment(overdueTime).format('YYYY-MM-DD')
+      // 未过期
+      } else {
+        this.isOverDueTime = false
+        this.taskIndex = index
+        this.isBorder = false
+        $('.question').html('')
+        $('.answer').html('')
+        const params = { task_id: taskId }
+        getTaskQuestion(params)
+        .then((data) => {
+          data = data.data
+          if (data.code !== 1) {
+            this.errorMsg('获取题目失败')
+            return
+          }
+          this.taskId = taskId
+          this.progressShow = true
+          this.questionList = data.data
+          this.questionList.forEach((question, i) => {
+            question.question = (i+1) + '、' + question.question 
+          })
+          if (isSubmit) {
+            this.submitBtn = false
+          } else {
+            this.submitBtn = true
+          }
+          const timer = setInterval(() => {
+            this.percent += 100
+            if (this.percent === 100) {
+              clearInterval(timer)
+              this.percent = 0
+              this.progressShow = false
+              this.isBorder = true
+              this.questionList.forEach((question, i) => {
+                const questionHtml = converter.makeHtml(question.question)
+                const replayHtml = converter.makeHtml(question.replay)
+                $('.question-' + i).html(questionHtml)
+                $('.replay-' + i).html(replayHtml)
+              })
+            }
+          }, 200)
+        })
+        .catch((e) => {
+          this.errorMsg((e))
+        })
+        this.questionMod = true
+        this.taskTitle = taskName
+        this.overdueTime = moment(overdueTime).format('YYYY-MM-DD')
+      }
     },
     // 成功消息提示
     successMsg(msg) {

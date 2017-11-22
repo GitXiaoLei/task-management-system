@@ -14,17 +14,18 @@
               <li>{{noSubmitTask.task_name}}</li>
               <li class="overdue-time">{{noSubmitTask.overdue_time}}</li>
             </ul>
-            <div v-show="noSubmitTaskList.length === 0" style="text-align: center;">暂无记录</div>
+            <div v-show="noSubmitTaskList.length === 0" style="text-align: center;">无未交作业记录</div>
           </TabPane>
           <TabPane label="已交">
             <ul class="head"><li>作业名称</li><li>过期时间</li></ul>
             <ul 
-              v-for="submitedTask of submitedTaskList" :key="submitedTask.id" 
+              v-for="(submitedTask, index) of submitedTaskList" :key="submitedTask.id" 
               class="ul-list"
-              @click="getTaskQuestion(submitedTask.task_id, submitedTask.task_name,  submitedTask.overdue_time, 1,$event)">
+              @click="getTaskQuestion(submitedTask.task_id, submitedTask.task_name,  submitedTask.overdue_time, 1, index, $event)">
               <li>{{submitedTask.task_name}}</li>
               <li class="overdue-time">{{submitedTask.overdue_time}}</li>
             </ul>
+            <div v-show="submitedTaskList.length === 0" style="text-align: center;">无已交作业记录</div>
           </TabPane>
         </Tabs>
       </Card>
@@ -50,12 +51,20 @@
 
           </div>
           <!-- 回答 -->
+          <div :class="'replay-' + index" class="repaly">
+
+          </div>
+          <!-- 参考答案 -->
           <div :class="'answer-' + index" class="answer">
 
           </div>
-          <Button type="primary" v-show="question.answer === '' && submitBtn" @click="cardShowFn(question, index, $event)" class="replay-btn">答题</Button>
+
+          <Button type="primary" v-show="question.replay === '' && submitBtn && !isOverDueTime" @click="cardShowFn(question, index, $event)" class="replay-btn">答题</Button>
           
-          <Button type="ghost" v-show="question.answer !== ''" disabled class="have-replay-btn">已回答</Button>
+          <Button type="ghost" v-show="question.replay !== '' && !isOverDueTime" disabled class="have-replay-btn">已回答</Button>
+
+          <Button type="ghost" v-show="isOverDueTime" disabled class="have-over-due-time">已过期</Button>
+
         </div>
         <!-- 作业加载进度条 -->
         <Progress :percent="percent" style="position: absolute;
@@ -64,7 +73,7 @@
       <div slot="footer">
         <Button type="text" @click="questionMod = false; cardShow = false;" v-show="submitBtn">取消</Button>
         <Button type="text" @click="cancelMod" v-show="!submitBtn">关闭</Button>
-        <Button type="primary" v-show="submitBtn" @click="addIsSubmit">交</Button>
+        <Button type="primary" v-show="submitBtn && !isOverDueTime" @click="addIsSubmit">交</Button>
         <Button type="primary" v-show="!submitBtn" disabled>已交</Button>
       </div>
     </Modal>
@@ -90,13 +99,13 @@
   transform: translate(-50%, -50%);
   z-index: 1001;
 }
-.replay-btn, .have-replay-btn {
+.replay-btn, .have-replay-btn, .have-over-due-time {
   position: absolute;
   right: 10px;
   top: 24px;
   display: none;
 }
-.have-replay-btn {
+.have-replay-btn, .have-over-due-time {
   display: inline-block;
 }
 .ivu-modal-body {

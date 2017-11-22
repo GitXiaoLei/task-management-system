@@ -244,9 +244,12 @@ export default {
         /* DO SOMETHING WITH workbook HERE */
         const first_worksheet = workbook.Sheets[workbook.SheetNames[0]]
         const arr = XLSX.utils.sheet_to_json(first_worksheet, { header: 1 })
-        arr.length = arr.length - 1
         console.log(arr)
         // 上传题目
+        if (that.subjectId === 0) {
+          that.errorMsg('没有选择课程')
+          return
+        }
         function addQuestions(arrIndex) {
           const index = arrIndex
           return function (cb) {

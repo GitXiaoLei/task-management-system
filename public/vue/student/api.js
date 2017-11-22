@@ -30,3 +30,6 @@ export const getReportCard = (params) => axios.get('/api/student/report_card', {
 
 // 获取学生首页页面初始化数据
 export const getStudentWebData = (params) => axios.get('/api/student/index', { params })
+
+// 获取某次作业的题目和标准答案
+export const getTaskQuestionAnswer = (params) => axios.post('/api/task_question_answer/list', qs.stringify(params))

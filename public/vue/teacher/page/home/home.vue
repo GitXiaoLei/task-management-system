@@ -2,7 +2,9 @@
   <contents class="index">
     <h2>作业情况</h2>
     <div class="wrap">
+      <!-- 有布置的作业 -->
       <div
+        v-if="taskData.length > 0"
         v-for="task of taskData"
         :key="task.id">
         <h3><span class="task-name">{{task.task_name}}</span> 作业</h3>
@@ -15,8 +17,9 @@
           您 <span class="check-count">批改了{{ cla.checkCount }}</span> 人的作业
         </div>
       </div>
+      <!-- 没有布置的作业 -->
+      <div v-else>还没有布置作业，<router-link to="/teacher/publish">去布置作业</router-link></div>
     </div>
-    
   </contents>
 </template>
 

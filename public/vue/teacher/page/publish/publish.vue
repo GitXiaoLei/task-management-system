@@ -7,7 +7,10 @@
           <h2 slot="title">创建作业</h2>
           <!-- 选择课程 -->
           <h3 style="margin: 10px 0;">选择课程</h3>
-          <RadioGroup v-model="subjectId" type="button" size="large">
+          <RadioGroup 
+            v-if="subjects.length > 0" 
+            v-model="subjectId" 
+            type="button" size="large">
             <Tooltip
               placement="top"
               v-for="subject of subjects" 
@@ -16,6 +19,7 @@
               <Radio :label="subject.subject_id" :disabled="isDisabled" style="margin-left: 10px;">{{subject.subject_name}}</Radio>
             </Tooltip>
           </RadioGroup>
+          <div v-else style="text-align: center; color: #888;">还没有选择课程,前往 <router-link to="/teacher/personal">个人中心</router-link> 添加课程</div>
           <h3 style="margin: 10px 0;">作业名称</h3>
           <Input v-model="taskName" placeholder="请输入作业名称" :disabled="isDisabled" style="width: 336px; margin-left: 10px;"></Input>
           <h3 style="margin: 10px 0;">过期时间</h3>

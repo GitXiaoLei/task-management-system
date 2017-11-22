@@ -764,6 +764,25 @@ const route = (app) => {
       res.apiErr(e)
     }
   })
+  // 获取某次作业的题目和标准答案
+  app.post('/api/task_question_answer/list', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const questionList = await User.getQuestionesAnswer(req.body.task_id, req._userInfo.user_id)
+      res.apiData(questionList, '获取题目和答案成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
   // 提交单个题目的回答
   app.post('/api/answer/add', async (req, res) => {
     // 没有登录
