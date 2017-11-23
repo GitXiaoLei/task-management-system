@@ -489,6 +489,7 @@ export default {
     }
   },
   created() {
+    document.title = '个人中心'
     getPersonalWebData()
     .then((data) => {
       data = data.data

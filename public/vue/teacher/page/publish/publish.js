@@ -854,6 +854,7 @@ export default {
     }
   },
   created () {
+    document.title = '布置作业'
     // 获取自己所教的课程
     getPublishWebData()
     .then((data) => {

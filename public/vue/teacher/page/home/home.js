@@ -23,7 +23,7 @@ export default {
     
   },
   created() {
-    
+    document.title = '首页'
   },
   mounted () {
     getTeacherIndexWebData()

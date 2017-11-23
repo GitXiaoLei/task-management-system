@@ -3,18 +3,19 @@
     <h2>作业情况</h2>
     <div class="wrap">
       <!-- 有布置的作业 -->
-      <div
-        v-if="taskData.length > 0"
-        v-for="task of taskData"
-        :key="task.id">
-        <h3><span class="task-name">{{task.task_name}}</span> 作业</h3>
+      <div v-if="taskData.length > 0">
         <div
-          v-for="cla of task.classes"
-          :key="cla.id"
-          style="text-indent: 30px;">
-          <span class="class-name">{{ cla.class_name }}</span> 班 <span class="count">总共{{ cla.count }}</span> 人；
-          有 <span class="finish-count">{{ cla.finishCount }}人完成</span> 了作业；
-          您 <span class="check-count">批改了{{ cla.checkCount }}</span> 人的作业
+          v-for="task of taskData"
+          :key="task.id">
+          <h3><span class="task-name">{{task.task_name}}</span> 作业</h3>
+          <div
+            v-for="cla of task.classes"
+            :key="cla.id"
+            style="text-indent: 30px;">
+            <span class="class-name">{{ cla.class_name }}</span> 班 <span class="count">总共{{ cla.count }}</span> 人；
+            有 <span class="finish-count">{{ cla.finishCount }}人完成</span> 了作业；
+            您 <span class="check-count">批改了{{ cla.checkCount }}</span> 人的作业
+          </div>
         </div>
       </div>
       <!-- 没有布置的作业 -->

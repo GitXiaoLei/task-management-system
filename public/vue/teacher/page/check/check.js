@@ -185,6 +185,9 @@ export default {
   computed: {
     
   },
+  created () {
+    document.title = '批改作业'
+  },
   mounted () {
     getCheckWebData()
     .then((data) => {

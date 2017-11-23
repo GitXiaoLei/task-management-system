@@ -4,7 +4,7 @@
       <!-- 创建作业 -->
       <div class="create-task-wrap">
         <Card style="width:380px; margin: 40px;">
-          <h2 slot="title">创建作业</h2>
+          <h2 slot="title">布置作业</h2>
           <!-- 选择课程 -->
           <h3 style="margin: 10px 0;">选择课程</h3>
           <RadioGroup 
@@ -25,7 +25,7 @@
           <h3 style="margin: 10px 0;">过期时间</h3>
           <DatePicker :disabled="isDisabled" placement="top-start" type="date" placeholder="选择作业过期时间" style="width: 336px; margin-left: 10px;" v-model="overdueTime"></DatePicker>
           <!-- 创建作业按钮 -->
-          <Button type="primary" @click="createTask" :disabled="isDisabled" style="float: right; margin: 10px 0;">创建</Button>
+          <Button type="primary" @click="createTask" :disabled="isDisabled" style="float: right; margin: 10px 0;">布置</Button>
         </Card>
       </div>
       <!-- 作业记录 -->
@@ -72,7 +72,7 @@
           :data="[noPublishedTaskList, publishedTaskList]"
           @li-selected="getTaskInfo"
           @li-del="delTask">
-            <Button @click="toCreateTaskStatus" type="primary" size="small" slot="headButton">创建作业</Button>
+            <Button @click="toCreateTaskStatus" type="primary" size="small" slot="headButton">布置作业</Button>
         </tab-list>
       </div>
       

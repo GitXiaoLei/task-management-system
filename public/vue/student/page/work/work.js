@@ -260,6 +260,7 @@ export default {
     
   },
   created() {
+    document.title = '做作业'
     getWorkWebData()
     .then((data) => {
       data = data.data

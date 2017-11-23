@@ -82,6 +82,7 @@ export default {
     }
   },
   created() {
+    document.title = '个人中心'
     getUserInfo()
       .then((data) => {
         data = data.data

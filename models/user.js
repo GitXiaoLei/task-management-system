@@ -824,6 +824,7 @@ const User = {
               checkCount: 0,
               count: 0
             })
+          // 班级有学生
           } else {
             const count =  await DB.instance('r').query('select count(*) from student_task where user_id in ' + str + ' and task_id=' + taskIdArr[i].task_id)
             

@@ -32,5 +32,8 @@ export default {
     .catch((e) => {
       console.error(e)
     })
+  },
+  created () {
+    document.title = '首页'
   }
 }

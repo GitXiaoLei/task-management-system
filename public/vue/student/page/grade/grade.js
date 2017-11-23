@@ -151,6 +151,6 @@ export default {
     })
   },
   created() {
-    
+    document.title = '查看成绩'
   }
 }
