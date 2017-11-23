@@ -1,0 +1,11 @@
+INSERT INTO `user_role` (`user_role_id`, `user_id`, `role_id`, `created_time`, `updated_time`) VALUES (1, 1, 1, 0, NULL);
+INSERT INTO `user_role` (`user_role_id`, `user_id`, `role_id`, `created_time`, `updated_time`) VALUES (3, 2, 3, 1508124871, 1508124871);
+INSERT INTO `user_role` (`user_role_id`, `user_id`, `role_id`, `created_time`, `updated_time`) VALUES (4, 3, 4, 1508124876, 1508124876);
+INSERT INTO `user_role` (`user_role_id`, `user_id`, `role_id`, `created_time`, `updated_time`) VALUES (5, 4, 5, 1508124880, 1508124880);
+INSERT INTO `user_role` (`user_role_id`, `user_id`, `role_id`, `created_time`, `updated_time`) VALUES (6, 5, 5, 1509604636, 1509604636);
+INSERT INTO `user_role` (`user_role_id`, `user_id`, `role_id`, `created_time`, `updated_time`) VALUES (7, 6, 5, 1509951393, 1509951393);
+INSERT INTO `user_role` (`user_role_id`, `user_id`, `role_id`, `created_time`, `updated_time`) VALUES (8, 7, 5, 1510136253, 1510136253);
+INSERT INTO `user_role` (`user_role_id`, `user_id`, `role_id`, `created_time`, `updated_time`) VALUES (9, 67, 5, 1511330286, 1511330286);
+INSERT INTO `user_role` (`user_role_id`, `user_id`, `role_id`, `created_time`, `updated_time`) VALUES (10, 68, 4, 1511330290, 1511330290);
+INSERT INTO `user_role` (`user_role_id`, `user_id`, `role_id`, `created_time`, `updated_time`) VALUES (11, 69, 5, 1511330294, 1511330294);
+INSERT INTO `user_role` (`user_role_id`, `user_id`, `role_id`, `created_time`, `updated_time`) VALUES (12, 70, 5, 1511330298, 1511330298);
