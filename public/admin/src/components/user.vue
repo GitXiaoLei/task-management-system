@@ -4,15 +4,14 @@
     <div v-if="canVisit === 1">
       <!-- 添加用户 -->
       <h2>添加单个用户</h2>
-      <el-form :inline="true" :model="addUserForm" ref="addUserForm" class="add-form">
-        <el-form-item label="用户名" required>
+      <el-form :inline="true" :model="addUserForm" :rules="rules" ref="addUserForm" class="add-form">
+        <el-form-item label="用户名" prop="username">
           <el-input v-model="addUserForm.username" placeholder="请输入用户名"></el-input>
         </el-form-item>
         <el-button type="primary" @click="addUser('addUserForm')">添加</el-button>
         </el-form-item>
-        
       </el-form>
-      <el-popover
+      <!-- <el-popover
         ref="popover"
         placement="right"
         title="Excel文件格式说明"
@@ -20,9 +19,9 @@
         trigger="click">
         <img src="../../../common/img/admin-help.png" alt="" style="width: 800px;">
         <p style="font-weight: bold; margin-top: 10px;">*请严格按照上面图片的格式导入用户</p>
-      </el-popover>
+      </el-popover> -->
       <h2>批量添加用户
-        <i style="color: #20a0ff; cursor: pointer;" v-popover:popover class="el-icon-information"></i>
+        <!-- <i style="color: #20a0ff; cursor: pointer;" v-popover:popover class="el-icon-information"></i> -->
       </h2>
       <div class="file-wrap">
         <input type="file" @change="readFile" @drag="readFile">
@@ -89,6 +88,9 @@
           </el-form-item>
           <el-form-item label="真实姓名" required>
             <el-input v-model="editUserForm.real_name" placeholder="请输入真实姓名"></el-input>
+          </el-form-item>
+          <el-form-item label="学号" required>
+            <el-input v-model="editUserForm.student_num" placeholder="请输入学号"></el-input>
           </el-form-item>
           <el-form-item label="性别" required>
             <el-select v-model="editUserForm.sex">
@@ -169,7 +171,8 @@ export default {
         class_name: '',
         student_id: '',
         phone_num: '',
-        qq_num: ''
+        qq_num: '',
+        student_num: ''
       },
       editDialogVisible: false,
       roleDialogVisible: false,
@@ -179,7 +182,12 @@ export default {
       sexArr: [],
       checkboxArr: [],
       roleData: [], // 角色信息
-      tempRow: {}
+      tempRow: {},
+      rules: {
+        username: [
+          { required: true, message: '用户名不能为空', trigger: 'blur' }
+        ]
+      }
     }
   },
   methods: {
@@ -272,6 +280,15 @@ export default {
           }
         })
         this.userData = data.data
+        this.userData.forEach((user) => {
+          if (user.sex === 0) {
+            user.sex = '未设置'
+          } else if (user.sex === 1) {
+            user.sex = '男'
+          } else {
+            user.sex = '女'
+          }
+        })
       })
       .catch((err) => {
         this.errorMsg(err)
@@ -280,23 +297,22 @@ export default {
     // 添加用户
     addUser (formName) {
       this.$refs[formName].validate((valid) => {
-        if (!valid) {
-          return
+        if (valid) {
+          // 发送请求
+          addUser({ username: this.addUserForm.username })
+          .then((data) => {
+            data = data.data
+            if (data.code !== 1) {
+              this.errorMsg(data.message)
+              return
+            }
+            this.successMsg(data.message)
+            this.getUser()
+          })
+          .catch((err) => {
+            this.errorMsg(err)
+          })
         }
-        // 发送请求
-        addUser({ username: this.addUserForm.username })
-        .then((data) => {
-          data = data.data
-          if (data.code !== 1) {
-            this.errorMsg(data.message)
-            return
-          }
-          this.successMsg(data.message)
-          this.getUser()
-        })
-        .catch((err) => {
-          this.errorMsg(err)
-        })
       })
     },
     // 删除用户：同时也要删除user_role表中user_id所对应的数据
@@ -350,6 +366,7 @@ export default {
         }
         this.successMsg(data.message)
         this.editDialogVisible = false
+        this.getUser()
       })
       .catch((err) => {
         this.errorMsg(err)

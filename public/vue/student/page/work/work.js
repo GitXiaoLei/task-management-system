@@ -140,10 +140,10 @@ export default {
     },
     // 获取某次作业的题目
     getTaskQuestion (taskId, taskName, overdueTime, isSubmit, index, event) {
-      overdueTime = moment(overdueTime).unix()
+      // overdueTime = moment(overdueTime).unix()
       const curTime = moment().unix()
       // 超期
-      if (curTime > overdueTime) {
+      if (curTime > moment(overdueTime).unix()) {
         this.errorMsg('作业已过期，不能提交答案')
         this.isOverDueTime = true
         // 获取题目和答案（过期了能够看到答案）

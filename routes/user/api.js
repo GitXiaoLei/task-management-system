@@ -1061,6 +1061,25 @@ const route = (app) => {
       res.apiErr(e)
     }
   })
+  // 老师是否有未批改的作业
+  app.get('/api/is_checked', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const result = await User.getIsChecked(req._userInfo.user_id)
+      res.apiData(result, '获取学生首页初始化数据成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
 }
 
 module.exports = route

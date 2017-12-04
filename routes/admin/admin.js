@@ -712,7 +712,7 @@ const route = (app) => {
     })
   })
   // 更新用户信息
-  app.post('/api/user/update', (req, res) => {
+  app.post('/api/user/update', async (req, res) => {
     // 没有登录
     if (!req._authInfo) {
       res.apiErr({ code: 0, message: '请先登录' })
@@ -731,17 +731,20 @@ const route = (app) => {
       class_name: req.body.class_name,
       phone_num: req.body.phone_num,
       qq_num: req.body.qq_num,
+      student_num: req.body.student_num,
       updated_time: Moment().unix()
     }
     const conditions = { user_id: req.body.user_id }
-    Admin
-    .updateUser(updateData, conditions)
-    .then((result) => {
-      res.apiData(result, '更新用户信息成功')
-    })
-    .catch((err) => {
+    try {
+      const result = await Admin.updateUser(updateData, conditions)
+      if (!result) {
+        res.apiErr({ code: 0, message: '班级名称不存在' })
+        return
+      }
+      res.apiData(result, '修改用户信息成功')
+    } catch (err) {
       res.apiErr(err)
-    })
+    }
   })
   // 给某个用户添加某个角色
   app.post('/api/user_role/add', (req, res) => {

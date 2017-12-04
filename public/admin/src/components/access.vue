@@ -4,11 +4,11 @@
     <div v-if="canVisit === 1">
       <!-- 添加权限 -->
       <h2>添加权限</h2>
-      <el-form :inline="true" :model="addAccessForm" ref="addAccessForm" class="add-form">
-        <el-form-item label="标题" required>
+      <el-form :inline="true" :rules="rules" :model="addAccessForm" ref="addAccessForm" class="add-form">
+        <el-form-item label="标题" prop="title">
           <el-input v-model="addAccessForm.title" placeholder="请输入标题"></el-input>
         </el-form-item>
-        <el-form-item label="URL" required>
+        <el-form-item label="URL" prop="url">
           <el-input v-model="addAccessForm.url" placeholder="请输入地址"></el-input>
         </el-form-item><el-form-item>
         <el-button type="primary" @click="addAccess('addAccessForm')">添加</el-button>
@@ -82,7 +82,15 @@ export default {
       },
       dialogVisible: false,
       editIndex: -1,
-      canVisit: -1
+      canVisit: -1,
+      rules: {
+        title: [
+          { required: true, message: '标题不能为空', trigger: 'blur' }
+        ],
+        url: [
+          { required: true, message: '地址不能为空', trigger: 'blur' }
+        ]
+      }
     }
   },
   methods: {

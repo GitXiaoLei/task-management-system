@@ -59,3 +59,7 @@ export const getReportCard = (params) => axios.get('/api/report_card/list', { pa
 
 // 获取老师首页页面初始化数据
 export const getTeacherIndexWebData = (params) => axios.get('/api/teacher/index', { params })
+
+
+// 获取老师首页页面初始化数据
+export const getIsChecked = (params) => axios.get('/api/is_checked', { params })

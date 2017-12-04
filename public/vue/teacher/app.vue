@@ -5,7 +5,7 @@
         <div class="layout-ceiling-main">
           <router-link to="/">首页</router-link>
           <router-link to="/teacher/publish">布置作业</router-link>
-          <router-link to="/teacher/check">批改作业</router-link>
+          <router-link to="/teacher/check" :class="{'check-task': isChecked}">批改作业</router-link>
           <router-link to="/teacher/grade">查看成绩</router-link>
           <router-link to="/teacher/personal">个人中心</router-link>
           <Dropdown placement="bottom-end" trigger="click">
@@ -25,15 +25,17 @@
 </template>
 
 <script>
-import { loginout } from './api.js'
+import { loginout, getIsChecked } from './api.js'
 export default {
   name: 'app',
   data () {
     return {
-      userName: 'xl'
+      userName: 'xl',
+      isChecked: false,
     }
   },
   methods: {
+    // 退出登录
     loginout () {
       loginout()
       .then((data) => {
@@ -53,6 +55,23 @@ export default {
     errorMsg (msg) {
       this.$Message.error(msg)
     }
+  },
+  mounted () {
+    getIsChecked()
+    .then((data) => {
+      data = data.data
+      if (data.code !== 1) {
+        console.log(data.message)
+        return
+      }
+      console.log('data.data = ')
+      console.log(data.data)
+      if (data.data) {
+        this.isChecked = true
+      } else {
+        this.isChecked = false
+      }
+    })
   }
 }
 </script>
@@ -78,5 +97,19 @@ export default {
   /* color: #9ba7b5; */
   color: #eee;
   margin-left: 20px;
+}
+.check-task {
+  position: relative;
+}
+.check-task:after {
+  content: '';
+  display: block;
+  position: absolute;
+  right: -5px;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f00;
 }
 </style>

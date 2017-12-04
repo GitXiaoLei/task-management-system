@@ -4,8 +4,8 @@
     <div v-if="canVisit === 1">
       <!-- 添加院系 -->
       <h2>添加院系</h2>
-      <el-form :inline="true" :model="addDepartmentForm" ref="addDepartmentForm" class="add-form">
-        <el-form-item label="院系名称" required>
+      <el-form :inline="true" :rules="rules" :model="addDepartmentForm" ref="addDepartmentForm" class="add-form">
+        <el-form-item label="院系名称" prop="name">
           <el-input v-model="addDepartmentForm.name" placeholder="请输入院系名称"></el-input>
         </el-form-item>
         <el-button type="primary" @click="addDepartment('addDepartmentForm')">添加</el-button>
@@ -46,7 +46,12 @@ export default {
       addDepartmentForm: {
         name: ''
       },
-      canVisit: -1
+      canVisit: -1,
+      rules: {
+        name: [
+          { required: true, message: '院系名不能为空', trigger: 'blur' }
+        ]
+      }
     }
   },
   methods: {

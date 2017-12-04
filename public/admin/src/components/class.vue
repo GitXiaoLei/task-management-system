@@ -4,8 +4,8 @@
     <div v-if="canVisit === 1">
       <!-- 添加班级 -->
       <h2>添加班级</h2>
-      <el-form :inline="true" :model="addClassForm" ref="addClassForm" class="add-form">
-        <el-form-item label="班级名称" required>
+      <el-form :inline="true" :rules="rules" :model="addClassForm" ref="addClassForm" class="add-form">
+        <el-form-item label="班级名称" prop="name">
           <el-input v-model="addClassForm.name" placeholder="请输入班级名称"></el-input>
         </el-form-item>
         <el-button type="primary" @click="addClass('addClassForm')">添加</el-button>
@@ -46,7 +46,12 @@ export default {
       addClassForm: {
         name: ''
       },
-      canVisit: -1
+      canVisit: -1,
+      rules: {
+        name: [
+          { required: true, message: '班级名称不能为空', trigger: 'blur' }
+        ]
+      }
     }
   },
   methods: {

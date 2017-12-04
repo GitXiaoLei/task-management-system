@@ -912,6 +912,30 @@ const User = {
       throw new Error(e)
     }
   },
+  // 获取老师是否有未批改的作业
+  async getIsChecked (userId) {
+    try {
+      const taskIdArr = await DB.instance('r').query('select task_id from task where user_id=' + userId)
+      if (taskIdArr.length === 0) {
+        return false
+      }
+      let sql = 'select * from student_task where is_check=0 and task_id in ('
+      taskIdArr.forEach((taskId, i, arr) => {
+        if (arr.length - 1 === i) {
+          sql += taskId.task_id + ')'
+        } else {
+          sql += taskId.task_id + ', '
+        }
+      })
+      const studentTaskArr = await DB.instance('r').query(sql)
+      if (studentTaskArr.length === 0) {
+        return false
+      }
+      return true
+    } catch (e) {
+      throw new Error(e)
+    }
+  }
 }
 
 module.exports = User

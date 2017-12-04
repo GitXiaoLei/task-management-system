@@ -44,8 +44,10 @@ export default {
           this.errorMsg(data.message)
           return
         }
-        this.errorMsg(data.message)
-        window.location.href = '/'
+        this.successMsg(data.message)
+        setTimeout(() => {
+          window.location.href = '/'
+        }, 1500)
       })
       .catch((err) => {
         console.error(err)

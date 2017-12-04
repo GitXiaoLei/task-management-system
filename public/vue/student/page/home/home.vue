@@ -15,6 +15,7 @@
         <span v-if="task.is_finish === 0" class="no-finished">未完成</span>
         <br>
       </div>
+      <br>
     </div>
     
   </contents>

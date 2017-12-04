@@ -4,8 +4,8 @@
     <div v-if="canVisit === 1">
       <!-- 添加角色 -->
       <h2>添加角色</h2>
-      <el-form :inline="true" :model="addRoleForm" ref="addRoleForm" class="add-form">
-        <el-form-item label="角色名" required>
+      <el-form :inline="true" :rules="rules" :model="addRoleForm" ref="addRoleForm" class="add-form">
+        <el-form-item label="角色名" prop="role_name">
           <el-input v-model="addRoleForm.role_name" placeholder="请输入角色名"></el-input>
         </el-form-item>
         <el-form-item>
@@ -71,7 +71,12 @@ export default {
       checkboxArr: [],
       dialogVisible: false,
       tempRow: {},
-      canVisit: -1
+      canVisit: -1,
+      rules: {
+        role_name: [
+          { required: true, message: '角色名不能为空', trigger: 'blur' }
+        ]
+      }
     }
   },
   methods: {
@@ -93,23 +98,22 @@ export default {
     // 添加角色
     addRole (formName) {
       this.$refs[formName].validate((valid) => {
-        if (!valid) {
-          return
+        if (valid) {
+          // 发送请求
+          addRole({ role_name: this.addRoleForm.role_name })
+          .then((data) => {
+            data = data.data
+            if (data.code !== 1) {
+              this.errorMsg(data.message)
+              return
+            }
+            this.successMsg(data.message)
+            this.getRole()
+          })
+          .catch((err) => {
+            this.errorMsg(err)
+          })
         }
-        // 发送请求
-        addRole({ role_name: this.addRoleForm.role_name })
-        .then((data) => {
-          data = data.data
-          if (data.code !== 1) {
-            this.errorMsg(data.message)
-            return
-          }
-          this.successMsg(data.message)
-          this.getRole()
-        })
-        .catch((err) => {
-          this.errorMsg(err)
-        })
       })
     },
     // 删除角色：同时要将该角色的权限删除掉

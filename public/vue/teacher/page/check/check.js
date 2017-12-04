@@ -189,6 +189,7 @@ export default {
     document.title = '批改作业'
   },
   mounted () {
+    // 获取页面初始化数据
     getCheckWebData()
     .then((data) => {
       data = data.data

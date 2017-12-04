@@ -4,11 +4,11 @@
     <div v-if="canVisit === 1">
       <!-- 添加课程 -->
       <h2>添加课程</h2>
-      <el-form :inline="true" :model="addSubjectForm" ref="addSubjectForm" class="add-form">
-        <el-form-item label="课程名称" required>
+      <el-form :inline="true" :rules="rules" :model="addSubjectForm" ref="addSubjectForm" class="add-form">
+        <el-form-item label="课程名称" prop="name">
           <el-input v-model="addSubjectForm.name" placeholder="请输入课程名称"></el-input>
         </el-form-item>
-        <el-form-item label="课程号" required>
+        <el-form-item label="课程号"  prop="num">
           <el-input v-model="addSubjectForm.num" placeholder="请输入课程名称"></el-input>
         </el-form-item>
         <el-button type="primary" @click="addSubject('addSubjectForm')">添加</el-button>
@@ -54,7 +54,15 @@ export default {
         name: '',
         num: ''
       },
-      canVisit: -1
+      canVisit: -1,
+      rules: {
+        name: [
+          { required: true, message: '课程名不能为空', trigger: 'blur' }
+        ],
+        num: [
+          { required: true, message: '课程号不能为空', trigger: 'blur' }
+        ]
+      }
     }
   },
   methods: {

@@ -560,18 +560,20 @@ const Admin = {
     })
   },
   // 更新用户信息
-  updateUser (updateData, conditions) {
-    return new Promise((resolve, reject) => {
-      DB
-      .instance('w')
-      .update('user', updateData, conditions)
-      .then((result) => {
-        resolve(result)
-      })
-      .catch((err) => {
-        reject(err)
-      })
-    })
+  async updateUser (updateData, conditions) {
+    try {
+      // 查询是否有该班级名称
+      const classIdArr = await DB.instance('r').query('select class_id from class where class_name="' + updateData.class_name + '"')
+      console.log('nininini')
+      if (classIdArr.length === 0) {
+        return false
+      }
+      updateData.class_id = classIdArr[0].class_id
+      const result = await DB.instance('w').update('user', updateData, conditions)
+      return result
+    } catch (e) {
+      throw new Error(e)
+    }
   },
   // 查询一个用户是否存在
   async getOne (conditions) {
