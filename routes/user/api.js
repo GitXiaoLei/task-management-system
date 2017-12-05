@@ -715,8 +715,22 @@ const route = (app) => {
     }
     try {
       const data = await User.getStudentTask(req._userInfo.user_id)
-      console.log(data)
-      const is_submit = data.length > 0 ? true : false
+      let is_submit
+      let newData = []
+      if (!data) {
+        is_submit = false
+      } else {
+        data.forEach((d, i, arr) => {
+          if (d.overdue_time > Moment().unix()) {
+            newData.push(d)
+          }
+        })
+      }
+      if (newData.length > 0) {
+        is_submit = true
+      } else {
+        is_submit = false
+      }
       res.apiData({ is_submit }, '获取用户是否有未提交的作业成功')
     } catch (e) {
       res.apiErr(e)

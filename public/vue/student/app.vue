@@ -9,7 +9,7 @@
           <router-link to="/student/personal">个人中心</router-link>
           <Dropdown placement="bottom-end" trigger="click">
             <a href="javascript:;">
-              {{userData.username}} 同学
+              {{userData.real_name}} 同学
               <Icon type="arrow-down-b"></Icon>
             </a>
             <DropdownMenu slot="list">

@@ -10,7 +10,7 @@
           <router-link to="/teacher/personal">个人中心</router-link>
           <Dropdown placement="bottom-end" trigger="click">
             <a href="javascript:;">
-              {{userName}} 老师
+              {{userData.real_name}} 老师
               <Icon type="arrow-down-b"></Icon>
             </a>
             <DropdownMenu slot="list">
@@ -25,12 +25,12 @@
 </template>
 
 <script>
-import { loginout, getIsChecked } from './api.js'
+import { loginout, getIsChecked, getUserData } from './api.js'
 export default {
   name: 'app',
   data () {
     return {
-      userName: 'xl',
+      userData: {},
       isChecked: false,
     }
   },
@@ -57,6 +57,7 @@ export default {
     }
   },
   mounted () {
+    // 获取老师是否有未批改的作业
     getIsChecked()
     .then((data) => {
       data = data.data
@@ -64,13 +65,25 @@ export default {
         console.log(data.message)
         return
       }
-      console.log('data.data = ')
-      console.log(data.data)
       if (data.data) {
         this.isChecked = true
       } else {
         this.isChecked = false
       }
+    })
+    // 获取老师个人信息
+    // 获取用户信息
+    getUserData()
+    .then((data) => {
+      data = data.data
+      if (data.code !== 1) {
+        this.errorMsg('获取个人信息失败')
+        return
+      }
+      this.userData = data.data[0]
+    })
+    .catch((e) => {
+      this.errorMsg(e)
     })
   }
 }

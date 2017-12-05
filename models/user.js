@@ -462,7 +462,20 @@ const User = {
   // 查询学生要做的作业id
   async getStudentTask (userId) {
     try {
-      return DB.instance('r').query('select is_submit from student_task where user_id=' + userId + ' and is_submit=0')
+      const taskIdArr = await DB.instance('r').query('select task_id from student_task where user_id=' + userId + ' and is_submit=0')
+      if (taskIdArr.length === 0) {
+        return false
+      }
+      let sql = 'select * from task where task_id in ('
+      taskIdArr.forEach((taskId, i, arr) => {
+        if (arr.length - 1 === i) {
+          sql += taskId.task_id + ')'
+        } else {
+          sql += taskId.task_id + ', '
+        }
+      })
+      const data = await DB.instance('r').query(sql)
+      return data
     } catch (e) {
       throw new Error(e)
     }
