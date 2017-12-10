@@ -1029,9 +1029,18 @@ const route = (app) => {
       return
     }
     try {
+      const userData = await User.getUserById(req._userInfo.user_id)
       const classId = await User.getStudentClassId(req._userInfo.user_id)
       const teacherUserId = await User.getTeacherUserId(req.query.subject_id, classId)
       const reportCardData = await User.getReportCard(req.query.subject_id, classId, teacherUserId)
+      // 只获取自己的成绩单
+      if (req.query.is_self == 1) {
+        for (let i = 1, len = reportCardData.length; i < len; i++) {
+          if (userData[0].student_num != reportCardData[i][0] || userData[0].real_name != reportCardData[i][1]) {
+            reportCardData.splice(i, 1)
+          }
+        }
+      }
       res.apiData(reportCardData, '获取成绩单数据成功')
     } catch (e) {
       res.apiErr(e)

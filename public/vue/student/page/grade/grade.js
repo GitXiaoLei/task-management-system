@@ -23,13 +23,35 @@ export default {
         ],
         colHeaders: true,
         rowHeaders: true
-      }
+      },
+      isSelf: 1,
+      typeTitle: '个人成绩',
     }
   },
   methods: {
-    // 获取成绩单
+    // 获取个人成绩单
+    getPersonalReportCard () {
+      if (this.subjectId === 0) {
+        this.errorMsg('请选选择课程！')
+        return
+      }
+      this.isSelf = 1
+      this.typeTitle = '个人成绩'
+      this.getReportCard()
+    },
+    // 获取全班成绩单
+    getClassReportCard () {
+      if (this.subjectId === 0) {
+        this.errorMsg('请选选择课程！')
+        return
+      }
+      this.isSelf = 0
+      this.typeTitle = '全班成绩'
+      this.getReportCard()
+    },
+    // 获取成绩单：默认只获取自己的成绩单，is_self为1时，获取自己的成绩单；为0时，获取全班的成绩单
     getReportCard () {
-      const params = { subject_id: this.subjectId }
+      const params = { subject_id: this.subjectId, is_self: this.isSelf }
       getReportCard(params)
       .then((data) => {
         data = data.data

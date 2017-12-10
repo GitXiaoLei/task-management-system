@@ -15,9 +15,17 @@
             <Radio :label="subject.subject_id" style="margin-left: 10px;">{{subject.subject_name}}</Radio>
           </Tooltip>
         </RadioGroup>
+        <!-- 选择类型 -->
+        <h3 style="margin: 10px 0;">选择类型</h3>
+        <div style="padding-left: 10px;">
+          
+          <Button type="ghost" @click="getPersonalReportCard">个人成绩</Button>
+          <Button type="ghost" @click="getClassReportCard">全班成绩</Button>
+        </div>
       </Card>
     </div>
     <!-- 表格 -->
+    <h2 style="padding-left: 20px;">{{ typeTitle }}</h2>
     <div id="hot-preview">
       <HotTable :root="root" :settings="hotSettings"></HotTable>
       <Button size="small" class="download-btn" type="ghost" @click="exportExcel" v-if="isDown">下载</Button>
