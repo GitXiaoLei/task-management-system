@@ -63,3 +63,9 @@ export const getTeacherIndexWebData = (params) => axios.get('/api/teacher/index'
 
 // 获取老师首页页面初始化数据
 export const getIsChecked = (params) => axios.get('/api/is_checked', { params })
+
+// 确认输入的原密码是否正确
+export const confirmPassword = (params) => axios.post('/api/password/confirm', qs.stringify(params))
+
+// 确认输入新密码
+export const newPassword = (params) => axios.post('/api/password/new', qs.stringify(params))

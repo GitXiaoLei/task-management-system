@@ -948,7 +948,26 @@ const User = {
     } catch (e) {
       throw new Error(e)
     }
+  },
+  async confirmPassword (userId, password) {
+    try {
+      const row = await DB.instance('r').query('select * from user where password=' + password + ' and user_id=' + userId)
+      if (row.length === 0) {
+        return false
+      }
+      return true
+    } catch (e) {
+      throw new Error(e)
+    }
+  },
+  async newPassword (userId, password) {
+    try {
+      return await DB.instance('r').query('update user set password=' + password + ' where user_id=' + userId)
+    } catch (e) {
+      throw new Error(e)
+    }
   }
+  
 }
 
 module.exports = User

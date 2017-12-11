@@ -1103,6 +1103,44 @@ const route = (app) => {
       res.apiErr(e)
     }
   })
+  // 确认输入的原密码是否正确
+  app.post('/api/password/confirm', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const result = await User.confirmPassword(req._userInfo.user_id, req.body.password)
+      res.apiData(result, '请求数据成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
+  // 确认输入新密码
+  app.post('/api/password/new', async (req, res) => {
+    // 没有登录
+    if (!req._authInfo) {
+      res.apiErr({ code: 0, message: '请先登录' })
+      return
+    }
+    // 权限控制
+    if (!req._canVisit) {
+      res.apiErr({ code: 0, message: '你没有权限访问' })
+      return
+    }
+    try {
+      const result = await User.newPassword(req._userInfo.user_id, req.body.newPassword)
+      res.apiData(result, '请求数据成功')
+    } catch (e) {
+      res.apiErr(e)
+    }
+  })
 }
 
 module.exports = route

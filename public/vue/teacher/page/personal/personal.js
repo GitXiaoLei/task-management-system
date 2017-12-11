@@ -1,10 +1,13 @@
 import contents from '../../../components/content.vue'
-import { getPersonalWebData, updateStudentInfo, getSubjectList, delSubject, addSubject, getClassList, addClass, delClass } from '../../api.js'
+import { getPersonalWebData, updateStudentInfo, getSubjectList, delSubject, addSubject, getClassList, addClass, delClass, confirmPassword, newPassword } from '../../api.js'
 export default {
   name: 'personal',
   components: { contents },
   data() {
     return {
+      password: '', // 密码
+      newPassword: '', // 新密码
+      isRepassWord: false,
       form: { // 个人信息表单数据
         username: '',
         real_name: '',
@@ -170,6 +173,47 @@ export default {
     }
   },
   methods: {
+    anewPassword () {
+      if (this.newPassword === '') {
+        this.errorMsg('请输入新密码')
+        return
+      }
+      newPassword({ newPassword: this.newPassword })
+      .then((data) => {
+        data = data.data
+        if (data.code !== 1) {
+          this.errorMsg(data.message)
+          return
+        }
+        this.successMsg('密码修改成功')
+        this.isRepassWord = false
+        this.password = ''
+        this.newPassword = ''
+      })
+    },
+    confirmPassword () {
+      if (this.password === '') {
+        this.errorMsg('请输入原密码')
+        return
+      }
+      confirmPassword({ password: this.password })
+      .then((data) => {
+        data = data.data
+        if (data.code !== 1) {
+          this.errorMsg('原密码错误')
+          return
+        }
+        if (!data.data) {
+          this.errorMsg('原密码错误')
+          return
+        }
+        this.successMsg('请输入新密码')
+        this.isRepassWord = true
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+    },
     expandChange (row, status) {
       this.closeOtherRows(row, status)
     },

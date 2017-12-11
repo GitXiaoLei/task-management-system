@@ -43,6 +43,14 @@
           <Input v-model="form.qqNum" placeholder="请输入QQ号" v-show="modifi"></Input>
           <span class="span" v-show="!modifi">{{form.qqNum}}</span>
         </FormItem>
+        
+        <FormItem label="修改密码">
+          <Input type="password" v-model="password" placeholder="请输入原密码" style="width: 100px;" v-show="!isRepassWord"></Input>
+          <Button type="ghost" v-show="!isRepassWord" @click="confirmPassword">确认</Button>
+          <Input type="password" v-model="newPassword" placeholder="请输入新密码" style="width: 100px;" v-show="isRepassWord"></Input>
+          <Button type="ghost" v-show="isRepassWord" @click="anewPassword">修改</Button>
+        </FormItem>
+
         <FormItem v-show="modifi">
           <Button type="primary" style="float: right;" @click.native="handleModifi('form')">修改</Button>
           <Button type="ghost" style="float: right; margin-right: 8px" @click="cancel">取消</Button>

@@ -1,5 +1,5 @@
 import contents from '../../../components/content.vue'
-import { getUserInfo, updateStudentInfo } from '../../api.js'
+import { getUserInfo, updateStudentInfo, confirmPassword, newPassword } from '../../api.js'
 export default {
   name: 'personal',
   components: { contents },
@@ -24,9 +24,53 @@ export default {
         ],
       },
       modifi: false, // 是否修改资料
+      password: '', // 密码
+      newPassword: '', // 新密码
+      isRepassWord: false,
     }
   },
   methods: {
+    anewPassword () {
+      if (this.newPassword === '') {
+        this.errorMsg('请输入新密码')
+        return
+      }
+      newPassword({ newPassword: this.newPassword })
+      .then((data) => {
+        data = data.data
+        if (data.code !== 1) {
+          this.errorMsg(data.message)
+          return
+        }
+        this.successMsg('密码修改成功')
+        this.isRepassWord = false
+        this.password = ''
+        this.newPassword = ''
+      })
+    },
+    confirmPassword () {
+      if (this.password === '') {
+        this.errorMsg('请输入原密码')
+        return
+      }
+      confirmPassword({ password: this.password })
+      .then((data) => {
+        data = data.data
+        if (data.code !== 1) {
+          this.errorMsg('原密码错误')
+          return
+        }
+        if (!data.data) {
+          this.errorMsg('原密码错误')
+          return
+        }
+        this.successMsg('请输入新密码')
+        this.isRepassWord = true
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+    },
     // 提交按钮
     handleModifi (name) {
       this.$refs[name].validate((valid) => {

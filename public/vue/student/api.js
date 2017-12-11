@@ -33,3 +33,9 @@ export const getStudentWebData = (params) => axios.get('/api/student/index', { p
 
 // 获取某次作业的题目和标准答案
 export const getTaskQuestionAnswer = (params) => axios.post('/api/task_question_answer/list', qs.stringify(params))
+
+// 确认输入的原密码是否正确
+export const confirmPassword = (params) => axios.post('/api/password/confirm', qs.stringify(params))
+
+// 确认输入新密码
+export const newPassword = (params) => axios.post('/api/password/new', qs.stringify(params))
