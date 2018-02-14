@@ -427,11 +427,11 @@ export default {
         .then((data) => {
           data = data.data
           if (data.code !== 1) {
-            this.errorMsg(data.message)
+            this.errorMsg('移除角色成功')
             targetEl.checked = false
             return
           }
-          this.successMsg(data.message)
+          this.successMsg('添加角色成功')
         })
         .catch((err) => {
           this.errorMsg(err)
